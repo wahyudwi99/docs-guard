@@ -6,12 +6,11 @@ interface CanvasDisplayProps {
 
 export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ canvasRef }) => {
   return (
-    <div className="relative w-full max-w-2xl bg-gray-100 rounded-lg shadow-md overflow-hidden">
+    <div className="relative w-full overflow-hidden bg-white">
       <canvas
         ref={canvasRef}
-        className="w-full h-auto max-w-full" // Added max-w-full for responsiveness
+        className="w-full h-auto max-w-full block"
       />
     </div>
   );
 };
-;
