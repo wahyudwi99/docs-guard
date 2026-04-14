@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "dev": "npm --prefix docs-guard run dev",
+    "build": "npm --prefix docs-guard run build",
+    "start": "npm --prefix docs-guard run start",
+    "lint": "npm --prefix docs-guard run lint"
+  },
   "dependencies": {
     "@capacitor-community/media": "^9.1.0",
     "@capacitor/android": "^8.3.0",
