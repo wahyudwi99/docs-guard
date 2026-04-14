@@ -1,18 +1,23 @@
-import { useCallback } from "react";
+import { useCallback, RefObject } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
 
 interface UseFileExportProps {
-  canvas: HTMLCanvasElement | null;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
   watermarkText: string;
 }
 
-export function useFileExport({ canvas, watermarkText }: UseFileExportProps) {
+export function useFileExport({ canvasRef, watermarkText }: UseFileExportProps) {
   
   const getExportDataUrl = useCallback(() => {
-    if (!canvas) return null;
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error("Canvas current ref is null");
+      return null;
+    }
+    // Force quality 1.0 to ensure image is visible and high quality
     return canvas.toDataURL("image/png", 1.0);
-  }, [canvas]);
+  }, [canvasRef]);
 
   const saveToDevice = useCallback(async (imageDataUrl: string) => {
     const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.png`;
@@ -41,8 +46,6 @@ export function useFileExport({ canvas, watermarkText }: UseFileExportProps) {
     }
   }, [watermarkText]);
 
-  // Keep original exportImage for backward compatibility if needed, 
-  // but we'll use the separated functions in page.tsx
   const exportImage = useCallback(async () => {
     const url = getExportDataUrl();
     if (url) await saveToDevice(url);

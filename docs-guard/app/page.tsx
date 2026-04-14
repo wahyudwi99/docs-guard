@@ -36,17 +36,18 @@ export default function Home() {
 
   // Callback to redraw the current document (image or PDF page)
   const redrawDocument = useCallback(async () => {
-    if (!canvas || !context || !file || !documentType) return;
+    const currentCanvas = canvasRef.current;
+    if (!currentCanvas || !context || !file || !documentType) return;
 
     // Clear the canvas first
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, currentCanvas.width, currentCanvas.height);
 
     if (documentType === "image") {
       await drawImageOnCanvas(file);
     } else if (documentType === "pdf") {
       await drawPdfOnCanvas(file);
     }
-  }, [canvas, context, file, documentType, drawImageOnCanvas, drawPdfOnCanvas]);
+  }, [canvasRef, context, file, documentType, drawImageOnCanvas, drawPdfOnCanvas]);
 
   // Watermark management
   const {
@@ -58,22 +59,27 @@ export default function Home() {
     setWatermarkOpacity,
   } = useWatermark({ context, canvas, redrawDocument });
 
-  // File Export logic
-  const { getExportDataUrl, saveToDevice } = useFileExport({ canvas, watermarkText });
+  // File Export logic - Passing canvasRef directly
+  const { getExportDataUrl, saveToDevice } = useFileExport({ canvasRef, watermarkText });
 
   const handleOpenPreview = useCallback(async () => {
+    // Ensure everything is drawn before capturing
+    await redrawDocument();
+    
     const url = getExportDataUrl();
     if (url) {
+      console.log("Preview URL generated successfully");
       setPreviewUrl(url);
+    } else {
+      console.error("Failed to generate Preview URL");
     }
-  }, [getExportDataUrl]);
+  }, [getExportDataUrl, redrawDocument]);
 
   const handleFinalDownload = useCallback(async () => {
     if (!previewUrl) return;
     setIsSaving(true);
     const success = await saveToDevice(previewUrl);
     if (success) {
-      // Keep showing preview, but maybe add success feedback
       setTimeout(() => setIsSaving(false), 1000);
     } else {
       setIsSaving(false);
@@ -306,7 +312,7 @@ export default function Home() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-md" 
+            className="absolute inset-0 bg-black/80 backdrop-blur-lg" 
             onClick={() => setPreviewUrl(null)}
           ></div>
           
@@ -333,14 +339,15 @@ export default function Home() {
             </div>
 
             {/* Scrollable Preview Area */}
-            <div className="flex-1 overflow-auto bg-slate-100 p-8 flex items-center justify-center min-h-[300px]">
-              <div className="relative shadow-2xl shadow-black/20 rounded-xl overflow-hidden group">
+            <div className="flex-1 overflow-auto bg-slate-200/50 p-8 flex items-center justify-center min-h-[300px]">
+              <div className="relative shadow-2xl rounded-2xl overflow-hidden bg-white max-w-full">
                 <img 
                   src={previewUrl} 
                   alt="Watermarked Preview" 
-                  className="max-h-[60vh] w-auto object-contain bg-white"
+                  className="max-h-[60vh] h-auto w-auto max-w-full block object-contain mx-auto shadow-sm"
+                  onLoad={(e) => console.log("Image loaded in preview")}
+                  onError={(e) => console.error("Image failed to load in preview")}
                 />
-                <div className="absolute inset-0 border-4 border-white opacity-20 pointer-events-none rounded-xl"></div>
               </div>
             </div>
 
