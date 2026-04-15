@@ -7,6 +7,7 @@ export function useCanvas() {
   const registerCanvas = useCallback((el: HTMLCanvasElement | null, index: number) => {
     if (el) {
       setCanvases(prev => {
+        if (prev[index] === el) return prev; // Prevent infinite loop
         const newCanvases = [...prev];
         newCanvases[index] = el;
         return newCanvases;
