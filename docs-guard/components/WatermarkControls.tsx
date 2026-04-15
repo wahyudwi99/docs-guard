@@ -2,7 +2,8 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Type, Palette, Eye, AlignLeft, TextCursor, Hash } from "lucide-react";
+import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
   watermarkText: string;
@@ -15,6 +16,8 @@ interface WatermarkControlsProps {
   setFontFamily: (font: string) => void;
   fontSize: number;
   setFontSize: (size: number) => void;
+  orientation: "horizontal" | "diagonal" | "vertical";
+  setOrientation: (orientation: "horizontal" | "diagonal" | "vertical") => void;
 }
 
 const FONTS = [
@@ -34,6 +37,8 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   setFontFamily,
   fontSize,
   setFontSize,
+  orientation,
+  setOrientation,
 }) => {
   return (
     <div className="w-full space-y-8 p-1">
@@ -57,6 +62,31 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Orientation Switcher */}
+      <div className="space-y-3">
+        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+          <RotateCw className="h-3 w-3" />
+          Orientation
+        </label>
+        <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
+          {(["horizontal", "diagonal", "vertical"] as const).map((o) => (
+            <button
+              key={o}
+              onClick={() => setOrientation(o)}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold capitalize transition-all duration-300",
+                orientation === o 
+                  ? "bg-white text-indigo-600 shadow-sm" 
+                  : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {o}
+            </button>
+          ))}
+        </div>
+      </div>
+
 
       <div className="grid grid-cols-2 gap-4">
         {/* Font Family Selection */}

@@ -6,12 +6,15 @@ interface UseWatermarkProps {
   redrawDocument: (canvases: HTMLCanvasElement[]) => Promise<void>;
 }
 
+type Orientation = "horizontal" | "diagonal" | "vertical";
+
 export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [watermarkText, setWatermarkText] = useState("DocsGuard");
   const [watermarkColor, setWatermarkColor] = useState("#000000");
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.3);
   const [fontFamily, setFontFamily] = useState("Arial");
   const [fontSize, setFontSize] = useState(40); // Base font size
+  const [orientation, setOrientation] = useState<Orientation>("diagonal");
 
   const drawWatermark = useCallback(async () => {
     if (canvases.length === 0) return;
@@ -33,7 +36,10 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       context.textAlign = "center";
       context.textBaseline = "middle";
 
-      const angle = -Math.PI / 4;
+      // Orientation Logic
+      let angle = 0;
+      if (orientation === "diagonal") angle = -Math.PI / 4;
+      else if (orientation === "vertical") angle = -Math.PI / 2;
       
       // Calculate text metrics to avoid overlap
       const metrics = context.measureText(watermarkText);
@@ -50,6 +56,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       context.translate(-canvas.width / 2, -canvas.height / 2);
 
       // Draw repeating watermarks with dynamic spacing
+      // Increase drawing area to cover corners after rotation
       for (let i = -canvas.width * 2; i < canvas.width * 3; i += horizontalSpacing) {
         for (let j = -canvas.height * 2; j < canvas.height * 3; j += verticalSpacing) {
           context.fillText(watermarkText, i, j);
@@ -57,12 +64,12 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       }
       context.restore();
     });
-  }, [canvases, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, redrawDocument]);
+  }, [canvases, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, redrawDocument]);
 
   // Redraw watermark whenever its properties or document changes
   useEffect(() => {
     drawWatermark();
-  }, [watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, drawWatermark]);
+  }, [watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, drawWatermark]);
 
   return {
     watermarkText,
@@ -75,6 +82,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setFontFamily,
     fontSize,
     setFontSize,
+    orientation,
+    setOrientation,
     drawWatermark,
   };
 }

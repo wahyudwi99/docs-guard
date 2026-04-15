@@ -52,6 +52,8 @@ export default function Home() {
     setFontFamily,
     fontSize,
     setFontSize,
+    orientation,
+    setOrientation,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
 
@@ -201,8 +203,9 @@ export default function Home() {
                         setFontFamily={setFontFamily}
                         fontSize={fontSize}
                         setFontSize={setFontSize}
-                      />
-                      <div className="pt-4 space-y-4">
+                        orientation={orientation}
+                        setOrientation={setOrientation}
+                        />                      <div className="pt-4 space-y-4">
                          <button 
                            onClick={handleOpenPreview}
                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
