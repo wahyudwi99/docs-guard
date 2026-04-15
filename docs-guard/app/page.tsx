@@ -24,6 +24,7 @@ export default function Home() {
   const {
     file,
     documentType,
+    error,
     handleFileChange,
     drawImageOnCanvas,
     drawPdfOnCanvas,
@@ -179,6 +180,12 @@ export default function Home() {
                            </p>
                          </div>
                        </div>
+                       {error && (
+                         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 flex gap-3 text-rose-600 animate-in fade-in slide-in-from-top-2 duration-300">
+                           <X className="h-5 w-5 shrink-0" />
+                           <p className="text-xs font-bold leading-relaxed">{error}</p>
+                         </div>
+                       )}
                        <FileInput onFileChange={handleFileChange} />
                     </div>
                   ) : (

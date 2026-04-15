@@ -6,9 +6,12 @@ async function getPdfjsLib() {
     return null; // Don't load on server
   }
   const PDFJS = await import("pdfjs-dist");
-  // Set the worker source for pdfjs-dist
-  // This is a common requirement for pdfjs-dist to function correctly
-  PDFJS.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.min.js`;
+  
+  // Set the worker source for pdfjs-dist using a reliable CDN that matches the installed version
+  // Version 5.x uses .mjs for the worker
+  const version = PDFJS.version;
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+  
   return PDFJS;
 }
 
@@ -51,11 +54,13 @@ export async function renderPdfPageToCanvas(
  * @param src The URL or Blob of the PDF file.
  * @returns A Promise that resolves with the PDFDocumentProxy object.
  */
-export async function loadPdf(src: string | URL | Uint8Array): Promise<PDFDocumentProxy> {
+export async function loadPdf(src: Uint8Array): Promise<PDFDocumentProxy> {
   const PDFJS = await getPdfjsLib();
   if (!PDFJS) {
     throw new Error("pdfjs-dist not available on the server side.");
   }
-  const pdf = await PDFJS.getDocument(src).promise;
+  // For Uint8Array, it's safer to use the object form
+  const loadingTask = PDFJS.getDocument({ data: src });
+  const pdf = await loadingTask.promise;
   return pdf;
 }

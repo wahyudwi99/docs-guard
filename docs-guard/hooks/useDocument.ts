@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
-import { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
-import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf"; // Assuming @/lib/pdf resolves to docs-guard/lib/pdf.ts
+import { useState, useCallback } from "react";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
 
 type DocumentType = "image" | "pdf" | null;
 
@@ -13,11 +13,13 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const clearDocument = useCallback(() => {
     setFile(null);
     setDocumentType(null);
     setPdfDoc(null);
+    setError(null);
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -74,13 +76,21 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
     async (pdfFile: File) => {
       if (!canvas || !context) return;
 
-      const pdfDocument = await loadPdf(new Uint8Array(await pdfFile.arrayBuffer()));
-      setPdfDoc(pdfDocument);
+      try {
+        let pdfDocument = pdfDoc;
+        if (!pdfDocument) {
+          pdfDocument = await loadPdf(new Uint8Array(await pdfFile.arrayBuffer()));
+          setPdfDoc(pdfDocument);
+        }
 
-      // For simplicity, render the first page
-      await renderPdfPageToCanvas(pdfDocument, 1, canvas);
+        // For simplicity, render the first page
+        await renderPdfPageToCanvas(pdfDocument, 1, canvas);
+      } catch (err) {
+        console.error("Error drawing PDF:", err);
+        throw err; // Rethrow to be caught by handleFileChange
+      }
     },
-    [canvas, context]
+    [canvas, context, pdfDoc]
   );
 
   const handleFileChange = useCallback(
@@ -91,16 +101,27 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
         return;
       }
 
+      // Reset states for the new file
+      setError(null);
+      setPdfDoc(null);
       setFile(selectedFile);
-      if (selectedFile.type.startsWith("image/")) {
-        setDocumentType("image");
-        await drawImageOnCanvas(selectedFile);
-      } else if (selectedFile.type === "application/pdf") {
-        setDocumentType("pdf");
-        await drawPdfOnCanvas(selectedFile);
-      } else {
-        console.error("Unsupported file type:", selectedFile.type);
-        clearDocument();
+      
+      try {
+        if (selectedFile.type.startsWith("image/")) {
+          setDocumentType("image");
+          await drawImageOnCanvas(selectedFile);
+        } else if (selectedFile.type === "application/pdf") {
+          setDocumentType("pdf");
+          await drawPdfOnCanvas(selectedFile);
+        } else {
+          throw new Error(`Unsupported file type: ${selectedFile.type}`);
+        }
+      } catch (err) {
+        console.error("Error loading document:", err);
+        setError(err instanceof Error ? err.message : "Failed to load document");
+        setDocumentType(null);
+        setFile(null);
+        setPdfDoc(null);
       }
     },
     [clearDocument, drawImageOnCanvas, drawPdfOnCanvas]
@@ -110,9 +131,10 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
     file,
     documentType,
     pdfDoc,
+    error,
     handleFileChange,
     clearDocument,
-    drawImageOnCanvas, // Expose for re-drawing if needed (e.g., after watermark changes)
-    drawPdfOnCanvas,   // Expose for re-drawing if needed
+    drawImageOnCanvas,
+    drawPdfOnCanvas,
   };
 }
