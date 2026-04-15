@@ -1,4 +1,7 @@
-import { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist/types/src/display/api";
+import { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+
+// Track the current render task to cancel it if a new one starts
+let currentRenderTask: { cancel: () => void } | null = null;
 
 // Dynamically import pdfjs-dist and set worker source only on the client side
 async function getPdfjsLib() {
@@ -28,6 +31,12 @@ export async function renderPdfPageToCanvas(
   pageNumber: number,
   canvas: HTMLCanvasElement
 ): Promise<void> {
+  // Cancel any ongoing render task
+  if (currentRenderTask) {
+    currentRenderTask.cancel();
+    currentRenderTask = null;
+  }
+
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
   const viewport = page.getViewport({ scale: 1 }); // Initial scale to get original dimensions
 
@@ -43,11 +52,25 @@ export async function renderPdfPageToCanvas(
   const renderContext = {
     canvasContext: context,
     viewport: viewport,
-    canvas: canvas, // Add the canvas element here
+    canvas: canvas,
   };
 
-  await page.render(renderContext).promise;
-  page.cleanup(); // Clean up page resources.
+  const renderTask = page.render(renderContext);
+  currentRenderTask = renderTask;
+
+  try {
+    await renderTask.promise;
+    currentRenderTask = null;
+    page.cleanup(); // Clean up page resources.
+  } catch (error: any) {
+    // If it was cancelled, we don't want to throw an error up
+    if (error.name === "RenderingCancelledException") {
+      console.log("PDF rendering cancelled");
+    } else {
+      currentRenderTask = null;
+      throw error;
+    }
+  }
 }
 
 /**

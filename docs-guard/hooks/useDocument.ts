@@ -83,11 +83,14 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
           setPdfDoc(pdfDocument);
         }
 
-        // For simplicity, render the first page
+        // renderPdfPageToCanvas now handles its own internal cancellation logic
         await renderPdfPageToCanvas(pdfDocument, 1, canvas);
       } catch (err) {
-        console.error("Error drawing PDF:", err);
-        throw err; // Rethrow to be caught by handleFileChange
+        // Only report real errors, not cancellations
+        if (err instanceof Error && err.name !== "RenderingCancelledException") {
+          console.error("Error drawing PDF:", err);
+          throw err;
+        }
       }
     },
     [canvas, context, pdfDoc]
