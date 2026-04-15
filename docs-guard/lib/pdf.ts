@@ -6,13 +6,11 @@ async function getPdfjsLib() {
     return null; // Don't load on server
   }
   
-  // Directly import the mjs build to avoid issues with some bundlers
-  // and Next.js's default module resolution for pdfjs-dist.
-  const PDFJS = await import("pdfjs-dist/build/pdf.mjs");
+  // Try importing the minified mjs build
+  const PDFJS = await import("pdfjs-dist/build/pdf.min.mjs");
   
-  // Set the worker source for pdfjs-dist using a reliable CDN that matches the installed version
-  // Version 5.x uses .mjs for the worker
-  const version = "5.6.205"; // Hardcode version to match package.json to be safer
+  // Set the worker source
+  const version = "5.6.205";
   PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
   
   return PDFJS;
