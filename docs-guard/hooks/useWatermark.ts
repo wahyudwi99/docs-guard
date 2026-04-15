@@ -40,9 +40,9 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       const textWidth = metrics.width;
       const textHeight = responsiveFontSize;
       
-      // Dynamic grid size based on text dimensions + padding
-      const horizontalSpacing = textWidth * 1.5 + 50; 
-      const verticalSpacing = textHeight * 4 + 50;
+      // Compact but safe spacing
+      const horizontalSpacing = textWidth + 100; 
+      const verticalSpacing = textHeight + 150; 
 
       context.translate(canvas.width / 2, canvas.height / 2);
       context.rotate(angle);
