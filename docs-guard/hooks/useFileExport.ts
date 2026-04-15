@@ -12,7 +12,9 @@ interface UseFileExportProps {
 export function useFileExport({ canvases, watermarkText, documentType }: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(() => {
-    return canvases.map(canvas => canvas.toDataURL("image/png", 0.8));
+    if (canvases.length === 0) return [];
+    // Only return the first page for preview as requested
+    return [canvases[0].toDataURL("image/png", 0.8)];
   }, [canvases]);
 
   const saveToDevice = useCallback(async () => {

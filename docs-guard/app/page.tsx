@@ -330,7 +330,7 @@ export default function Home() {
                  </div>
                  <div>
                    <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to Secure</h3>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Final Preview ({previewUrls.length} pages)</p>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Preview (First Page Only)</p>
                  </div>
               </div>
               <button 
@@ -351,17 +351,20 @@ export default function Home() {
                     className="h-auto w-auto max-w-full block object-contain shadow-sm"
                   />
                   <div className="absolute top-4 right-4 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur-md font-bold">
-                    Page {index + 1}
+                    Sample Page {index + 1}
                   </div>
                 </div>
               ))}
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/80 px-4 py-2 rounded-full shadow-sm">
+                Watermark will be applied to all {numPages} pages upon download
+              </p>
             </div>
 
             {/* Footer Actions */}
             <div className="p-8 bg-white border-t border-slate-100 flex flex-col md:flex-row gap-4">
               <div className="flex-1 flex flex-col justify-center">
                  <p className="text-sm font-bold text-slate-900">Final Verification</p>
-                 <p className="text-xs font-medium text-slate-400 leading-relaxed">Check if the watermark placement on all pages is correct.</p>
+                 <p className="text-xs font-medium text-slate-400 leading-relaxed">Previewing the first page as a sample. Download to apply to all pages.</p>
               </div>
               <div className="flex gap-4">
                 <button 
