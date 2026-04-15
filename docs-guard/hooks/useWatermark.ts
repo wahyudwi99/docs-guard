@@ -37,12 +37,13 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       
       // Calculate text metrics to avoid overlap
       const metrics = context.measureText(watermarkText);
+      const spaceWidth = context.measureText("  ").width; // Exact 2 spaces width
       const textWidth = metrics.width;
       const textHeight = responsiveFontSize;
       
-      // Compact but safe spacing
-      const horizontalSpacing = textWidth + 100; 
-      const verticalSpacing = textHeight + 150; 
+      // Extremely tight but safe spacing
+      const horizontalSpacing = textWidth + spaceWidth; 
+      const verticalSpacing = textHeight * 2.5; // Enough for 3+ lines on any standard page
 
       context.translate(canvas.width / 2, canvas.height / 2);
       context.rotate(angle);
