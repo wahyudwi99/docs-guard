@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 export default function Home() {
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
   const [activeTab, setActiveTab] = useState<'upload' | 'design'>( 'upload');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Document management
@@ -52,16 +52,29 @@ export default function Home() {
   } = useWatermark({ canvases, redrawDocument });
 
   // File Export logic - Passing canvases array
-  const { saveToDevice } = useFileExport({ 
+  const { getPreviewUrls, saveToDevice } = useFileExport({ 
     canvases, 
     watermarkText,
     documentType 
   });
 
+  const handleOpenPreview = useCallback(async () => {
+    // Ensure everything is drawn before capturing
+    await drawWatermark();
+    
+    const urls = getPreviewUrls();
+    if (urls && urls.length > 0) {
+      setPreviewUrls(urls);
+    } else {
+      console.error("Failed to generate Preview URLs");
+    }
+  }, [getPreviewUrls, drawWatermark]);
+
   const handleFinalDownload = useCallback(async () => {
     setIsSaving(true);
     const success = await saveToDevice();
     setIsSaving(false);
+    if (success) setPreviewUrls([]); // Clear preview after successful download
   }, [saveToDevice]);
 
   return (
@@ -187,15 +200,11 @@ export default function Home() {
 
                         <div className="pt-4 space-y-4">
                            <button 
-                             onClick={handleFinalDownload}
-                             disabled={isSaving}
-                             className={cn(
-                               "w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2",
-                               isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
-                             )}
+                             onClick={handleOpenPreview}
+                             className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
                            >
-                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
-                             {isSaving ? "Processing..." : "Export & Download"}
+                             <Sparkles className="h-4 w-4" />
+                             Generate Preview
                            </button>
                            <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                               <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -300,6 +309,83 @@ export default function Home() {
           </section>
         </div>
       </main>
+
+      {/* Preview Modal Overlay */}
+      {previewUrls.length > 0 && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-lg" 
+            onClick={() => setPreviewUrls([])}
+          ></div>
+          
+          {/* Modal Container */}
+          <div className="relative w-full max-w-4xl bg-white rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                 <div className="h-10 w-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
+                   <CheckCircle2 className="h-6 w-6" />
+                 </div>
+                 <div>
+                   <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to Secure</h3>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Final Preview ({previewUrls.length} pages)</p>
+                 </div>
+              </div>
+              <button 
+                onClick={() => setPreviewUrls([])}
+                className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Preview Area */}
+            <div className="flex-1 overflow-auto bg-slate-200/50 p-8 flex flex-col items-center gap-8 min-h-[300px] custom-scrollbar">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative shadow-2xl rounded-2xl overflow-hidden bg-white max-w-full">
+                  <img 
+                    src={url} 
+                    alt={`Watermarked Preview Page ${index + 1}`} 
+                    className="h-auto w-auto max-w-full block object-contain shadow-sm"
+                  />
+                  <div className="absolute top-4 right-4 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur-md font-bold">
+                    Page {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="p-8 bg-white border-t border-slate-100 flex flex-col md:flex-row gap-4">
+              <div className="flex-1 flex flex-col justify-center">
+                 <p className="text-sm font-bold text-slate-900">Final Verification</p>
+                 <p className="text-xs font-medium text-slate-400 leading-relaxed">Check if the watermark placement on all pages is correct.</p>
+              </div>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setPreviewUrls([])}
+                  className="px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-xs uppercase tracking-widest"
+                >
+                  Edit Again
+                </button>
+                <button 
+                  onClick={handleFinalDownload}
+                  disabled={isSaving}
+                  className={cn(
+                    "px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
+                    isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
+                  )}
+                >
+                  <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
+                  {isSaving ? "Saving..." : `Download ${documentType === 'pdf' ? 'PDF' : 'PNG'}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modern Mini Footer */}
       <footer className="max-w-5xl mx-auto w-full px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-200/60 mt-8 relative z-10">

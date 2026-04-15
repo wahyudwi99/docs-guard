@@ -11,6 +11,10 @@ interface UseFileExportProps {
 
 export function useFileExport({ canvases, watermarkText, documentType }: UseFileExportProps) {
   
+  const getPreviewUrls = useCallback(() => {
+    return canvases.map(canvas => canvas.toDataURL("image/png", 0.8));
+  }, [canvases]);
+
   const saveToDevice = useCallback(async () => {
     if (canvases.length === 0) return false;
 
@@ -57,5 +61,5 @@ export function useFileExport({ canvases, watermarkText, documentType }: UseFile
     }
   }, [canvases, watermarkText, documentType]);
 
-  return { saveToDevice };
+  return { getPreviewUrls, saveToDevice };
 }
