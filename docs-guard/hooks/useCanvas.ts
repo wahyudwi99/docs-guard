@@ -14,13 +14,16 @@ export function useCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
+  // Check for canvas and context on every render to catch it when it appears in the DOM
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
+    if (canvas && !context) {
       const renderContext = canvas.getContext("2d");
-      setContext(renderContext);
+      if (renderContext) {
+        setContext(renderContext);
+      }
     }
-  }, []);
+  });
 
   const clearCanvas = useCallback(() => {
     if (context && canvasRef.current) {

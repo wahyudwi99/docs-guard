@@ -14,4 +14,3 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ canvasRef }) => {
     </div>
   );
 };
-;

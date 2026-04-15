@@ -57,6 +57,7 @@ export default function Home() {
     setWatermarkColor,
     watermarkOpacity,
     setWatermarkOpacity,
+    drawWatermark,
   } = useWatermark({ context, canvas, redrawDocument });
 
   // File Export logic - Passing canvasRef directly
@@ -64,7 +65,7 @@ export default function Home() {
 
   const handleOpenPreview = useCallback(async () => {
     // Ensure everything is drawn before capturing
-    await redrawDocument();
+    await drawWatermark();
     
     const url = getExportDataUrl();
     if (url) {
@@ -73,7 +74,7 @@ export default function Home() {
     } else {
       console.error("Failed to generate Preview URL");
     }
-  }, [getExportDataUrl, redrawDocument]);
+  }, [getExportDataUrl, drawWatermark]);
 
   const handleFinalDownload = useCallback(async () => {
     if (!previewUrl) return;
