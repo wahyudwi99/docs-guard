@@ -44,6 +44,8 @@ export default function Home() {
   const {
     watermarkMode,
     setWatermarkMode,
+    watermarkLayout,
+    setWatermarkLayout,
     watermarkText,
     setWatermarkText,
     watermarkColor,
@@ -200,6 +202,8 @@ export default function Home() {
                      <WatermarkControls
                         watermarkMode={watermarkMode}
                         setWatermarkMode={setWatermarkMode}
+                        watermarkLayout={watermarkLayout}
+                        setWatermarkLayout={setWatermarkLayout}
                         watermarkText={watermarkText}
                         setWatermarkText={setWatermarkText}
                         watermarkColor={watermarkColor}

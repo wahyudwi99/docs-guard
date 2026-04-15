@@ -2,12 +2,14 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as ImageIcon, Upload } from "lucide-react";
+import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as ImageIcon, Upload, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
   watermarkMode: "text" | "image";
   setWatermarkMode: (mode: "text" | "image") => void;
+  watermarkLayout: "tiled" | "single";
+  setWatermarkLayout: (layout: "tiled" | "single") => void;
   watermarkText: string;
   setWatermarkText: (text: string) => void;
   watermarkColor: string;
@@ -34,6 +36,8 @@ const FONTS = [
 export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   watermarkMode,
   setWatermarkMode,
+  watermarkLayout,
+  setWatermarkLayout,
   watermarkText,
   setWatermarkText,
   watermarkColor,
@@ -62,34 +66,62 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   return (
     <div className="w-full space-y-6 p-1">
       {/* Mode Switcher */}
-      <div className="space-y-3">
-        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
-          <ImageIcon className="h-3.5 w-3.5" />
-          Watermark Type
-        </label>
-        <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
-          <button
-            onClick={() => setWatermarkMode("text")}
-            className={cn(
-              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "text" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <Type className="h-3 w-3" />
-            Text
-          </button>
-          <button
-            onClick={() => setWatermarkMode("image")}
-            className={cn(
-              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "image" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <ImageIcon className="h-3 w-3" />
-            Image
-          </button>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <ImageIcon className="h-3.5 w-3.5" />
+            Type
+          </label>
+          <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
+            <button
+              onClick={() => setWatermarkMode("text")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkMode === "text" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Text
+            </button>
+            <button
+              onClick={() => setWatermarkMode("image")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkMode === "image" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Image
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <LayoutGrid className="h-3.5 w-3.5" />
+            Layout
+          </label>
+          <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
+            <button
+              onClick={() => setWatermarkLayout("tiled")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkLayout === "tiled" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Tiled
+            </button>
+            <button
+              onClick={() => setWatermarkLayout("single")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkLayout === "single" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Single
+            </button>
+          </div>
         </div>
       </div>
+
 
       {watermarkMode === "text" ? (
         <>
