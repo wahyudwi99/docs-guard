@@ -5,31 +5,56 @@ import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
 type DocumentType = "image" | "pdf" | null;
 
 interface UseDocumentProps {
-  canvas: HTMLCanvasElement | null;
-  context: CanvasRenderingContext2D | null;
+  canvases: HTMLCanvasElement[];
 }
 
-export function useDocument({ canvas, context }: UseDocumentProps) {
+export function useDocument({ canvases }: UseDocumentProps) {
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
+  const [numPages, setNumPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const clearDocument = useCallback(() => {
     setFile(null);
     setDocumentType(null);
     setPdfDoc(null);
+    setNumPages(0);
     setError(null);
-    if (context && canvas) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }, [canvas, context]);
+  }, []);
 
   const loadImage = useCallback(
-    async (imageFile: File) => {
-      return new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
+    async (imageFile: File, canvas: HTMLCanvasElement) => {
+      const img = new Image();
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      return new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          const maxWidth = 800;
+          const maxHeight = 600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          context.clearRect(0, 0, width, height);
+          context.drawImage(img, 0, 0, width, height);
+          URL.revokeObjectURL(img.src);
+          resolve();
+        };
         img.onerror = reject;
         img.src = URL.createObjectURL(imageFile);
       });
@@ -37,63 +62,38 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
     []
   );
 
-  const drawImageOnCanvas = useCallback(
-    async (imageFile: File) => {
-      if (!canvas || !context) return;
-
-      const img = await loadImage(imageFile);
-
-      // Calculate aspect ratio to fit the image within a reasonable canvas size
-      const maxWidth = 800; // Max width for display
-      const maxHeight = 600; // Max height for display
-
-      let width = img.width;
-      let height = img.height;
-
-      if (width > height) {
-        if (width > maxWidth) {
-          height *= maxWidth / width;
-          width = maxWidth;
-        }
-      } else {
-        if (height > maxHeight) {
-          width *= maxHeight / height;
-          height = maxHeight;
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(img.src); // Clean up the object URL
-    },
-    [canvas, context, loadImage]
-  );
-
-  const drawPdfOnCanvas = useCallback(
-    async (pdfFile: File) => {
-      if (!canvas || !context) return;
+  const drawDocumentOnCanvases = useCallback(
+    async (selectedFile: File, currentCanvases: HTMLCanvasElement[]) => {
+      if (currentCanvases.length === 0) return;
 
       try {
-        let pdfDocument = pdfDoc;
-        if (!pdfDocument) {
-          pdfDocument = await loadPdf(new Uint8Array(await pdfFile.arrayBuffer()));
-          setPdfDoc(pdfDocument);
-        }
+        if (selectedFile.type.startsWith("image/")) {
+          await loadImage(selectedFile, currentCanvases[0]);
+        } else if (selectedFile.type === "application/pdf") {
+          let doc = pdfDoc;
+          if (!doc) {
+            doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
+            setPdfDoc(doc);
+            setNumPages(doc.numPages);
+          }
 
-        // renderPdfPageToCanvas now handles its own internal cancellation logic
-        await renderPdfPageToCanvas(pdfDocument, 1, canvas);
+          // Wait for all pages to render if canvases are available
+          const renderPromises = [];
+          for (let i = 1; i <= doc.numPages; i++) {
+            if (currentCanvases[i - 1]) {
+              renderPromises.push(renderPdfPageToCanvas(doc, i, currentCanvases[i - 1]));
+            }
+          }
+          await Promise.all(renderPromises);
+        }
       } catch (err) {
-        // Only report real errors, not cancellations
         if (err instanceof Error && err.name !== "RenderingCancelledException") {
-          console.error("Error drawing PDF:", err);
+          console.error("Error drawing document:", err);
           throw err;
         }
       }
     },
-    [canvas, context, pdfDoc]
+    [loadImage, pdfDoc]
   );
 
   const handleFileChange = useCallback(
@@ -104,7 +104,6 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
         return;
       }
 
-      // Reset states for the new file
       setError(null);
       setPdfDoc(null);
       setFile(selectedFile);
@@ -112,10 +111,12 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
       try {
         if (selectedFile.type.startsWith("image/")) {
           setDocumentType("image");
-          await drawImageOnCanvas(selectedFile);
+          setNumPages(1);
         } else if (selectedFile.type === "application/pdf") {
           setDocumentType("pdf");
-          await drawPdfOnCanvas(selectedFile);
+          const doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
+          setPdfDoc(doc);
+          setNumPages(doc.numPages);
         } else {
           throw new Error(`Unsupported file type: ${selectedFile.type}`);
         }
@@ -125,19 +126,20 @@ export function useDocument({ canvas, context }: UseDocumentProps) {
         setDocumentType(null);
         setFile(null);
         setPdfDoc(null);
+        setNumPages(0);
       }
     },
-    [clearDocument, drawImageOnCanvas, drawPdfOnCanvas]
+    [clearDocument]
   );
 
   return {
     file,
     documentType,
     pdfDoc,
+    numPages,
     error,
     handleFileChange,
     clearDocument,
-    drawImageOnCanvas,
-    drawPdfOnCanvas,
+    drawDocumentOnCanvases,
   };
 }

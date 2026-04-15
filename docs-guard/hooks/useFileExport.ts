@@ -1,55 +1,61 @@
-import { useCallback, RefObject } from "react";
+import { useCallback } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
+import { jsPDF } from "jspdf";
 
 interface UseFileExportProps {
-  canvasRef: RefObject<HTMLCanvasElement | null>;
+  canvases: HTMLCanvasElement[];
   watermarkText: string;
+  documentType: "image" | "pdf" | null;
 }
 
-export function useFileExport({ canvasRef, watermarkText }: UseFileExportProps) {
+export function useFileExport({ canvases, watermarkText, documentType }: UseFileExportProps) {
   
-  const getExportDataUrl = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      console.error("Canvas current ref is null");
-      return null;
-    }
-    // Force quality 1.0 to ensure image is visible and high quality
-    return canvas.toDataURL("image/png", 1.0);
-  }, [canvasRef]);
-
-  const saveToDevice = useCallback(async (imageDataUrl: string) => {
-    const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.png`;
+  const saveToDevice = useCallback(async () => {
+    if (canvases.length === 0) return false;
 
     try {
-      if (!isCapacitorApp()) {
-        // On web
-        const blob = await (await fetch(imageDataUrl)).blob();
-        saveAndOpenBlob(blob, fileName, "image/png");
-      } else {
-        // On mobile
-        const base64Data = imageDataUrl.split(",")[1];
-        await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: Directory.Documents,
-          recursive: true,
+      if (documentType === "pdf") {
+        const pdf = new jsPDF({
+          orientation: canvases[0].width > canvases[0].height ? "l" : "p",
+          unit: "px",
+          format: [canvases[0].width, canvases[0].height]
         });
-        alert(`Image saved to ${fileName} in Documents folder.`);
+
+        canvases.forEach((canvas, index) => {
+          if (index > 0) {
+            pdf.addPage([canvas.width, canvas.height], canvas.width > canvas.height ? "l" : "p");
+          }
+          pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
+        });
+
+        const pdfBlob = pdf.output("blob");
+        const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.pdf`;
+        saveAndOpenBlob(pdfBlob, fileName, "application/pdf");
+      } else {
+        const canvas = canvases[0];
+        const imageDataUrl = canvas.toDataURL("image/png", 1.0);
+        const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.png`;
+
+        if (!isCapacitorApp()) {
+          const blob = await (await fetch(imageDataUrl)).blob();
+          saveAndOpenBlob(blob, fileName, "image/png");
+        } else {
+          const base64Data = imageDataUrl.split(",")[1];
+          await Filesystem.writeFile({
+            path: fileName,
+            data: base64Data,
+            directory: Directory.Documents,
+            recursive: true,
+          });
+        }
       }
       return true;
     } catch (error) {
-      console.error("Error saving image:", error);
-      alert("Failed to save image.");
+      console.error("Error saving file:", error);
       return false;
     }
-  }, [watermarkText]);
+  }, [canvases, watermarkText, documentType]);
 
-  const exportImage = useCallback(async () => {
-    const url = getExportDataUrl();
-    if (url) await saveToDevice(url);
-  }, [getExportDataUrl, saveToDevice]);
-
-  return { exportImage, getExportDataUrl, saveToDevice };
+  return { saveToDevice };
 }

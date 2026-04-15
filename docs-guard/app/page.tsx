@@ -14,8 +14,7 @@ import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRi
 import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const { canvasRef, context } = useCanvas();
-  const canvas = canvasRef.current;
+  const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
   const [activeTab, setActiveTab] = useState<'upload' | 'design'>( 'upload');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -24,31 +23,22 @@ export default function Home() {
   const {
     file,
     documentType,
+    numPages,
     error,
     handleFileChange,
-    drawImageOnCanvas,
-    drawPdfOnCanvas,
-  } = useDocument({ canvas, context });
+    drawDocumentOnCanvases,
+  } = useDocument({ canvases });
 
   // Switch to design tab when file is uploaded
   useEffect(() => {
     if (file) setActiveTab('design');
   }, [file]);
 
-  // Callback to redraw the current document (image or PDF page)
-  const redrawDocument = useCallback(async () => {
-    const currentCanvas = canvasRef.current;
-    if (!currentCanvas || !context || !file || !documentType) return;
-
-    // Clear the canvas first
-    context.clearRect(0, 0, currentCanvas.width, currentCanvas.height);
-
-    if (documentType === "image") {
-      await drawImageOnCanvas(file);
-    } else if (documentType === "pdf") {
-      await drawPdfOnCanvas(file);
-    }
-  }, [canvasRef, context, file, documentType, drawImageOnCanvas, drawPdfOnCanvas]);
+  // Callback to redraw the current document (image or PDF pages)
+  const redrawDocument = useCallback(async (currentCanvases: HTMLCanvasElement[]) => {
+    if (!file || !documentType || currentCanvases.length === 0) return;
+    await drawDocumentOnCanvases(file, currentCanvases);
+  }, [file, documentType, drawDocumentOnCanvases]);
 
   // Watermark management
   const {
@@ -59,34 +49,20 @@ export default function Home() {
     watermarkOpacity,
     setWatermarkOpacity,
     drawWatermark,
-  } = useWatermark({ context, canvas, redrawDocument });
+  } = useWatermark({ canvases, redrawDocument });
 
-  // File Export logic - Passing canvasRef directly
-  const { getExportDataUrl, saveToDevice } = useFileExport({ canvasRef, watermarkText });
-
-  const handleOpenPreview = useCallback(async () => {
-    // Ensure everything is drawn before capturing
-    await drawWatermark();
-    
-    const url = getExportDataUrl();
-    if (url) {
-      console.log("Preview URL generated successfully");
-      setPreviewUrl(url);
-    } else {
-      console.error("Failed to generate Preview URL");
-    }
-  }, [getExportDataUrl, drawWatermark]);
+  // File Export logic - Passing canvases array
+  const { saveToDevice } = useFileExport({ 
+    canvases, 
+    watermarkText,
+    documentType 
+  });
 
   const handleFinalDownload = useCallback(async () => {
-    if (!previewUrl) return;
     setIsSaving(true);
-    const success = await saveToDevice(previewUrl);
-    if (success) {
-      setTimeout(() => setIsSaving(false), 1000);
-    } else {
-      setIsSaving(false);
-    }
-  }, [previewUrl, saveToDevice]);
+    const success = await saveToDevice();
+    setIsSaving(false);
+  }, [saveToDevice]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -210,7 +186,17 @@ export default function Home() {
                         />
 
                         <div className="pt-4 space-y-4">
-                           <ExportButton onExport={handleOpenPreview} className="w-full" />
+                           <button 
+                             onClick={handleFinalDownload}
+                             disabled={isSaving}
+                             className={cn(
+                               "w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2",
+                               isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
+                             )}
+                           >
+                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
+                             {isSaving ? "Processing..." : "Export & Download"}
+                           </button>
                            <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                               <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
                               <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">End-to-End Secure</span>
@@ -299,7 +285,7 @@ export default function Home() {
                         <div className="absolute inset-0 bg-indigo-500/10 rounded-[20px] blur-3xl group-hover/canvas:bg-indigo-500/20 transition-all duration-700"></div>
                         <div className="relative shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] bg-white p-2 rounded-[24px] transition-transform duration-500 group-hover/canvas:scale-[1.005]">
                            <div className="rounded-[18px] overflow-hidden border border-black/[0.03]">
-                             <CanvasDisplay canvasRef={canvasRef} />
+                             <CanvasDisplay numPages={numPages} registerCanvas={registerCanvas} />
                            </div>
                            
                            {/* Decorative Document Edges */}
@@ -314,80 +300,6 @@ export default function Home() {
           </section>
         </div>
       </main>
-
-      {/* Preview Modal Overlay */}
-      {previewUrl && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-lg" 
-            onClick={() => setPreviewUrl(null)}
-          ></div>
-          
-          {/* Modal Container */}
-          <div className="relative w-full max-w-4xl bg-white rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col max-h-[90vh]">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                 <div className="h-10 w-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
-                   <CheckCircle2 className="h-6 w-6" />
-                 </div>
-                 <div>
-                   <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to Secure</h3>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Final Preview</p>
-                 </div>
-              </div>
-              <button 
-                onClick={() => setPreviewUrl(null)}
-                className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Scrollable Preview Area */}
-            <div className="flex-1 overflow-auto bg-slate-200/50 p-8 flex items-center justify-center min-h-[300px]">
-              <div className="relative shadow-2xl rounded-2xl overflow-hidden bg-white max-w-full">
-                <img 
-                  src={previewUrl} 
-                  alt="Watermarked Preview" 
-                  className="max-h-[60vh] h-auto w-auto max-w-full block object-contain mx-auto shadow-sm"
-                  onLoad={(e) => console.log("Image loaded in preview")}
-                  onError={(e) => console.error("Image failed to load in preview")}
-                />
-              </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="p-8 bg-white border-t border-slate-100 flex flex-col md:flex-row gap-4">
-              <div className="flex-1 flex flex-col justify-center">
-                 <p className="text-sm font-bold text-slate-900">Final Verification</p>
-                 <p className="text-xs font-medium text-slate-400 leading-relaxed">Check if the watermark placement and text are correct before saving.</p>
-              </div>
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => setPreviewUrl(null)}
-                  className="px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-xs uppercase tracking-widest"
-                >
-                  Edit Again
-                </button>
-                <button 
-                  onClick={handleFinalDownload}
-                  disabled={isSaving}
-                  className={cn(
-                    "px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
-                    isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
-                  )}
-                >
-                  <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
-                  {isSaving ? "Saving..." : "Download Now"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modern Mini Footer */}
       <footer className="max-w-5xl mx-auto w-full px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-200/60 mt-8 relative z-10">
