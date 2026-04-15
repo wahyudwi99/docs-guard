@@ -48,6 +48,10 @@ export default function Home() {
     setWatermarkColor,
     watermarkOpacity,
     setWatermarkOpacity,
+    fontFamily,
+    setFontFamily,
+    fontSize,
+    setFontSize,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
 
@@ -193,8 +197,11 @@ export default function Home() {
                         setWatermarkColor={setWatermarkColor}
                         watermarkOpacity={watermarkOpacity}
                         setWatermarkOpacity={setWatermarkOpacity}
+                        fontFamily={fontFamily}
+                        setFontFamily={setFontFamily}
+                        fontSize={fontSize}
+                        setFontSize={setFontSize}
                       />
-
                       <div className="pt-4 space-y-4">
                          <button 
                            onClick={handleOpenPreview}

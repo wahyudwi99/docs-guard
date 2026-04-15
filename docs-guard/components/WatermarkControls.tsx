@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Type, Palette, Eye, AlignLeft } from "lucide-react";
+import { Type, Palette, Eye, AlignLeft, TextCursor, Hash } from "lucide-react";
 
 interface WatermarkControlsProps {
   watermarkText: string;
@@ -11,7 +11,17 @@ interface WatermarkControlsProps {
   setWatermarkColor: (color: string) => void;
   watermarkOpacity: number;
   setWatermarkOpacity: (opacity: number) => void;
+  fontFamily: string;
+  setFontFamily: (font: string) => void;
+  fontSize: number;
+  setFontSize: (size: number) => void;
 }
+
+const FONTS = [
+  "Arial", "Helvetica", "Times New Roman", "Courier New", "Georgia", 
+  "Palatino", "Garamond", "Bookman", "Comic Sans MS", "Trebuchet MS", 
+  "Arial Black", "Impact"
+];
 
 export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   watermarkText,
@@ -20,6 +30,10 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   setWatermarkColor,
   watermarkOpacity,
   setWatermarkOpacity,
+  fontFamily,
+  setFontFamily,
+  fontSize,
+  setFontSize,
 }) => {
   return (
     <div className="w-full space-y-8 p-1">
@@ -40,6 +54,44 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
             <AlignLeft className="h-4 w-4" />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* Font Family Selection */}
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <TextCursor className="h-3 w-3" />
+            Typeface
+          </label>
+          <select 
+            value={fontFamily}
+            onChange={(e) => setFontFamily(e.target.value)}
+            className="w-full h-12 px-4 bg-black/5 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-xs font-bold text-slate-600 appearance-none cursor-pointer"
+          >
+            {FONTS.map(font => (
+              <option key={font} value={font} style={{ fontFamily: font }}>{font}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Font Size Control */}
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <Hash className="h-3 w-3" />
+            Scale
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-black/5 p-4 rounded-2xl">
+              <Slider
+                min={10}
+                max={200}
+                step={1}
+                value={fontSize}
+                onValueChange={setFontSize}
+              />
+            </div>
           </div>
         </div>
       </div>

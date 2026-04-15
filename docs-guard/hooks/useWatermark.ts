@@ -10,6 +10,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [watermarkText, setWatermarkText] = useState("DocsGuard");
   const [watermarkColor, setWatermarkColor] = useState("#000000");
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.3);
+  const [fontFamily, setFontFamily] = useState("Arial");
+  const [fontSize, setFontSize] = useState(40); // Base font size
 
   const drawWatermark = useCallback(async () => {
     if (canvases.length === 0) return;
@@ -24,30 +26,42 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       context.save();
       context.globalAlpha = watermarkOpacity;
       context.fillStyle = watermarkColor;
-      context.font = `${canvas.width / 15}px Arial`;
+      
+      // Responsive font size based on canvas width vs base size
+      const responsiveFontSize = (canvas.width / 800) * fontSize;
+      context.font = `${responsiveFontSize}px ${fontFamily}`;
       context.textAlign = "center";
       context.textBaseline = "middle";
 
       const angle = -Math.PI / 4;
-      const gridSize = canvas.width / 3;
+      
+      // Calculate text metrics to avoid overlap
+      const metrics = context.measureText(watermarkText);
+      const textWidth = metrics.width;
+      const textHeight = responsiveFontSize;
+      
+      // Dynamic grid size based on text dimensions + padding
+      const horizontalSpacing = textWidth * 1.5 + 50; 
+      const verticalSpacing = textHeight * 4 + 50;
 
       context.translate(canvas.width / 2, canvas.height / 2);
       context.rotate(angle);
       context.translate(-canvas.width / 2, -canvas.height / 2);
 
-      for (let i = -canvas.width; i < canvas.width * 2; i += gridSize) {
-        for (let j = -canvas.height; j < canvas.height * 2; j += gridSize) {
+      // Draw repeating watermarks with dynamic spacing
+      for (let i = -canvas.width * 2; i < canvas.width * 3; i += horizontalSpacing) {
+        for (let j = -canvas.height * 2; j < canvas.height * 3; j += verticalSpacing) {
           context.fillText(watermarkText, i, j);
         }
       }
       context.restore();
     });
-  }, [canvases, watermarkText, watermarkColor, watermarkOpacity, redrawDocument]);
+  }, [canvases, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, redrawDocument]);
 
   // Redraw watermark whenever its properties or document changes
   useEffect(() => {
     drawWatermark();
-  }, [watermarkText, watermarkColor, watermarkOpacity, drawWatermark]);
+  }, [watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, drawWatermark]);
 
   return {
     watermarkText,
@@ -56,6 +70,10 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setWatermarkColor,
     watermarkOpacity,
     setWatermarkOpacity,
+    fontFamily,
+    setFontFamily,
+    fontSize,
+    setFontSize,
     drawWatermark,
   };
 }
