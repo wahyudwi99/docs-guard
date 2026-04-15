@@ -42,6 +42,8 @@ export default function Home() {
 
   // Watermark management
   const {
+    watermarkMode,
+    setWatermarkMode,
     watermarkText,
     setWatermarkText,
     watermarkColor,
@@ -54,6 +56,9 @@ export default function Home() {
     setFontSize,
     orientation,
     setOrientation,
+    setWatermarkImage,
+    imageScale,
+    setImageScale,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
 
@@ -193,6 +198,8 @@ export default function Home() {
                      </div>
                      
                      <WatermarkControls
+                        watermarkMode={watermarkMode}
+                        setWatermarkMode={setWatermarkMode}
                         watermarkText={watermarkText}
                         setWatermarkText={setWatermarkText}
                         watermarkColor={watermarkColor}
@@ -205,7 +212,10 @@ export default function Home() {
                         setFontSize={setFontSize}
                         orientation={orientation}
                         setOrientation={setOrientation}
-                        />                      <div className="pt-4 space-y-4">
+                        setWatermarkImage={setWatermarkImage}
+                        imageScale={imageScale}
+                        setImageScale={setImageScale}
+                      />                      <div className="pt-4 space-y-4">
                          <button 
                            onClick={handleOpenPreview}
                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
