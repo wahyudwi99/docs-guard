@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "ローカルプライバシー",
+    "lab": "保護ラボ",
+    "tools": "セキュアツール"
+  },
+  "tabs": {
+    "upload": "アップロード",
+    "design": "デザイン",
+    "subscription": "サブスクリプション",
+    "pro_active": "プロ有効",
+    "go_pro": "プロにアップグレード"
+  },
+  "upload_section": {
+    "select_doc": "開始するにはドキュメントを選択してください。ファイルはローカルで処理され、サーバーにアップロードされることはありません。",
+    "privacy_note": "ファイルはローカルで処理され、サーバーにアップロードされることはありません。",
+    "error_no_file": "最初にファイルを選択してください",
+    "import_title": "ドキュメントをインポート",
+    "drag_drop": "ドラッグ＆ドロップまたは{browse}",
+    "browse": "ファイルを選択",
+    "pdf": "PDF",
+    "image": "画像"
+  },
+  "design_section": {
+    "appearance": "外観",
+    "new_file": "新しいファイル",
+    "generate_preview": "プレビューを生成",
+    "secure_note": "エンドツーエンドで安全"
+  },
+  "watermark_controls": {
+    "type": "タイプ",
+    "layout": "レイアウト",
+    "text_mode": "テキスト",
+    "image_mode": "画像",
+    "tiled": "タイル",
+    "single": "シングル",
+    "content_label": "ウォーターマークの内容",
+    "content_placeholder": "保護テキストを入力...",
+    "typeface": "書体",
+    "scale": "スケール",
+    "color_profile": "カラープロファイル",
+    "upload_image": "画像をアップロード",
+    "select_image_hint": "PNG/JPGを選択",
+    "image_scale": "画像のスケール",
+    "orientation": "方向",
+    "horizontal": "水平",
+    "diagonal": "対角線",
+    "vertical": "垂直",
+    "visibility": "透明度",
+    "subtle": "控えめ",
+    "visible": "はっきり"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "プライバシーの全機能を解放",
+    "features": [
+      "無制限の一括処理",
+      "カスタム画像の透かし",
+      "プレミアムフォントコレクション",
+      "優先ローカル処理",
+      "広告なし（近日公開）"
+    ],
+    "price": "¥450",
+    "per_month": "/ 月",
+    "subscribe_now": "今すぐ購読",
+    "restore": "購入を復元",
+    "active": "プロサブスクリプション有効"
+  },
+  "info_card": {
+    "how_it_works": "仕組み",
+    "description": "DocsGuardはブラウザベースのキャンバスレンダリングを使用して透かしを適用します。これにより、データがコンピュータから離れることがなく、100%のプライバシーが保証されます。",
+    "learn_more": "詳細はこちら"
+  },
+  "preview_modal": {
+    "ready_title": "準備完了",
+    "preview_note": "プレビュー（最初のページのみ）",
+    "sample_page": "サンプルページ",
+    "all_pages_note": "ダウンロード時に全{numPages}ページに透かしが適用されます",
+    "edit_again": "再度編集",
+    "download_pdf": "PDFをダウンロード",
+    "download_png": "PNGをダウンロード",
+    "saving": "保存中...",
+    "final_verification": "最終確認",
+    "download_note": "サンプルとして最初のページをプレビューしています。ダウンロードして全ページに適用します。"
+  },
+  "footer": {
+    "copyright": "© {year} Built with Privacy by Wahyu",
+    "security_protocol": "セキュリティプロトコル",
+    "local_first": "ローカルファースト"
+  },
+  "errors": {
+    "unsupported_file": "サポートされていないファイル形式: {type}",
+    "failed_to_load": "ドキュメントの読み込みに失敗しました"
+  }
+}

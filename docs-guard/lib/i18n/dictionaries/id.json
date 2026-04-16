@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "Privasi Lokal",
+    "lab": "Lab Perlindungan",
+    "tools": "Alat Keamanan"
+  },
+  "tabs": {
+    "upload": "Unggah",
+    "design": "Desain",
+    "subscription": "Langganan",
+    "pro_active": "Pro Aktif",
+    "go_pro": "Dapatkan Pro"
+  },
+  "upload_section": {
+    "select_doc": "Pilih dokumen untuk memulai. File Anda diproses secara lokal dan tidak pernah diunggah ke server mana pun.",
+    "privacy_note": "File Anda diproses secara lokal dan tidak pernah diunggah ke server mana pun.",
+    "error_no_file": "Silakan pilih file terlebih dahulu",
+    "import_title": "Impor Dokumen",
+    "drag_drop": "Seret & Lepas atau {browse}",
+    "browse": "Pilih File",
+    "pdf": "PDF",
+    "image": "GAMBAR"
+  },
+  "design_section": {
+    "appearance": "Tampilan",
+    "new_file": "File Baru",
+    "generate_preview": "Buat Pratinjau",
+    "secure_note": "Aman End-to-End"
+  },
+  "watermark_controls": {
+    "type": "Tipe",
+    "layout": "Tata Letak",
+    "text_mode": "Teks",
+    "image_mode": "Gambar",
+    "tiled": "Ubin",
+    "single": "Tunggal",
+    "content_label": "Konten Watermark",
+    "content_placeholder": "Ketik teks pelindung...",
+    "typeface": "Jenis Huruf",
+    "scale": "Skala",
+    "color_profile": "Profil Warna",
+    "upload_image": "Unggah Gambar Watermark",
+    "select_image_hint": "Pilih PNG/JPG",
+    "image_scale": "Skala Gambar",
+    "orientation": "Orientasi",
+    "horizontal": "Horisontal",
+    "diagonal": "Diagonal",
+    "vertical": "Vertikal",
+    "visibility": "Visibilitas",
+    "subtle": "Halus",
+    "visible": "Terlihat"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "Buka kekuatan penuh privasi",
+    "features": [
+      "Pemrosesan Batch Tanpa Batas",
+      "Watermark Gambar Kustom",
+      "Koleksi Font Premium",
+      "Prioritas Pemrosesan Lokal",
+      "Tanpa Iklan (Segera Hadir)"
+    ],
+    "price": "Rp 45.000",
+    "per_month": "/ Bulan",
+    "subscribe_now": "Berlangganan Sekarang",
+    "restore": "Pulihkan Pembelian",
+    "active": "Langganan Pro Aktif"
+  },
+  "info_card": {
+    "how_it_works": "Cara kerjanya",
+    "description": "DocsGuard menggunakan rendering kanvas berbasis browser untuk menerapkan watermark. Ini berarti data Anda tidak pernah meninggalkan komputer Anda, menjamin privasi 100%.",
+    "learn_more": "Pelajari Lebih Lanjut"
+  },
+  "preview_modal": {
+    "ready_title": "Siap Dilindungi",
+    "preview_note": "Pratinjau (Halaman Pertama Saja)",
+    "sample_page": "Halaman Contoh",
+    "all_pages_note": "Watermark akan diterapkan ke semua {numPages} halaman setelah diunduh",
+    "edit_again": "Edit Lagi",
+    "download_pdf": "Unduh PDF",
+    "download_png": "Unduh PNG",
+    "saving": "Menyimpan...",
+    "final_verification": "Verifikasi Akhir",
+    "download_note": "Menampilkan halaman pertama sebagai contoh. Unduh untuk menerapkan ke semua halaman."
+  },
+  "footer": {
+    "copyright": "© {year} Dibuat dengan Privasi oleh Wahyu",
+    "security_protocol": "Protokol Keamanan",
+    "local_first": "Lokal-Utama"
+  },
+  "errors": {
+    "unsupported_file": "Tipe file tidak didukung: {type}",
+    "failed_to_load": "Gagal memuat dokumen"
+  }
+}

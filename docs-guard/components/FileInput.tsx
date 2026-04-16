@@ -7,7 +7,14 @@ interface FileInputProps {
   className?: string;
 }
 
+import { useI18n } from "@/hooks/useI18n";
+
 export const FileInput: React.FC<FileInputProps> = ({ onFileChange, className }) => {
+  const { t } = useI18n();
+  const dragDropText = t('upload_section.drag_drop', { 
+    browse: `<span class="text-indigo-600">${t('upload_section.browse')}</span>` 
+  });
+  
   return (
     <div
       className={cn(
@@ -39,16 +46,17 @@ export const FileInput: React.FC<FileInputProps> = ({ onFileChange, className })
         
         <div className="space-y-2">
           <p className="text-[#1C1C1E] text-lg font-black tracking-tight leading-none">
-            Import Document
+            {t('upload_section.import_title')}
           </p>
-          <p className="text-xs font-bold text-slate-400 max-w-[180px] mx-auto leading-relaxed">
-            Drag & Drop or <span className="text-indigo-600">Browse Library</span>
-          </p>
+          <p 
+            className="text-xs font-bold text-slate-400 max-w-[180px] mx-auto leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: dragDropText }}
+          />
         </div>
         
         <div className="flex gap-2 pt-2 scale-90 opacity-60 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500">
-          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">PDF</span>
-          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">IMAGE</span>
+          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">{t('upload_section.pdf')}</span>
+          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">{t('upload_section.image')}</span>
         </div>
       </div>
       

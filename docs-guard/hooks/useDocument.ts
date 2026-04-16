@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
+import { useI18n } from "@/hooks/useI18n";
 
 type DocumentType = "image" | "pdf" | null;
 
@@ -9,6 +10,7 @@ interface UseDocumentProps {
 }
 
 export function useDocument({ canvases }: UseDocumentProps) {
+  const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
@@ -118,18 +120,18 @@ export function useDocument({ canvases }: UseDocumentProps) {
           setPdfDoc(doc);
           setNumPages(doc.numPages);
         } else {
-          throw new Error(`Unsupported file type: ${selectedFile.type}`);
+          throw new Error(t('errors.unsupported_file', { type: selectedFile.type }));
         }
       } catch (err) {
         console.error("Error loading document:", err);
-        setError(err instanceof Error ? err.message : "Failed to load document");
+        setError(err instanceof Error ? err.message : t('errors.failed_to_load'));
         setDocumentType(null);
         setFile(null);
         setPdfDoc(null);
         setNumPages(0);
       }
     },
-    [clearDocument]
+    [clearDocument, t]
   );
 
   return {

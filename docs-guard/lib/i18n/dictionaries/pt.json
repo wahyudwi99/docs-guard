@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "Privacidade Local",
+    "lab": "Laboratório de Proteção",
+    "tools": "Ferramentas Seguras"
+  },
+  "tabs": {
+    "upload": "Enviar",
+    "design": "Design",
+    "subscription": "Assinatura",
+    "pro_active": "Pro Ativo",
+    "go_pro": "Obter Pro"
+  },
+  "upload_section": {
+    "select_doc": "Selecione um documento para começar. Seus arquivos são processados localmente e nunca são enviados para nenhum servidor.",
+    "privacy_note": "Seus arquivos sont processados localmente e nunca são enviados para nenhum servidor.",
+    "error_no_file": "Por favor, selecione um arquivo primeiro",
+    "import_title": "Importar Documento",
+    "drag_drop": "Arraste & Solte ou {browse}",
+    "browse": "Procurar Biblioteca",
+    "pdf": "PDF",
+    "image": "IMAGEM"
+  },
+
+  "design_section": {
+    "appearance": "Aparência",
+    "new_file": "Novo Arquivo",
+    "generate_preview": "Gerar Visualização",
+    "secure_note": "Seguro de Ponta a Ponta"
+  },
+  "watermark_controls": {
+    "type": "Tipo",
+    "layout": "Layout",
+    "text_mode": "Texto",
+    "image_mode": "Imagem",
+    "tiled": "Lado a Lado",
+    "single": "Único",
+    "content_label": "Conteúdo da Marca d'Água",
+    "content_placeholder": "Digite o texto protegido...",
+    "typeface": "Tipo de Fonte",
+    "scale": "Escala",
+    "color_profile": "Perfil de Cor",
+    "upload_image": "Enviar Imagem",
+    "select_image_hint": "Selecionar PNG/JPG",
+    "image_scale": "Escala da Imagem",
+    "orientation": "Orientação",
+    "horizontal": "Horizontal",
+    "diagonal": "Diagonal",
+    "vertical": "Vertical",
+    "visibility": "Visibilidade",
+    "subtle": "Sutil",
+    "visible": "Visível"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "Desbloqueie todo o poder da privacidade",
+    "features": [
+      "Processamento em Lote Ilimitado",
+      "Marcas d'Água de Imagem Personalizadas",
+      "Coleção de Fontes Premium",
+      "Processamento Local Prioritário",
+      "Sem Anúncios (Em breve)"
+    ],
+    "price": "€ 2,99",
+    "per_month": "/ Mês",
+    "subscribe_now": "Assinar Agora",
+    "restore": "Restaurar Compras",
+    "active": "Assinatura Pro Ativa"
+  },
+  "info_card": {
+    "how_it_works": "Como funciona",
+    "description": "O DocsGuard usa renderização em tela no navegador para aplicar marcas d'água. Isso significa que seus dados nunca saem do seu computador, garantindo 100% de privacidade.",
+    "learn_more": "Saiba Mais"
+  },
+  "preview_modal": {
+    "ready_title": "Pronto para Proteger",
+    "preview_note": "Visualização (Apenas Primeira Página)",
+    "sample_page": "Página de Exemplo",
+    "all_pages_note": "A marca d'água será aplicada a todas as {numPages} páginas ao baixar",
+    "edit_again": "Editar Novamente",
+    "download_pdf": "Baixar PDF",
+    "download_png": "Baixar PNG",
+    "saving": "Salvando...",
+    "final_verification": "Verificação Final",
+    "download_note": "Visualizando a primeira página como amostra. Baixe para aplicar a todas as páginas."
+  },
+  "footer": {
+    "copyright": "© {year} Built with Privacy by Wahyu",
+    "security_protocol": "Protocolo de Segurança",
+    "local_first": "Local em Primeiro Lugar"
+  }
+}

@@ -14,7 +14,11 @@ import { useCallback, useState, useEffect } from "react";
 import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useI18n } from "@/hooks/useI18n";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 export default function Home() {
+  const { t, locale } = useI18n();
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -110,16 +114,21 @@ export default function Home() {
               <Shield className="h-5 w-5" />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">DocsGuard</span>
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Local Privacy</span>
+              <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">{t('nav.title')}</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{t('nav.subtitle')}</span>
             </div>
           </div>
-          
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
         <div className="w-full space-y-6">
+          <div className="md:hidden w-full mb-4">
+             <LanguageSwitcher />
+          </div>
           
           {/* Main Control Card */}
           <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60">
@@ -129,9 +138,9 @@ export default function Home() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-indigo-600">
                   <Sparkles className="h-4 w-4" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Protection Lab</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">{t('nav.lab')}</span>
                 </div>
-                <h2 className="text-2xl font-black text-[#1C1C1E] tracking-tight">Secure Tools</h2>
+                <h2 className="text-2xl font-black text-[#1C1C1E] tracking-tight">{t('nav.tools')}</h2>
               </div>
 
               {/* Tab Switcher */}
@@ -144,7 +153,7 @@ export default function Home() {
                   )}
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  Upload
+                  {t('tabs.upload')}
                 </button>
                 <button 
                   onClick={() => file && setActiveTab('design')}
@@ -155,7 +164,7 @@ export default function Home() {
                   )}
                 >
                   <Settings className="h-3.5 w-3.5" />
-                  Design
+                  {t('tabs.design')}
                 </button>
                 <button 
                   onClick={() => setActiveTab('subscription')}
@@ -165,7 +174,7 @@ export default function Home() {
                   )}
                 >
                   <Zap className={cn("h-3.5 w-3.5", isPro ? "text-amber-500 fill-amber-500" : "")} />
-                  {isPro ? "Pro Active" : "Go Pro"}
+                  {isPro ? t('tabs.pro_active') : t('tabs.go_pro')}
                 </button>
               </div>
 
@@ -179,7 +188,7 @@ export default function Home() {
                            <ImageIcon className="h-5 w-5" />
                          </div>
                          <p className="text-xs font-medium text-slate-600 leading-relaxed">
-                           Select a document to begin. Your files are processed locally and never uploaded to any server.
+                           {t('upload_section.select_doc')}
                          </p>
                        </div>
                      </div>
@@ -196,12 +205,12 @@ export default function Home() {
                 {activeTab === 'design' && (
                   <div className="space-y-8">
                      <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Appearance</p>
+                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('design_section.appearance')}</p>
                        <button 
                           onClick={() => window.location.reload()} 
                           className="text-[10px] font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition-colors"
                         >
-                          New File
+                          {t('design_section.new_file')}
                         </button>
                      </div>
                      
@@ -232,11 +241,11 @@ export default function Home() {
                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
                          >
                            <Sparkles className="h-4 w-4" />
-                           Generate Preview
+                           {t('design_section.generate_preview')}
                          </button>
                          <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">End-to-End Secure</span>
+                            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">{t('design_section.secure_note')}</span>
                          </div>
                       </div>
                   </div>
@@ -248,18 +257,12 @@ export default function Home() {
                        <Zap className="absolute -right-4 -top-4 h-24 w-24 text-amber-200/50 -rotate-12" />
                        <div className="relative z-10 space-y-4">
                          <div className="space-y-1">
-                           <h3 className="text-lg font-black text-amber-900 tracking-tight">DocsGuard Pro</h3>
-                           <p className="text-xs font-medium text-amber-700/80">Unlock the full power of privacy</p>
+                           <h3 className="text-lg font-black text-amber-900 tracking-tight">{t('subscription_section.pro_title')}</h3>
+                           <p className="text-xs font-medium text-amber-700/80">{t('subscription_section.pro_subtitle')}</p>
                          </div>
                          
                          <div className="space-y-2">
-                           {[
-                             'Unlimited Batch Processing',
-                             'Custom Image Watermarks',
-                             'Premium Font Collection',
-                             'Priority Local Processing',
-                             'No Ads (Coming Soon)'
-                           ].map((feature, i) => (
+                           {(t('subscription_section.features') as string[]).map((feature, i) => (
                              <div key={i} className="flex items-center gap-2">
                                <CheckCircle2 className="h-3.5 w-3.5 text-amber-500" />
                                <span className="text-xs font-bold text-amber-800/70">{feature}</span>
@@ -269,14 +272,14 @@ export default function Home() {
 
                          <div className="pt-2">
                             <div className="flex items-baseline gap-1 mb-4">
-                              <span className="text-3xl font-black text-amber-950">$2.99</span>
-                              <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">/ Month</span>
+                              <span className="text-3xl font-black text-amber-950">{t('subscription_section.price')}</span>
+                              <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">{t('subscription_section.per_month')}</span>
                             </div>
 
                             {isPro ? (
                               <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex items-center justify-center gap-2">
                                 <CheckCircle2 className="h-4 w-4" />
-                                Pro Subscription Active
+                                {t('subscription_section.active')}
                               </div>
                             ) : (
                               <button 
@@ -289,7 +292,7 @@ export default function Home() {
                                 ) : (
                                   <>
                                     <CreditCard className="h-4 w-4" />
-                                    Subscribe Now
+                                    {t('subscription_section.subscribe_now')}
                                   </>
                                 )}
                               </button>
@@ -300,7 +303,7 @@ export default function Home() {
                               disabled={subLoading}
                               className="w-full mt-3 py-2 text-[10px] font-bold text-amber-700/60 uppercase tracking-widest hover:text-amber-800 transition-colors"
                             >
-                              Restore Purchases
+                              {t('subscription_section.restore')}
                             </button>
                          </div>
                        </div>
@@ -326,13 +329,13 @@ export default function Home() {
              <div className="relative z-10 space-y-4">
                 <h3 className="font-bold flex items-center gap-2">
                   <Info className="h-4 w-4" />
-                  How it works
+                  {t('info_card.how_it_works')}
                 </h3>
                 <p className="text-xs text-indigo-100 leading-relaxed">
-                  DocsGuard uses browser-based canvas rendering to apply watermarks. This means your data never leaves your computer, ensuring 100% privacy.
+                  {t('info_card.description')}
                 </p>
                 <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all">
-                  Learn More <ChevronRight className="h-3 w-3" />
+                  {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
                 </button>
              </div>
           </div>
@@ -358,8 +361,8 @@ export default function Home() {
                    <CheckCircle2 className="h-6 w-6" />
                  </div>
                  <div>
-                   <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to Secure</h3>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Preview (First Page Only)</p>
+                   <h3 className="text-xl font-black text-slate-900 tracking-tight">{t('preview_modal.ready_title')}</h3>
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('preview_modal.preview_note')}</p>
                  </div>
               </div>
               <button 
@@ -380,27 +383,27 @@ export default function Home() {
                     className="h-auto w-auto max-w-full block object-contain shadow-sm"
                   />
                   <div className="absolute top-4 right-4 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur-md font-bold">
-                    Sample Page {index + 1}
+                    {t('preview_modal.sample_page')} {index + 1}
                   </div>
                 </div>
               ))}
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/80 px-4 py-2 rounded-full shadow-sm">
-                Watermark will be applied to all {numPages} pages upon download
+                {t('preview_modal.all_pages_note', { numPages })}
               </p>
             </div>
 
             {/* Footer Actions */}
             <div className="p-8 bg-white border-t border-slate-100 flex flex-col md:flex-row gap-4">
               <div className="flex-1 flex flex-col justify-center">
-                 <p className="text-sm font-bold text-slate-900">Final Verification</p>
-                 <p className="text-xs font-medium text-slate-400 leading-relaxed">Previewing the first page as a sample. Download to apply to all pages.</p>
+                 <p className="text-sm font-bold text-slate-900">{t('preview_modal.final_verification')}</p>
+                 <p className="text-xs font-medium text-slate-400 leading-relaxed">{t('preview_modal.download_note')}</p>
               </div>
               <div className="flex gap-4">
                 <button 
                   onClick={() => setPreviewUrls([])}
                   className="px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-xs uppercase tracking-widest"
                 >
-                  Edit Again
+                  {t('preview_modal.edit_again')}
                 </button>
                 <button 
                   onClick={handleFinalDownload}
@@ -411,7 +414,7 @@ export default function Home() {
                   )}
                 >
                   <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
-                  {isSaving ? "Saving..." : `Download ${documentType === 'pdf' ? 'PDF' : 'PNG'}`}
+                  {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
                 </button>
               </div>
             </div>
@@ -423,15 +426,15 @@ export default function Home() {
       <footer className="max-w-5xl mx-auto w-full px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-200/60 mt-8 relative z-10">
         <div className="flex items-center gap-2 opacity-60">
           <Shield className="h-4 w-4 text-indigo-600" />
-          <span className="text-xs font-black tracking-tighter text-[#1C1C1E] uppercase">DocsGuard</span>
+          <span className="text-xs font-black tracking-tighter text-[#1C1C1E] uppercase">{t('nav.title')}</span>
         </div>
         <div className="flex flex-col items-center md:items-end gap-2">
            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-             © {new Date().getFullYear()} Build with Privacy by Wahyu
+             {t('footer.copyright', { year: new Date().getFullYear() })}
            </p>
            <div className="flex gap-6">
-             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">Security Protocol</span>
-             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">Local-First</span>
+             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">{t('footer.security_protocol')}</span>
+             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">{t('footer.local_first')}</span>
            </div>
         </div>
       </footer>

@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "Privacidad Local",
+    "lab": "Laboratorio de Protección",
+    "tools": "Herramientas Seguras"
+  },
+  "tabs": {
+    "upload": "Subir",
+    "design": "Diseño",
+    "subscription": "Suscripción",
+    "pro_active": "Pro Activo",
+    "go_pro": "Obtener Pro"
+  },
+  "upload_section": {
+    "select_doc": "Seleccione un documento para comenzar. Sus archivos se procesan localmente y nunca se suben a ningún servidor.",
+    "privacy_note": "Sus archivos se procesan localmente y nunca se suben a ningún servidor.",
+    "error_no_file": "Por favor seleccione un archivo primero",
+    "import_title": "Importar Documento",
+    "drag_drop": "Arrastrar & Soltar o {browse}",
+    "browse": "Explorar Biblioteca",
+    "pdf": "PDF",
+    "image": "IMAGEN"
+  },
+  "design_section": {
+    "appearance": "Apariencia",
+    "new_file": "Nuevo Archivo",
+    "generate_preview": "Generar Vista Previa",
+    "secure_note": "Seguro de Extremo a Extremo"
+  },
+  "watermark_controls": {
+    "type": "Tipo",
+    "layout": "Diseño",
+    "text_mode": "Texto",
+    "image_mode": "Imagen",
+    "tiled": "Mosaico",
+    "single": "Único",
+    "content_label": "Contenido de la Marca de Agua",
+    "content_placeholder": "Escriba el texto protegido...",
+    "typeface": "Tipo de Letra",
+    "scale": "Escala",
+    "color_profile": "Perfil de Color",
+    "upload_image": "Subir Imagen de Marca de Agua",
+    "select_image_hint": "Seleccionar PNG/JPG",
+    "image_scale": "Escala de Imagen",
+    "orientation": "Orientación",
+    "horizontal": "Horizontal",
+    "diagonal": "Diagonal",
+    "vertical": "Vertical",
+    "visibility": "Visibilidad",
+    "subtle": "Sutil",
+    "visible": "Visible"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "Desbloquee todo el poder de la privacidad",
+    "features": [
+      "Procesamiento por Lotes Ilimitado",
+      "Marcas de Agua de Imagen Personalizadas",
+      "Colección de Fuentes Premium",
+      "Procesamiento Local Prioritario",
+      "Sin Anuncios (Próximamente)"
+    ],
+    "price": "2,99 €",
+    "per_month": "/ Mes",
+    "subscribe_now": "Suscribirse Ahora",
+    "restore": "Restaurar Compras",
+    "active": "Suscripción Pro Activa"
+  },
+  "info_card": {
+    "how_it_works": "Cómo funciona",
+    "description": "DocsGuard utiliza el renderizado en el navegador para aplicar marcas de agua. Esto significa que sus datos nunca salen de su ordenador, garantizando una privacidad del 100%.",
+    "learn_more": "Saber Más"
+  },
+  "preview_modal": {
+    "ready_title": "Listo para Asegurar",
+    "preview_note": "Vista Previa (Solo Primera Página)",
+    "sample_page": "Página de Ejemplo",
+    "all_pages_note": "La marca de agua se aplicará a todas las {numPages} páginas al descargar",
+    "edit_again": "Editar de Nuevo",
+    "download_pdf": "Descargar PDF",
+    "download_png": "Descargar PNG",
+    "saving": "Guardando...",
+    "final_verification": "Verificación Final",
+    "download_note": "Vista previa de la primera página como ejemplo. Descargar para aplicar a todas las páginas."
+  },
+  "footer": {
+    "copyright": "© {year} Built with Privacy by Wahyu",
+    "security_protocol": "Protocolo de Seguridad",
+    "local_first": "Local Primero"
+  }
+}

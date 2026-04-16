@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "로컬 프라이버시",
+    "lab": "보호 랩",
+    "tools": "보안 도구"
+  },
+  "tabs": {
+    "upload": "업로드",
+    "design": "디자인",
+    "subscription": "구독",
+    "pro_active": "프로 활성",
+    "go_pro": "프로 가입"
+  },
+  "upload_section": {
+    "select_doc": "시작하려면 문서를 선택하세요. 파일은 로컬에서 처리되며 서버에 업로드되지 않습니다.",
+    "privacy_note": "파일은 로컬에서 처리되며 서버에 업로드되지 않습니다.",
+    "error_no_file": "먼저 파일을 선택하세요",
+    "import_title": "문서 가져오기",
+    "drag_drop": "드래그 앤 드롭 또는 {browse}",
+    "browse": "파일 찾기",
+    "pdf": "PDF",
+    "image": "이미지"
+  },
+  "design_section": {
+    "appearance": "모양",
+    "new_file": "새 파일",
+    "generate_preview": "미리보기 생성",
+    "secure_note": "엔드투엔드 보안"
+  },
+  "watermark_controls": {
+    "type": "유형",
+    "layout": "레이아웃",
+    "text_mode": "텍스트",
+    "image_mode": "이미지",
+    "tiled": "바둑판",
+    "single": "단일",
+    "content_label": "워터마크 내용",
+    "content_placeholder": "보호 텍스트 입력...",
+    "typeface": "서체",
+    "scale": "크기",
+    "color_profile": "색상 프로필",
+    "upload_image": "이미지 업로드",
+    "select_image_hint": "PNG/JPG 선택",
+    "image_scale": "이미지 비율",
+    "orientation": "방향",
+    "horizontal": "가로",
+    "diagonal": "대각선",
+    "vertical": "세로",
+    "visibility": "투명도",
+    "subtle": "희미하게",
+    "visible": "선명하게"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "프라이버시의 모든 기능 잠금 해제",
+    "features": [
+      "무제한 일괄 처리",
+      "커스텀 이미지 워터마크",
+      "프리미엄 폰트 컬렉션",
+      "우선 로컬 처리",
+      "광고 제거 (출시 예정)"
+    ],
+    "price": "₩3,900",
+    "per_month": "/ 월",
+    "subscribe_now": "지금 구독",
+    "restore": "구매 복원",
+    "active": "프로 구독 활성화됨"
+  },
+  "info_card": {
+    "how_it_works": "작동 원리",
+    "description": "DocsGuard는 브라우저 기반 캔버스 렌더링을 사용하여 워터마크를 적용합니다. 즉, 데이터가 컴퓨터를 떠나지 않아 100% 프라이버시를 보장합니다.",
+    "learn_more": "더 알아보기"
+  },
+  "preview_modal": {
+    "ready_title": "보안 준비 완료",
+    "preview_note": "미리보기 (첫 페이지만)",
+    "sample_page": "샘플 페이지",
+    "all_pages_note": "다운로드 시 모든 {numPages}페이지에 워터마크가 적용됩니다",
+    "edit_again": "다시 편집",
+    "download_pdf": "PDF 다운로드",
+    "download_png": "PNG 다운로드",
+    "saving": "저장 중...",
+    "final_verification": "최종 확인",
+    "download_note": "첫 페이지만 샘플로 미리 봅니다. 모든 페이지에 적용하려면 다운로드하세요."
+  },
+  "footer": {
+    "copyright": "© {year} Built with Privacy by Wahyu",
+    "security_protocol": "보안 프로토콜",
+    "local_first": "로컬 우선"
+  }
+}

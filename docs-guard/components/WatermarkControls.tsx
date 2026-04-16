@@ -33,6 +33,8 @@ const FONTS = [
   "Arial Black", "Impact"
 ];
 
+import { useI18n } from "@/hooks/useI18n";
+
 export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   watermarkMode,
   setWatermarkMode,
@@ -54,6 +56,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   imageScale,
   setImageScale,
 }) => {
+  const { t } = useI18n();
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -70,7 +73,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <ImageIcon className="h-3.5 w-3.5" />
-            Type
+            {t('watermark_controls.type')}
           </label>
           <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
             <button
@@ -80,7 +83,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 watermarkMode === "text" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
-              Text
+              {t('watermark_controls.text_mode')}
             </button>
             <button
               onClick={() => setWatermarkMode("image")}
@@ -89,7 +92,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 watermarkMode === "image" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
-              Image
+              {t('watermark_controls.image_mode')}
             </button>
           </div>
         </div>
@@ -97,7 +100,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <LayoutGrid className="h-3.5 w-3.5" />
-            Layout
+            {t('watermark_controls.layout')}
           </label>
           <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
             <button
@@ -107,7 +110,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 watermarkLayout === "tiled" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
-              Tiled
+              {t('watermark_controls.tiled')}
             </button>
             <button
               onClick={() => setWatermarkLayout("single")}
@@ -116,7 +119,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 watermarkLayout === "single" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
-              Single
+              {t('watermark_controls.single')}
             </button>
           </div>
         </div>
@@ -129,7 +132,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           <div className="space-y-3">
             <label htmlFor="watermark-text" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
               <Type className="h-3 w-3" />
-              Watermark Content
+              {t('watermark_controls.content_label')}
             </label>
             <div className="relative group">
               <Input
@@ -137,7 +140,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 type="text"
                 value={watermarkText}
                 onChange={(e) => setWatermarkText(e.target.value)}
-                placeholder="Type protected text..."
+                placeholder={t('watermark_controls.content_placeholder')}
                 className="h-12 bg-black/5 border-transparent focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 rounded-2xl transition-all duration-300 font-medium"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
@@ -150,7 +153,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
                 <TextCursor className="h-3 w-3" />
-                Typeface
+                {t('watermark_controls.typeface')}
               </label>
               <select 
                 value={fontFamily}
@@ -166,7 +169,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
                 <Hash className="h-3 w-3" />
-                Scale
+                {t('watermark_controls.scale')}
               </label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 bg-black/5 p-4 rounded-2xl">
@@ -185,7 +188,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           <div className="space-y-3">
             <label htmlFor="watermark-color" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
               <Palette className="h-3 w-3" />
-              Color Profile
+              {t('watermark_controls.color_profile')}
             </label>
             <div className="flex items-center gap-3">
               <div className="p-1.5 bg-black/5 rounded-2xl border border-transparent hover:border-indigo-200 transition-all cursor-pointer">
@@ -213,7 +216,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
               <Upload className="h-3.5 w-3.5" />
-              Upload Watermark Image
+              {t('watermark_controls.upload_image')}
             </label>
             <div className="relative">
               <input
@@ -224,7 +227,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               />
               <div className="h-24 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-black/5 group-hover:bg-black/10 transition-all gap-2">
                 <ImageIcon className="h-6 w-6 text-slate-400" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Select PNG/JPG</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('watermark_controls.select_image_hint')}</span>
               </div>
             </div>
           </div>
@@ -232,7 +235,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
               <Hash className="h-3 w-3" />
-              Image Scale
+              {t('watermark_controls.image_scale')}
             </label>
             <div className="bg-black/5 p-5 rounded-[24px]">
               <Slider
@@ -251,7 +254,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
       <div className="space-y-3">
         <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
           <RotateCw className="h-3 w-3" />
-          Orientation
+          {t('watermark_controls.orientation')}
         </label>
         <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
           {(["horizontal", "diagonal", "vertical"] as const).map((o) => (
@@ -265,7 +268,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                   : "text-slate-500 hover:text-slate-700"
               )}
             >
-              {o}
+              {t(`watermark_controls.${o}`)}
             </button>
           ))}
         </div>
@@ -276,7 +279,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         <div className="flex items-center justify-between">
           <label htmlFor="watermark-opacity" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <Eye className="h-3 w-3" />
-            Visibility
+            {t('watermark_controls.visibility')}
           </label>
           <div className="px-3 py-1 bg-white rounded-full shadow-sm border border-black/5">
             <span className="text-[10px] font-black text-indigo-600 tabular-nums">
@@ -296,9 +299,9 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           />
         </div>
         <div className="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
-          <span className="opacity-50">Subtle</span>
+          <span className="opacity-50">{t('watermark_controls.subtle')}</span>
           <div className="h-px flex-1 mx-4 bg-slate-200/50"></div>
-          <span className="opacity-100">Visible</span>
+          <span className="opacity-100">{t('watermark_controls.visible')}</span>
         </div>
       </div>
     </div>

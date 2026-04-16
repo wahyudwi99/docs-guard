@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "title": "DocsGuard",
+    "subtitle": "Local Privacy",
+    "lab": "Protection Lab",
+    "tools": "Secure Tools"
+  },
+  "tabs": {
+    "upload": "Upload",
+    "design": "Design",
+    "subscription": "Subscription",
+    "pro_active": "Pro Active",
+    "go_pro": "Go Pro"
+  },
+  "upload_section": {
+    "select_doc": "Select a document to begin. Your files are processed locally and never uploaded to any server.",
+    "privacy_note": "Your files are processed locally and never uploaded to any server.",
+    "error_no_file": "Please select a file first",
+    "import_title": "Import Document",
+    "drag_drop": "Drag & Drop or {browse}",
+    "browse": "Browse Library",
+    "pdf": "PDF",
+    "image": "IMAGE"
+  },
+  "design_section": {
+    "appearance": "Appearance",
+    "new_file": "New File",
+    "generate_preview": "Generate Preview",
+    "secure_note": "End-to-End Secure"
+  },
+  "watermark_controls": {
+    "type": "Type",
+    "layout": "Layout",
+    "text_mode": "Text",
+    "image_mode": "Image",
+    "tiled": "Tiled",
+    "single": "Single",
+    "content_label": "Watermark Content",
+    "content_placeholder": "Type protected text...",
+    "typeface": "Typeface",
+    "scale": "Scale",
+    "color_profile": "Color Profile",
+    "upload_image": "Upload Watermark Image",
+    "select_image_hint": "Select PNG/JPG",
+    "image_scale": "Image Scale",
+    "orientation": "Orientation",
+    "horizontal": "Horizontal",
+    "diagonal": "Diagonal",
+    "vertical": "Vertical",
+    "visibility": "Visibility",
+    "subtle": "Subtle",
+    "visible": "Visible"
+  },
+  "subscription_section": {
+    "pro_title": "DocsGuard Pro",
+    "pro_subtitle": "Unlock the full power of privacy",
+    "features": [
+      "Unlimited Batch Processing",
+      "Custom Image Watermarks",
+      "Premium Font Collection",
+      "Priority Local Processing",
+      "No Ads (Coming Soon)"
+    ],
+    "price": "$2.99",
+    "per_month": "/ Month",
+    "subscribe_now": "Subscribe Now",
+    "restore": "Restore Purchases",
+    "active": "Pro Subscription Active"
+  },
+  "info_card": {
+    "how_it_works": "How it works",
+    "description": "DocsGuard uses browser-based canvas rendering to apply watermarks. This means your data never leaves your computer, ensuring 100% privacy.",
+    "learn_more": "Learn More"
+  },
+  "preview_modal": {
+    "ready_title": "Ready to Secure",
+    "preview_note": "Preview (First Page Only)",
+    "sample_page": "Sample Page",
+    "all_pages_note": "Watermark will be applied to all {numPages} pages upon download",
+    "edit_again": "Edit Again",
+    "download_pdf": "Download PDF",
+    "download_png": "Download PNG",
+    "saving": "Saving...",
+    "final_verification": "Final Verification",
+    "download_note": "Previewing the first page as a sample. Download to apply to all pages."
+  },
+  "footer": {
+    "copyright": "© {year} Build with Privacy by Wahyu",
+    "security_protocol": "Security Protocol",
+    "local_first": "Local-First"
+  },
+  "errors": {
+    "unsupported_file": "Unsupported file type: {type}",
+    "failed_to_load": "Failed to load document"
+  }
+}
