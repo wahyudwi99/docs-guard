@@ -112,15 +112,6 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-6">
-             <a 
-              href="https://github.com/wahyudwi99/docs-guard" 
-              target="_blank" 
-              className="p-2.5 rounded-full bg-black/5 hover:bg-black/10 transition-colors"
-            >
-              <ExternalLink className="h-5 w-5 text-slate-600" />
-            </a>
-          </div>
         </div>
       </header>
 
