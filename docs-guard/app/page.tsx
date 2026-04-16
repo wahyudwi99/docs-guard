@@ -4,20 +4,23 @@ import { useCanvas } from "@/hooks/useCanvas";
 import { useDocument } from "@/hooks/useDocument";
 import { useWatermark } from "@/hooks/useWatermark";
 import { useFileExport } from "@/hooks/useFileExport";
+import { useSubscription } from "@/hooks/useSubscription";
 
 import { FileInput } from "@/components/FileInput";
 import { CanvasDisplay } from "@/components/CanvasDisplay";
 import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { useCallback, useState, useEffect } from "react";
-import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2 } from "lucide-react";
+import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
-  const [activeTab, setActiveTab] = useState<'upload' | 'design'>( 'upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
 
   // Document management
   const {
@@ -154,11 +157,21 @@ export default function Home() {
                   <Settings className="h-3.5 w-3.5" />
                   Design
                 </button>
+                <button 
+                  onClick={() => setActiveTab('subscription')}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-[12px] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2",
+                    activeTab === 'subscription' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}
+                >
+                  <Zap className={cn("h-3.5 w-3.5", isPro ? "text-amber-500 fill-amber-500" : "")} />
+                  {isPro ? "Pro Active" : "Go Pro"}
+                </button>
               </div>
 
               {/* Conditional Content */}
               <div className="min-h-[280px] flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-500">
-                {activeTab === 'upload' ? (
+                {activeTab === 'upload' && (
                   <div className="space-y-6">
                      <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100/50">
                        <div className="flex gap-3">
@@ -178,7 +191,9 @@ export default function Home() {
                      )}
                      <FileInput onFileChange={handleFileChange} />
                   </div>
-                ) : (
+                )}
+
+                {activeTab === 'design' && (
                   <div className="space-y-8">
                      <div className="flex items-center justify-between">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Appearance</p>
@@ -210,7 +225,8 @@ export default function Home() {
                         setWatermarkImage={setWatermarkImage}
                         imageScale={imageScale}
                         setImageScale={setImageScale}
-                      />                      <div className="pt-4 space-y-4">
+                      />
+                      <div className="pt-4 space-y-4">
                          <button 
                            onClick={handleOpenPreview}
                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
@@ -223,6 +239,72 @@ export default function Home() {
                             <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">End-to-End Secure</span>
                          </div>
                       </div>
+                  </div>
+                )}
+
+                {activeTab === 'subscription' && (
+                  <div className="space-y-6">
+                    <div className="p-6 rounded-[24px] bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 relative overflow-hidden">
+                       <Zap className="absolute -right-4 -top-4 h-24 w-24 text-amber-200/50 -rotate-12" />
+                       <div className="relative z-10 space-y-4">
+                         <div className="space-y-1">
+                           <h3 className="text-lg font-black text-amber-900 tracking-tight">DocsGuard Pro</h3>
+                           <p className="text-xs font-medium text-amber-700/80">Unlock the full power of privacy</p>
+                         </div>
+                         
+                         <div className="space-y-2">
+                           {[
+                             'Unlimited Batch Processing',
+                             'Custom Image Watermarks',
+                             'Premium Font Collection',
+                             'Priority Local Processing',
+                             'No Ads (Coming Soon)'
+                           ].map((feature, i) => (
+                             <div key={i} className="flex items-center gap-2">
+                               <CheckCircle2 className="h-3.5 w-3.5 text-amber-500" />
+                               <span className="text-xs font-bold text-amber-800/70">{feature}</span>
+                             </div>
+                           ))}
+                         </div>
+
+                         <div className="pt-2">
+                            <div className="flex items-baseline gap-1 mb-4">
+                              <span className="text-3xl font-black text-amber-950">$2.99</span>
+                              <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">/ Month</span>
+                            </div>
+
+                            {isPro ? (
+                              <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex items-center justify-center gap-2">
+                                <CheckCircle2 className="h-4 w-4" />
+                                Pro Subscription Active
+                              </div>
+                            ) : (
+                              <button 
+                                onClick={subscribe}
+                                disabled={subLoading}
+                                className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
+                              >
+                                {subLoading ? (
+                                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                  <>
+                                    <CreditCard className="h-4 w-4" />
+                                    Subscribe Now
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            
+                            <button 
+                              onClick={restorePurchases}
+                              disabled={subLoading}
+                              className="w-full mt-3 py-2 text-[10px] font-bold text-amber-700/60 uppercase tracking-widest hover:text-amber-800 transition-colors"
+                            >
+                              Restore Purchases
+                            </button>
+                         </div>
+                       </div>
+                    </div>
                   </div>
                 )}
               </div>
