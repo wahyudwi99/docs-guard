@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  turbopack: {},
   transpilePackages: ['pdfjs-dist'],
   webpack: (config) => {
     config.resolve.alias.canvas = false;
