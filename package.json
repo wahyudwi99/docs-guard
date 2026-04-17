@@ -1,20 +1,41 @@
 {
+  "name": "docs-guard",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "npm --prefix docs-guard run dev",
-    "build": "npm --prefix docs-guard run build",
-    "start": "npm --prefix docs-guard run start",
-    "lint": "npm --prefix docs-guard run lint"
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
+    "@capgo/native-purchases": "^8.3.3",
     "@capacitor-community/media": "^9.1.0",
     "@capacitor/android": "^8.3.0",
     "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/ios": "^8.3.0",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.8.0",
-    "pdfjs-dist": "^5.6.205"
+    "next": "16.2.3",
+    "next-auth": "^4.24.14",
+    "pdfjs-dist": "^5.6.205",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pdfjs-dist": "^2.10.377",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
