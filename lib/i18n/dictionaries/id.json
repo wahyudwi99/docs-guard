@@ -12,6 +12,16 @@
     "pro_active": "Pro Aktif",
     "go_pro": "Dapatkan Pro"
   },
+  "login": {
+    "title": "Selamat Datang",
+    "subtitle": "Masuk untuk melindungi dokumen Anda secara lokal.",
+    "google_button": "Lanjutkan dengan Google",
+    "secure_badge": "Akses Aman",
+    "privacy_note": "Kredensial Anda tidak pernah disimpan. Kami hanya menggunakan Google untuk identifikasi.",
+    "footer_privacy": "Dengan masuk, Anda menyetujui Kebijakan Privasi kami",
+    "footer_version": "Protokol Privasi DocsGuard v1.0",
+    "footer_processing": "Pemrosesan Lokal-Aman"
+  },
   "upload_section": {
     "select_doc": "Pilih dokumen untuk memulai. File Anda diproses secara lokal dan tidak pernah diunggah ke server mana pun.",
     "privacy_note": "File Anda diproses secara lokal dan tidak pernah diunggah ke server mana pun.",

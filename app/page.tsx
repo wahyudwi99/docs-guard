@@ -126,7 +126,7 @@ export default function Home() {
 
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
         <div className="w-full space-y-6">
-          <div className="md:hidden w-full mb-4">
+          <div className="md:hidden w-full mb-4 flex justify-center">
              <LanguageSwitcher />
           </div>
           

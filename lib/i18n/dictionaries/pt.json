@@ -10,7 +10,17 @@
     "design": "Design",
     "subscription": "Assinatura",
     "pro_active": "Pro Ativo",
-    "go_pro": "Obter Pro"
+    "go_pro": "Obtener Pro"
+  },
+  "login": {
+    "title": "Bem-vindo de volta",
+    "subtitle": "Entre para proteger seus documentos localmente.",
+    "google_button": "Continuar com o Google",
+    "secure_badge": "Acesso Seguro",
+    "privacy_note": "Suas credenciais nunca são armazenadas. Usamos o Google apenas para identificação.",
+    "footer_privacy": "Ao entrar, você concorda com nossa Política de Privacidade",
+    "footer_version": "Protocolo de Privacidade DocsGuard v1.0",
+    "footer_processing": "Processamento Local Seguro Primeiro"
   },
   "upload_section": {
     "select_doc": "Selecione um documento para começar. Seus arquivos são processados localmente e nunca são enviados para nenhum servidor.",

@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Shield, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Shield, Lock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg">
               <Shield className="h-5 w-5" />
             </div>
-            <span className="text-lg font-bold tracking-tight">DocsGuard</span>
+            <span className="text-lg font-bold tracking-tight">{t('nav.title')}</span>
           </div>
           <LanguageSwitcher />
         </div>
@@ -37,10 +37,10 @@ export default function LoginPage() {
               <Lock className="h-8 w-8 text-indigo-600" />
             </div>
             <h1 className="text-3xl font-black tracking-tight text-[#1C1C1E]">
-              Welcome Back
+              {t('login.title')}
             </h1>
             <p className="text-sm font-medium text-slate-500">
-              Sign in to protect your documents locally.
+              {t('login.subtitle')}
             </p>
           </div>
 
@@ -70,7 +70,7 @@ export default function LoginPage() {
                 />
               </svg>
               <span className="text-sm font-bold text-[#1C1C1E]">
-                Continue with Google
+                {t('login.google_button')}
               </span>
             </button>
 
@@ -80,7 +80,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="px-4 bg-white text-slate-400 font-bold uppercase tracking-widest">
-                  Secure Access
+                  {t('login.secure_badge')}
                 </span>
               </div>
             </div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
                   <CheckCircle2 className="h-3.5 w-3.5" />
                 </div>
                 <p className="text-xs font-medium text-slate-500 leading-relaxed">
-                  Your credentials are never stored. We only use Google for identification.
+                  {t('login.privacy_note')}
                 </p>
               </div>
             </div>
@@ -99,15 +99,15 @@ export default function LoginPage() {
 
           {/* Footer Note */}
           <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            By signing in, you agree to our <span className="text-indigo-600">Privacy Policy</span>
+            {t('login.footer_privacy')}
           </p>
         </div>
       </main>
 
       <footer className="p-8 text-center border-t border-slate-200/60 bg-white/50">
         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-loose">
-          DocsGuard Privacy Protocol v1.0<br/>
-          Secure Local-First Processing
+          {t('login.footer_version')}<br/>
+          {t('login.footer_processing')}
         </p>
       </footer>
 

@@ -12,6 +12,16 @@
     "pro_active": "Pro Active",
     "go_pro": "Go Pro"
   },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to protect your documents locally.",
+    "google_button": "Continue with Google",
+    "secure_badge": "Secure Access",
+    "privacy_note": "Your credentials are never stored. We only use Google for identification.",
+    "footer_privacy": "By signing in, you agree to our Privacy Policy",
+    "footer_version": "DocsGuard Privacy Protocol v1.0",
+    "footer_processing": "Secure Local-First Processing"
+  },
   "upload_section": {
     "select_doc": "Select a document to begin. Your files are processed locally and never uploaded to any server.",
     "privacy_note": "Your files are processed locally and never uploaded to any server.",

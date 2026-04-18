@@ -12,6 +12,16 @@
     "pro_active": "Pro Activo",
     "go_pro": "Obtener Pro"
   },
+  "login": {
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Inicia sesión para proteger tus documentos localmente.",
+    "google_button": "Continuar con Google",
+    "secure_badge": "Acceso seguro",
+    "privacy_note": "Tus credenciales nunca se almacenan. Solo usamos Google para la identificación.",
+    "footer_privacy": "Al iniciar sesión, aceptas nuestra Política de privacidad",
+    "footer_version": "Protocolo de privacidad DocsGuard v1.0",
+    "footer_processing": "Procesamiento local seguro primero"
+  },
   "upload_section": {
     "select_doc": "Seleccione un documento para comenzar. Sus archivos se procesan localmente y nunca se suben a ningún servidor.",
     "privacy_note": "Sus archivos se procesan localmente y nunca se suben a ningún servidor.",

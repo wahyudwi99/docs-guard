@@ -12,6 +12,16 @@
     "pro_active": "Pro 已激活",
     "go_pro": "升级 Pro"
   },
+  "login": {
+    "title": "欢迎回来",
+    "subtitle": "登录以在本地保护您的文档。",
+    "google_button": "继续使用 Google 账号",
+    "secure_badge": "安全访问",
+    "privacy_note": "您的凭据永不存储。我们仅将 Google 用于身份识别。",
+    "footer_privacy": "登录即表示您同意我们的隐私政策",
+    "footer_version": "DocsGuard 隐私协议 v1.0",
+    "footer_processing": "安全的本地优先处理"
+  },
   "upload_section": {
     "select_doc": "选择一个文档开始。您的文件在本地处理，绝不会上传到任何服务器。",
     "privacy_note": "您的文件在本地处理，绝不会上传到任何服务器。",

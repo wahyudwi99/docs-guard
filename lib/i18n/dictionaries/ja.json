@@ -12,6 +12,16 @@
     "pro_active": "プロ有効",
     "go_pro": "プロにアップグレード"
   },
+  "login": {
+    "title": "おかえりなさい",
+    "subtitle": "ドキュメントをローカルで保護するためにサインインしてください。",
+    "google_button": "Google で続行",
+    "secure_badge": "セキュアアクセス",
+    "privacy_note": "認証情報は保存されません。Google は本人確認のためのみに使用されます。",
+    "footer_privacy": "サインインすることで、プライバシーポリシーに同意したものとみなされます。",
+    "footer_version": "DocsGuard プライバシープロトコル v1.0",
+    "footer_processing": "セキュアなローカルファースト処理"
+  },
   "upload_section": {
     "select_doc": "開始するにはドキュメントを選択してください。ファイルはローカルで処理され、サーバーにアップロードされることはありません。",
     "privacy_note": "ファイルはローカルで処理され、サーバーにアップロードされることはありません。",
