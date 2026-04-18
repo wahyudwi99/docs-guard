@@ -20,6 +20,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 export default function Home() {
   const { t, locale } = useI18n();
   const [showSplash, setShowSplash] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -30,8 +31,11 @@ export default function Home() {
   // Splash screen effect
   useEffect(() => {
     const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 3000);
+      setIsExiting(true);
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 800); // 800ms for the exit animation
+    }, 2200); // Start exit after 2.2s (total ~3s)
     return () => clearTimeout(timer);
   }, []);
 
@@ -108,14 +112,17 @@ export default function Home() {
 
   if (showSplash) {
     return (
-      <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white">
+      <div className={cn(
+        "fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white transition-all duration-[800ms] ease-in-out shadow-[0_20px_50px_rgba(0,0,0,0.1)]",
+        isExiting ? "-translate-y-full opacity-90 scale-[0.98]" : "translate-y-0 opacity-100 scale-100"
+      )}>
         <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[120px]"></div>
         </div>
         
         <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-          <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-indigo-200 animate-bounce">
+          <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-indigo-200">
             <Shield className="h-12 w-12" />
           </div>
           <div className="flex flex-col items-center gap-2">
@@ -126,9 +133,9 @@ export default function Home() {
         
         <div className="absolute bottom-12 flex flex-col items-center gap-4">
           <div className="flex gap-1">
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/20"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/40"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/60"></div>
           </div>
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('nav.lab')}</span>
         </div>
