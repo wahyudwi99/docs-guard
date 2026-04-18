@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { I18nProvider } from "@/hooks/useI18n";
-import { AuthProvider } from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "DocsGuard",
@@ -16,11 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <I18nProvider>
-            {children}
-          </I18nProvider>
-        </AuthProvider>
+        <I18nProvider>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

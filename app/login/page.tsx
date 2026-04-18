@@ -1,12 +1,16 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { Shield, Lock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function LoginPage() {
   const { t } = useI18n();
+
+  const handleLogin = () => {
+    // Mock login for static export
+    window.location.href = "/";
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans">
@@ -48,7 +52,7 @@ export default function LoginPage() {
           <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60 space-y-6">
             
             <button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={handleLogin}
               className="group w-full py-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-center gap-3 transition-all hover:bg-slate-50 active:scale-95 shadow-sm"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
