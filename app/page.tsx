@@ -110,41 +110,40 @@ export default function Home() {
     if (success) setPreviewUrls([]); // Clear preview after successful download
   }, [saveToDevice]);
 
-  if (showSplash) {
-    return (
-      <div className={cn(
-        "fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white transition-all duration-[800ms] ease-in-out",
-        isExiting ? "scale-150 opacity-0 blur-sm" : "scale-100 opacity-100 blur-0"
-      )}>
-        <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px]"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[120px]"></div>
-        </div>
-        
-        <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-          <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-indigo-200">
-            <Shield className="h-12 w-12" />
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">{t('nav.subtitle')}</p>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-12 flex flex-col items-center gap-4">
-          <div className="flex gap-1">
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/20"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/40"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/60"></div>
-          </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('nav.lab')}</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Splash Screen Overlay */}
+      {showSplash && (
+        <div className={cn(
+          "fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white transition-all duration-[800ms] ease-in-out pointer-events-none",
+          isExiting ? "scale-150 opacity-0 blur-sm" : "scale-100 opacity-100 blur-0"
+        )}>
+          <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px]"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/20 rounded-full blur-[120px]"></div>
+          </div>
+          
+          <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
+            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-indigo-200">
+              <Shield className="h-12 w-12" />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">{t('nav.subtitle')}</p>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-12 flex flex-col items-center gap-4">
+            <div className="flex gap-1">
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/20"></div>
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/40"></div>
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/60"></div>
+            </div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('nav.lab')}</span>
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Background Blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px] animate-pulse"></div>
