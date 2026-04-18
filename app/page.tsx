@@ -113,8 +113,8 @@ export default function Home() {
   if (showSplash) {
     return (
       <div className={cn(
-        "fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white transition-all duration-[800ms] ease-in-out shadow-[0_20px_50px_rgba(0,0,0,0.1)]",
-        isExiting ? "-translate-y-full opacity-90 scale-[0.98]" : "translate-y-0 opacity-100 scale-100"
+        "fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white transition-all duration-[800ms] ease-in-out",
+        isExiting ? "scale-150 opacity-0 blur-sm" : "scale-100 opacity-100 blur-0"
       )}>
         <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-400/20 rounded-full blur-[120px]"></div>
