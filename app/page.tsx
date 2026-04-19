@@ -176,7 +176,7 @@ export default function Home() {
               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{t('nav.subtitle')}</span>
             </div>
           </div>
-          <div className="hidden md:block">
+          <div>
             <LanguageSwitcher />
           </div>
         </div>
@@ -206,10 +206,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="md:hidden w-full mb-4 flex justify-center">
-             <LanguageSwitcher />
-          </div>
-          
           {/* Main Control Card */}
           <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60">
             <div className="flex flex-col gap-6">
