@@ -39,9 +39,9 @@ export async function renderPdfPageToCanvas(
   }
 
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
-  const viewport = page.getViewport({ scale: 1 }); // Initial scale to get original dimensions
+  const viewport = page.getViewport({ scale: 2.0 }); // Higher scale for better quality
 
-  // Set canvas dimensions to match the PDF page dimensions
+  // Set canvas dimensions to match the PDF page dimensions at the specified scale
   canvas.width = viewport.width;
   canvas.height = viewport.height;
 

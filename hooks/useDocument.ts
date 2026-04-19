@@ -37,22 +37,9 @@ export function useDocument({ canvases }: UseDocumentProps) {
 
       return new Promise<void>((resolve, reject) => {
         img.onload = () => {
-          const maxWidth = 800;
-          const maxHeight = 600;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxWidth) {
-              height *= maxWidth / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
-          }
+          // Use original image dimensions to maintain quality
+          const width = img.width;
+          const height = img.height;
 
           canvas.width = width;
           canvas.height = height;
