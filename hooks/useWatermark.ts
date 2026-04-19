@@ -24,6 +24,19 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [watermarkImage, setWatermarkImage] = useState<HTMLImageElement | null>(null);
   const [imageScale, setImageScale] = useState(0.5);
 
+  const resetWatermark = useCallback(() => {
+    setWatermarkMode("text");
+    setWatermarkLayout("tiled");
+    setWatermarkText("DocsGuard");
+    setWatermarkColor("#000000");
+    setWatermarkOpacity(0.3);
+    setFontFamily("Arial");
+    setFontSize(40);
+    setOrientation("diagonal");
+    setWatermarkImage(null);
+    setImageScale(0.5);
+  }, []);
+
   const drawWatermark = useCallback(async () => {
     if (canvases.length === 0) return;
 
@@ -120,6 +133,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setWatermarkImage,
     imageScale,
     setImageScale,
+    resetWatermark,
     drawWatermark,
   };
 }

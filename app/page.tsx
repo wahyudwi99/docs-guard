@@ -83,8 +83,17 @@ export default function Home() {
     setWatermarkImage,
     imageScale,
     setImageScale,
+    resetWatermark,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
+
+  const handleNewFile = useCallback(() => {
+    clearDocument();
+    clearCanvases();
+    resetWatermark();
+    setPreviewUrls([]);
+    setActiveTab('upload');
+  }, [clearDocument, clearCanvases, resetWatermark]);
 
   // File Export logic - Passing canvases array
   const { getPreviewUrls, saveToDevice } = useFileExport({ 
@@ -275,13 +284,12 @@ export default function Home() {
                   <div className="space-y-8">
                      <div className="flex items-center justify-between">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('design_section.appearance')}</p>
-                       <button 
-                          onClick={() => window.location.reload()} 
+                       <button
+                          onClick={handleNewFile}
                           className="text-[10px] font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition-colors"
                         >
                           {t('design_section.new_file')}
-                        </button>
-                     </div>
+                        </button>                     </div>
                      
                      <WatermarkControls
                         watermarkMode={watermarkMode}
