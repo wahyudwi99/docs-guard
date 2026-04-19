@@ -3,7 +3,8 @@
     "title": "DocsGuard",
     "subtitle": "Amankan sebelum dibagikan",
     "lab": "Lab Perlindungan",
-    "tools": "Alat Keamanan"
+    "tools": "Alat Keamanan",
+    "privacy_banner": "Dokumen Anda diproses secara lokal di perangkat Anda tanpa menggunakan server. Kami tidak menyimpan atau mengakses data Anda. Privasi Anda sepenuhnya ada di tangan Anda."
   },
   "tabs": {
     "upload": "Unggah",

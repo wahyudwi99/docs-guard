@@ -3,7 +3,8 @@
     "title": "DocsGuard",
     "subtitle": "Secure it before you share it",
     "lab": "Protection Lab",
-    "tools": "Secure Tools"
+    "tools": "Secure Tools",
+    "privacy_banner": "Your documents are processed locally on your device without the use of servers. We do not store or access your data. Your privacy is entirely in your hands."
   },
   "tabs": {
     "upload": "Upload",
