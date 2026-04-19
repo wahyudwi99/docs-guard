@@ -105,6 +105,8 @@
   },
   "errors": {
     "unsupported_file": "Unsupported file type: {type}",
-    "failed_to_load": "Failed to load document"
+    "failed_to_load": "Failed to load document",
+    "page_limit_exceeded": "Free Tier Limit: Max 3 Pages",
+    "page_limit_description": "This document has {count} pages. Please upgrade to Pro Plan to watermark documents with more than 3 pages."
   }
 }

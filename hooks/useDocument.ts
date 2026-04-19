@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
 import { useI18n } from "@/hooks/useI18n";
+import { useSubscription } from "@/hooks/useSubscription";
 
 type DocumentType = "image" | "pdf" | null;
 
@@ -11,11 +12,13 @@ interface UseDocumentProps {
 
 export function useDocument({ canvases }: UseDocumentProps) {
   const { t } = useI18n();
+  const { isPro } = useSubscription();
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [limitExceeded, setLimitExceeded] = useState(false);
 
   const clearDocument = useCallback(() => {
     setFile(null);
@@ -23,6 +26,7 @@ export function useDocument({ canvases }: UseDocumentProps) {
     setPdfDoc(null);
     setNumPages(0);
     setError(null);
+    setLimitExceeded(false);
   }, []);
 
   const loadImage = useCallback(
@@ -107,6 +111,7 @@ export function useDocument({ canvases }: UseDocumentProps) {
       }
 
       setError(null);
+      setLimitExceeded(false);
       setPdfDoc(null);
       setFile(selectedFile);
       
@@ -117,6 +122,15 @@ export function useDocument({ canvases }: UseDocumentProps) {
         } else if (selectedFile.type === "application/pdf") {
           setDocumentType("pdf");
           const doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
+          
+          if (!isPro && doc.numPages > 3) {
+            setLimitExceeded(true);
+            setPdfDoc(null);
+            setFile(null);
+            setNumPages(0);
+            return;
+          }
+
           setPdfDoc(doc);
           setNumPages(doc.numPages);
         } else {
@@ -131,7 +145,7 @@ export function useDocument({ canvases }: UseDocumentProps) {
         setNumPages(0);
       }
     },
-    [clearDocument, t]
+    [clearDocument, t, isPro]
   );
 
   return {
@@ -140,6 +154,8 @@ export function useDocument({ canvases }: UseDocumentProps) {
     pdfDoc,
     numPages,
     error,
+    limitExceeded,
+    setLimitExceeded,
     handleFileChange,
     clearDocument,
     drawDocumentOnCanvases,

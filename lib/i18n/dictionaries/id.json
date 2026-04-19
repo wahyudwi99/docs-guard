@@ -105,6 +105,8 @@
   },
   "errors": {
     "unsupported_file": "Tipe file tidak didukung: {type}",
-    "failed_to_load": "Gagal memuat dokumen"
+    "failed_to_load": "Gagal memuat dokumen",
+    "page_limit_exceeded": "Batas Gratis: Maks 3 Halaman",
+    "page_limit_description": "Dokumen ini memiliki {count} halaman. Silakan tingkatkan ke Pro Plan untuk memberikan watermark pada dokumen lebih dari 3 halaman."
   }
 }

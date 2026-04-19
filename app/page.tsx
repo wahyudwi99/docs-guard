@@ -45,6 +45,8 @@ export default function Home() {
     documentType,
     numPages,
     error,
+    limitExceeded,
+    setLimitExceeded,
     handleFileChange,
     drawDocumentOnCanvases,
   } = useDocument({ canvases });
@@ -495,6 +497,49 @@ export default function Home() {
       )}
 
       {/* Modern Mini Footer */}
+      {/* Page Limit Exceeded Modal */}
+      {limitExceeded && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => setLimitExceeded(false)}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-50 text-amber-500 mx-auto shadow-sm">
+              <Zap className="h-10 w-10 fill-amber-500" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                {t('errors.page_limit_exceeded')}
+              </h3>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed">
+                {t('errors.page_limit_description', { count: '>3' })}
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setLimitExceeded(false);
+                  setActiveTab('subscription');
+                }}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+              >
+                <Zap className="h-4 w-4 fill-white" />
+                Upgrade to Pro
+              </button>
+              <button 
+                onClick={() => setLimitExceeded(false)}
+                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="max-w-5xl mx-auto w-full px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-200/60 mt-8 relative z-10">
         <div className="flex items-center gap-2 opacity-60">
           <Shield className="h-4 w-4 text-indigo-600" />
