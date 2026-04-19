@@ -55,31 +55,6 @@ export default function Home() {
     drawDocumentOnCanvases,
   } = useDocument({ canvases });
 
-  const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // Renew canvases and state to avoid "canvas already used" error
-    clearCanvases();
-    resetWatermark();
-    setPreviewUrls([]);
-    handleFileChange(e);
-  }, [handleFileChange, clearCanvases, resetWatermark]);
-
-  const handleCameraCapture = useCallback((capturedFile: File) => {
-    // Create a mock event to reuse handleFileChange logic
-    const mockEvent = {
-      target: {
-        files: [capturedFile]
-      }
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    
-    handleFileChangeWithReset(mockEvent);
-    setShowCamera(false);
-  }, [handleFileChangeWithReset]);
-
-  // Switch to design tab when file is uploaded
-  useEffect(() => {
-    if (file) setActiveTab('design');
-  }, [file]);
-
   // Callback to redraw the current document (image or PDF pages)
   const redrawDocument = useCallback(async (currentCanvases: HTMLCanvasElement[]) => {
     if (!file || !documentType || currentCanvases.length === 0) return;
@@ -110,6 +85,31 @@ export default function Home() {
     resetWatermark,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
+
+  const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Renew canvases and state to avoid "canvas already used" error
+    clearCanvases();
+    resetWatermark();
+    setPreviewUrls([]);
+    handleFileChange(e);
+  }, [handleFileChange, clearCanvases, resetWatermark]);
+
+  const handleCameraCapture = useCallback((capturedFile: File) => {
+    // Create a mock event to reuse handleFileChange logic
+    const mockEvent = {
+      target: {
+        files: [capturedFile]
+      }
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
+    
+    handleFileChangeWithReset(mockEvent);
+    setShowCamera(false);
+  }, [handleFileChangeWithReset]);
+
+  // Switch to design tab when file is uploaded
+  useEffect(() => {
+    if (file) setActiveTab('design');
+  }, [file]);
 
   const handleNewFile = useCallback(() => {
     clearDocument();
