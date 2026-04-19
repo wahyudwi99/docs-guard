@@ -34,6 +34,8 @@
     "browse": "Browse Library",
     "take_photo": "Take Photo",
     "camera": "CAMERA",
+    "crop_title": "Adjust Edges",
+    "crop_hint": "Drag corners to crop the document",
     "pdf": "PDF",
     "image": "IMAGE"
   },

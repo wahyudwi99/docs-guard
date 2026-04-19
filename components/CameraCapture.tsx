@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
-import { Camera, X, Check, RefreshCw } from "lucide-react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { Camera, X, Check, RefreshCw, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/hooks/useI18n";
 
@@ -10,14 +10,30 @@ interface CameraCaptureProps {
   onClose: () => void;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => {
   const { t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isAdjusting, setIsAdjusting] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 4 points for the crop area (percentage 0-100)
+  const [points, setPoints] = useState<Point[]>([
+    { x: 10, y: 10 },
+    { x: 90, y: 10 },
+    { x: 90, y: 90 },
+    { x: 10, y: 90 },
+  ]);
+  const [activePoint, setActivePoint] = useState<number | null>(null);
 
   const startCamera = useCallback(async () => {
     setIsStarting(true);
@@ -49,8 +65,6 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
-      
-      // Ensure video is ready
       if (video.readyState < 2) return;
 
       const canvas = canvasRef.current;
@@ -61,26 +75,64 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
         setCapturedImage(dataUrl);
-        // Don't stop camera immediately to avoid blinking/abrupt UI changes
+        setIsAdjusting(true);
       }
     }
   }, []);
 
-  const handleConfirm = useCallback(() => {
-    if (capturedImage) {
-      stopCamera();
-      fetch(capturedImage)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], `camera-capture-${Date.now()}.jpg`, { type: "image/jpeg" });
+  const handlePointMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (activePoint === null || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+    const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+
+    setPoints(prev => {
+      const newPoints = [...prev];
+      newPoints[activePoint] = { x, y };
+      return newPoints;
+    });
+  }, [activePoint]);
+
+  const handleConfirm = useCallback(async () => {
+    if (capturedImage && canvasRef.current) {
+      const img = new Image();
+      img.src = capturedImage;
+      await new Promise(resolve => img.onload = resolve);
+
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Calculate bounding box of the 4 points
+      const minX = Math.min(...points.map(p => p.x)) / 100 * img.width;
+      const minY = Math.min(...points.map(p => p.y)) / 100 * img.height;
+      const maxX = Math.max(...points.map(p => p.x)) / 100 * img.width;
+      const maxY = Math.max(...points.map(p => p.y)) / 100 * img.height;
+
+      const width = maxX - minX;
+      const height = maxY - minY;
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, minX, minY, width, height, 0, 0, width, height);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], `camera-crop-${Date.now()}.jpg`, { type: "image/jpeg" });
+          stopCamera();
           onCapture(file);
-        });
+        }
+      }, "image/jpeg", 0.95);
     }
-  }, [capturedImage, onCapture, stopCamera]);
+  }, [capturedImage, points, onCapture, stopCamera]);
 
   const handleRetake = useCallback(() => {
     setCapturedImage(null);
-    // Camera is still running if we didn't call stopCamera in capturePhoto
+    setIsAdjusting(false);
     if (!stream) startCamera();
   }, [startCamera, stream]);
 
@@ -89,61 +141,77 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
     onClose();
   }, [stopCamera, onClose]);
 
-  // Auto-start camera
-  React.useEffect(() => {
+  useEffect(() => {
     startCamera();
     return () => {
-      // Cleanup tracks on unmount
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      if (stream) stream.getTracks().forEach(t => t.stop());
     };
-  }, [startCamera]); // Removed stream from dependency to avoid loop
+  }, [startCamera]);
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300 select-none">
       <div className="relative w-full max-w-xl bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl flex flex-col aspect-[3/4] md:aspect-video">
+        
         {/* Header */}
         <div className="absolute top-6 left-6 right-6 z-20 flex justify-between items-center">
           <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-            <Camera className="h-4 w-4 text-emerald-400" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white">{t('upload_section.camera')}</span>
+            {isAdjusting ? <Scissors className="h-4 w-4 text-indigo-400" /> : <Camera className="h-4 w-4 text-emerald-400" />}
+            <span className="text-[10px] font-black uppercase tracking-widest text-white">
+              {isAdjusting ? t('upload_section.crop_title') : t('upload_section.camera')}
+            </span>
           </div>
-          <button 
-            onClick={handleClose}
-            className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"
-          >
+          <button onClick={handleClose} className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Viewport */}
-        <div className="flex-1 relative bg-black flex items-center justify-center">
+        <div 
+          ref={containerRef}
+          className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none"
+          onMouseMove={handlePointMove}
+          onTouchMove={handlePointMove}
+          onMouseUp={() => setActivePoint(null)}
+          onTouchEnd={() => setActivePoint(null)}
+        >
           {capturedImage ? (
-            <img src={capturedImage} alt="Captured" className="w-full h-full object-contain animate-in fade-in duration-300" />
+            <div className="relative w-full h-full flex items-center justify-center">
+              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none" />
+              
+              {isAdjusting && (
+                <div className="absolute inset-0 z-10">
+                   <svg className="w-full h-full pointer-events-none">
+                      <polygon 
+                        points={points.map(p => `${p.x}%,${p.y}%`).join(' ')}
+                        className="fill-indigo-500/20 stroke-indigo-500 stroke-2"
+                      />
+                   </svg>
+                   {points.map((p, i) => (
+                     <div
+                        key={i}
+                        onMouseDown={() => setActivePoint(i)}
+                        onTouchStart={() => setActivePoint(i)}
+                        style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                        className={cn(
+                          "absolute h-8 w-8 -ml-4 -mt-4 rounded-full border-2 border-white shadow-xl cursor-move pointer-events-auto flex items-center justify-center transition-transform",
+                          activePoint === i ? "scale-125 bg-indigo-500 border-indigo-400" : "bg-indigo-600/80"
+                        )}
+                     >
+                       <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
+                     </div>
+                   ))}
+                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold text-white/80 uppercase tracking-widest">
+                     {t('upload_section.crop_hint')}
+                   </div>
+                </div>
+              )}
+            </div>
           ) : (
             <>
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                playsInline 
-                muted
-                className="w-full h-full object-cover"
-              />
+              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
               {isStarting && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/60">
                   <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                </div>
-              )}
-              {error && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center space-y-4">
-                  <p className="text-white text-sm font-bold">{error}</p>
-                  <button 
-                    onClick={startCamera}
-                    className="px-6 py-2 bg-white text-black rounded-full font-bold text-xs uppercase tracking-widest"
-                  >
-                    Retry
-                  </button>
                 </div>
               )}
             </>
@@ -163,7 +231,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
               </button>
               <button 
                 onClick={handleConfirm}
-                className="h-20 w-20 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all scale-110"
+                className="h-20 w-20 rounded-full bg-indigo-500 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 hover:bg-indigo-600 transition-all scale-110"
               >
                 <Check className="h-10 w-10" />
               </button>
