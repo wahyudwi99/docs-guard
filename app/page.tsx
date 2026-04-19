@@ -48,6 +48,7 @@ export default function Home() {
     limitExceeded,
     setLimitExceeded,
     handleFileChange,
+    clearDocument,
     drawDocumentOnCanvases,
   } = useDocument({ canvases });
 
