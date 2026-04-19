@@ -379,6 +379,11 @@ export default function Home() {
                 <p className="text-xs text-indigo-100 leading-relaxed">
                   {t('info_card.description')}
                 </p>
+                <div className="pt-2 border-t border-white/20">
+                  <p className="text-[10px] text-indigo-200/90 leading-relaxed italic">
+                    {t('info_card.privacy_notice')}
+                  </p>
+                </div>
                 <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all">
                   {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
                 </button>

@@ -80,6 +80,7 @@
   "info_card": {
     "how_it_works": "Cara kerjanya",
     "description": "DocsGuard menggunakan rendering kanvas berbasis browser untuk menerapkan watermark. Ini berarti data Anda tidak pernah meninggalkan komputer Anda, menjamin privasi 100%.",
+    "privacy_notice": "Dokumen Anda diproses secara lokal di perangkat Anda tanpa menggunakan server. Kami tidak menyimpan atau mengakses data Anda. Privasi Anda sepenuhnya ada di tangan Anda.",
     "learn_more": "Pelajari Lebih Lanjut"
   },
   "preview_modal": {
