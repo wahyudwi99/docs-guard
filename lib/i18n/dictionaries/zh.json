@@ -37,7 +37,7 @@
   },
   "design_section": {
     "appearance": "外观",
-    "new_file": "新文件",
+    "remove_file": "删除文件",
     "generate_preview": "生成预览",
     "secure_note": "端到端安全"
   },

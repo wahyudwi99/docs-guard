@@ -37,7 +37,7 @@
   },
   "design_section": {
     "appearance": "Apariencia",
-    "new_file": "Nuevo Archivo",
+    "remove_file": "Eliminar Archivo",
     "generate_preview": "Generar Vista Previa",
     "secure_note": "Seguro de Extremo a Extremo"
   },

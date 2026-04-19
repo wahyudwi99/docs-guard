@@ -37,7 +37,7 @@
   },
   "design_section": {
     "appearance": "모양",
-    "new_file": "새 파일",
+    "remove_file": "파일 삭제",
     "generate_preview": "미리보기 생성",
     "secure_note": "엔드투엔드 보안"
   },

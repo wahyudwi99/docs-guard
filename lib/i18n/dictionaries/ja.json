@@ -37,7 +37,7 @@
   },
   "design_section": {
     "appearance": "外観",
-    "new_file": "新しいファイル",
+    "remove_file": "ファイルを削除",
     "generate_preview": "プレビューを生成",
     "secure_note": "エンドツーエンドで安全"
   },

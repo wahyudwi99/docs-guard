@@ -245,8 +245,9 @@ export default function Home() {
               <div className="flex p-1 bg-black/5 rounded-[16px]">
                 <button 
                   onClick={() => setActiveTab('upload')}
+                  disabled={!!file}
                   className={cn(
-                    "flex-1 py-2 px-4 rounded-[12px] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2",
+                    "flex-1 py-2 px-4 rounded-[12px] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40",
                     activeTab === 'upload' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                   )}
                 >
@@ -339,12 +340,7 @@ export default function Home() {
                   <div className="space-y-8">
                      <div className="flex items-center justify-between">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('design_section.appearance')}</p>
-                       <button
-                          onClick={handleNewFile}
-                          className="text-[10px] font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition-colors"
-                        >
-                          {t('design_section.new_file')}
-                        </button>                     </div>
+                     </div>
                      
                      <WatermarkControls
                         watermarkMode={watermarkMode}
@@ -374,6 +370,13 @@ export default function Home() {
                          >
                            <Sparkles className="h-4 w-4" />
                            {t('design_section.generate_preview')}
+                         </button>
+                         <button 
+                           onClick={handleNewFile}
+                           className="w-full py-4 bg-rose-50 text-rose-600 font-bold rounded-2xl border border-rose-100 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-rose-100"
+                         >
+                           <X className="h-4 w-4" />
+                           {t('design_section.remove_file')}
                          </button>
                          <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>

@@ -37,7 +37,7 @@
   },
   "design_section": {
     "appearance": "Внешний вид",
-    "new_file": "Новый файл",
+    "remove_file": "Удалить файл",
     "generate_preview": "Создать превью",
     "secure_note": "Сквозное шифрование"
   },

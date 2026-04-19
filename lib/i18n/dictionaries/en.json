@@ -41,7 +41,7 @@
   },
   "design_section": {
     "appearance": "Appearance",
-    "new_file": "New File",
+    "remove_file": "Remove File",
     "generate_preview": "Generate Preview",
     "secure_note": "End-to-End Secure"
   },

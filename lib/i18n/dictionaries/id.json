@@ -41,7 +41,7 @@
   },
   "design_section": {
     "appearance": "Tampilan",
-    "new_file": "File Baru",
+    "remove_file": "Hapus File",
     "generate_preview": "Buat Pratinjau",
     "secure_note": "Aman End-to-End"
   },
