@@ -43,7 +43,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
     setError(null);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
       });
       setStream(mediaStream);
@@ -71,19 +71,19 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       if (video.readyState < 2) return;
 
       const canvas = canvasRef.current;
+      // Capture at full resolution
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const context = canvas.getContext("2d");
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+        const dataUrl = canvas.toDataURL("image/jpeg", 1.0);
         setCapturedImage(dataUrl);
         setIsAdjusting(true);
       }
     }
   }, []);
 
-  // Global move and up handlers to prevent "losing" the handle or shifting on click
   useEffect(() => {
     if (!activeHandle) return;
 
@@ -94,7 +94,6 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-      // Calculate percentage relative to viewport
       const x = Math.max(0, Math.min(100, ((clientX - containerRect.left) / containerRect.width) * 100));
       const y = Math.max(0, Math.min(100, ((clientY - containerRect.top) / containerRect.height) * 100));
 
@@ -124,9 +123,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       });
     };
 
-    const handleUp = () => {
-      setActiveHandle(null);
-    };
+    const handleUp = () => setActiveHandle(null);
 
     window.addEventListener('mousemove', handleMove);
     window.addEventListener('mouseup', handleUp);
@@ -151,17 +148,55 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const scaleX = img.width / 100;
-      const scaleY = img.height / 100;
+      // Crucial Fix: Calculate actual coordinates based on how image fits in viewport
+      // The viewport uses 'object-contain', so we need to account for padding
+      const container = containerRef.current;
+      if (!container) return;
 
-      const cropX = rect.left * scaleX;
-      const cropY = rect.top * scaleY;
-      const cropW = rect.width * scaleX;
-      const cropH = rect.height * scaleY;
+      const containerW = container.clientWidth;
+      const containerH = container.clientHeight;
+      const imgW = img.width;
+      const imgH = img.height;
 
-      canvas.width = cropW;
-      canvas.height = cropH;
-      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+      const containerRatio = containerW / containerH;
+      const imgRatio = imgW / imgH;
+
+      let displayW, displayH, offsetX, offsetY;
+
+      if (imgRatio > containerRatio) {
+        displayW = containerW;
+        displayH = containerW / imgRatio;
+        offsetX = 0;
+        offsetY = (containerH - displayH) / 2;
+      } else {
+        displayH = containerH;
+        displayW = containerH * imgRatio;
+        offsetY = 0;
+        offsetX = (containerW - displayW) / 2;
+      }
+
+      // Percentage relative to container -> coordinate relative to image
+      const getImgCoord = (percX: number, percY: number) => {
+        const xInContainer = (percX / 100) * containerW;
+        const yInContainer = (percY / 100) * containerH;
+        
+        const xInImg = ((xInContainer - offsetX) / displayW) * imgW;
+        const yInImg = ((yInContainer - offsetY) / displayH) * imgH;
+        
+        return { x: xInImg, y: yInImg };
+      };
+
+      const tl = getImgCoord(rect.left, rect.top);
+      const br = getImgCoord(rect.left + rect.width, rect.top + rect.height);
+
+      const finalX = Math.max(0, tl.x);
+      const finalY = Math.max(0, tl.y);
+      const finalW = Math.min(imgW - finalX, br.x - tl.x);
+      const finalH = Math.min(imgH - finalY, br.y - tl.y);
+
+      canvas.width = finalW;
+      canvas.height = finalH;
+      ctx.drawImage(img, finalX, finalY, finalW, finalH, 0, 0, finalW, finalH);
 
       canvas.toBlob((blob) => {
         if (blob) {
@@ -169,7 +204,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
           stopCamera();
           onCapture(file);
         }
-      }, "image/jpeg", 0.9);
+      }, "image/jpeg", 0.95);
     }
   }, [capturedImage, rect, onCapture, stopCamera]);
 
@@ -195,7 +230,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300 select-none">
       <div className="relative w-full max-w-xl bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl flex flex-col aspect-[3/4] md:aspect-video">
         
-        {/* Header - Z-Index 20 */}
+        {/* Header */}
         <div className="absolute top-6 left-6 right-6 z-20 flex justify-between items-center">
           <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
             {isAdjusting ? <Scissors className="h-4 w-4 text-indigo-400" /> : <Camera className="h-4 w-4 text-emerald-400" />}
@@ -209,25 +244,16 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         </div>
 
         {/* Viewport */}
-        <div 
-          ref={containerRef}
-          className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none"
-        >
+        <div ref={containerRef} className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none">
           {capturedImage ? (
             <div className="relative w-full h-full flex items-center justify-center">
-              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-50" />
+              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-60" />
               
               {isAdjusting && (
                 <div 
-                  className="absolute border-2 border-indigo-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] z-30"
-                  style={{ 
-                    top: `${rect.top}%`, 
-                    left: `${rect.left}%`, 
-                    width: `${rect.width}%`, 
-                    height: `${rect.height}%` 
-                  }}
+                  className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] z-30"
+                  style={{ top: `${rect.top}%`, left: `${rect.left}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
                 >
-                  {/* Corner Handles - Larger hit area */}
                   {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
                     <div
                       key={h}
@@ -243,29 +269,17 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
                     >
                       <div className={cn(
                         "h-4 w-4 rounded-full border-2 border-white shadow-xl transition-transform",
-                        activeHandle === h ? "scale-125 bg-white" : "bg-indigo-500"
+                        activeHandle === h ? "scale-150 bg-white" : "bg-indigo-500"
                       )}></div>
                     </div>
                   ))}
-                  
-                  {/* Visual Guide Grid */}
                   <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-20 pointer-events-none">
-                    <div className="border-r border-b border-white"></div>
-                    <div className="border-r border-b border-white"></div>
-                    <div className="border-b border-white"></div>
-                    <div className="border-r border-b border-white"></div>
-                    <div className="border-r border-b border-white"></div>
-                    <div className="border-b border-white"></div>
-                    <div className="border-r border-white"></div>
-                    <div className="border-r border-white"></div>
-                    <div></div>
+                    <div className="border-r border-b border-white"></div><div className="border-r border-b border-white"></div><div className="border-b border-white"></div>
+                    <div className="border-r border-b border-white"></div><div className="border-r border-b border-white"></div><div className="border-b border-white"></div>
+                    <div className="border-r border-white"></div><div className="border-r border-white"></div><div></div>
                   </div>
                 </div>
               )}
-              
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-indigo-600/90 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold text-white uppercase tracking-widest z-40">
-                {t('upload_section.crop_hint')}
-              </div>
             </div>
           ) : (
             <>
@@ -284,25 +298,15 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         <div className="relative z-50 p-8 flex justify-center items-center gap-8 bg-black/40 border-t border-white/10">
           {capturedImage ? (
             <>
-              <button 
-                onClick={handleRetake}
-                className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
-              >
+              <button onClick={handleRetake} className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all">
                 <RefreshCw className="h-6 w-6" />
               </button>
-              <button 
-                onClick={handleConfirm}
-                className="h-20 w-20 rounded-full bg-indigo-500 flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 hover:bg-indigo-600 transition-all scale-110 active:scale-95"
-              >
+              <button onClick={handleConfirm} className="h-20 w-20 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all scale-110 active:scale-95">
                 <Check className="h-10 w-10" />
               </button>
             </>
           ) : (
-            <button 
-              onClick={capturePhoto}
-              disabled={!stream || isStarting}
-              className="group h-20 w-20 rounded-full border-4 border-white p-1 transition-all active:scale-95 disabled:opacity-50"
-            >
+            <button onClick={capturePhoto} disabled={!stream || isStarting} className="group h-20 w-20 rounded-full border-4 border-white p-1 transition-all active:scale-95 disabled:opacity-50">
               <div className="h-full w-full rounded-full bg-white transition-all group-hover:scale-90"></div>
             </button>
           )}
