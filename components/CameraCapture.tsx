@@ -49,21 +49,26 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
+      
+      // Ensure video is ready
+      if (video.readyState < 2) return;
+
       const canvas = canvasRef.current;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const context = canvas.getContext("2d");
       if (context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg");
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
         setCapturedImage(dataUrl);
-        stopCamera();
+        // Don't stop camera immediately to avoid blinking/abrupt UI changes
       }
     }
-  }, [stopCamera]);
+  }, []);
 
   const handleConfirm = useCallback(() => {
     if (capturedImage) {
+      stopCamera();
       fetch(capturedImage)
         .then(res => res.blob())
         .then(blob => {
@@ -71,12 +76,13 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
           onCapture(file);
         });
     }
-  }, [capturedImage, onCapture]);
+  }, [capturedImage, onCapture, stopCamera]);
 
   const handleRetake = useCallback(() => {
     setCapturedImage(null);
-    startCamera();
-  }, [startCamera]);
+    // Camera is still running if we didn't call stopCamera in capturePhoto
+    if (!stream) startCamera();
+  }, [startCamera, stream]);
 
   const handleClose = useCallback(() => {
     stopCamera();
@@ -86,8 +92,13 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   // Auto-start camera
   React.useEffect(() => {
     startCamera();
-    return () => stopCamera();
-  }, [startCamera, stopCamera]);
+    return () => {
+      // Cleanup tracks on unmount
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [startCamera]); // Removed stream from dependency to avoid loop
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
@@ -109,13 +120,14 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         {/* Viewport */}
         <div className="flex-1 relative bg-black flex items-center justify-center">
           {capturedImage ? (
-            <img src={capturedImage} alt="Captured" className="w-full h-full object-contain" />
+            <img src={capturedImage} alt="Captured" className="w-full h-full object-contain animate-in fade-in duration-300" />
           ) : (
             <>
               <video 
                 ref={videoRef} 
                 autoPlay 
                 playsInline 
+                muted
                 className="w-full h-full object-cover"
               />
               {isStarting && (
