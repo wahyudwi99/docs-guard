@@ -55,6 +55,14 @@ export default function Home() {
     drawDocumentOnCanvases,
   } = useDocument({ canvases });
 
+  const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Renew canvases and state to avoid "canvas already used" error
+    clearCanvases();
+    resetWatermark();
+    setPreviewUrls([]);
+    handleFileChange(e);
+  }, [handleFileChange, clearCanvases, resetWatermark]);
+
   const handleCameraCapture = useCallback((capturedFile: File) => {
     // Create a mock event to reuse handleFileChange logic
     const mockEvent = {
@@ -63,9 +71,9 @@ export default function Home() {
       }
     } as unknown as React.ChangeEvent<HTMLInputElement>;
     
-    handleFileChange(mockEvent);
+    handleFileChangeWithReset(mockEvent);
     setShowCamera(false);
-  }, [handleFileChange]);
+  }, [handleFileChangeWithReset]);
 
   // Switch to design tab when file is uploaded
   useEffect(() => {
@@ -290,7 +298,7 @@ export default function Home() {
                      )}
                      
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FileInput onFileChange={handleFileChange} />
+                        <FileInput onFileChange={handleFileChangeWithReset} />
                         
                         <div 
                           onClick={() => setShowCamera(true)}
