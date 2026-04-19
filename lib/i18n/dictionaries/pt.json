@@ -3,7 +3,10 @@
     "title": "DocsGuard",
     "subtitle": "Proteja-o antes de partilhar",
     "lab": "Laboratório de Proteção",
-    "tools": "Ferramentas Seguras"
+    "tools": "Ferramentas Seguras",
+    "privacy_banner_title": "Processamento Local Verificado",
+    "privacy_banner_subtitle": "Seguro e Privado",
+    "privacy_banner": "Os seus documentos são processados localmente no seu dispositivo sem a utilização de servidores. Não armazenamos nem acedemos aos seus dados. A sua privacidade está inteiramente nas suas mãos."
   },
   "tabs": {
     "upload": "Enviar",

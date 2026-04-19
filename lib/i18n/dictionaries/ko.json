@@ -3,7 +3,10 @@
     "title": "DocsGuard",
     "subtitle": "공유하기 전에 보호하세요",
     "lab": "보호 랩",
-    "tools": "보안 도구"
+    "tools": "보안 도구",
+    "privacy_banner_title": "검증된 로컬 처리",
+    "privacy_banner_subtitle": "안전 및 프라이버시",
+    "privacy_banner": "문서는 서버를 사용하지 않고 기기에서 로컬로 처리됩니다. 당사는 귀하의 데이터를 저장하거나 액세스하지 않습니다. 귀하의 개인 정보 보호는 전적으로 귀하의 손에 달려 있습니다."
   },
   "tabs": {
     "upload": "업로드",

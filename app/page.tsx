@@ -182,9 +182,9 @@ export default function Home() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">Verified Local Processing</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">{t('nav.privacy_banner_title')}</span>
                   <div className="h-1 w-1 rounded-full bg-emerald-300"></div>
-                  <span className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest">Safe & Private</span>
+                  <span className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest">{t('nav.privacy_banner_subtitle')}</span>
                 </div>
                 <p className="text-xs font-medium text-slate-600 leading-relaxed">
                   {t('nav.privacy_banner')}
