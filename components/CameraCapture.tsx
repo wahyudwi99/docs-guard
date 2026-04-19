@@ -10,9 +10,11 @@ interface CameraCaptureProps {
   onClose: () => void;
 }
 
-interface Point {
-  x: number;
-  y: number;
+interface Rect {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
 }
 
 export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => {
@@ -26,14 +28,15 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // 4 points for the crop area (percentage 0-100)
-  const [points, setPoints] = useState<Point[]>([
-    { x: 10, y: 10 },
-    { x: 90, y: 10 },
-    { x: 90, y: 90 },
-    { x: 10, y: 90 },
-  ]);
-  const [activePoint, setActivePoint] = useState<number | null>(null);
+  // Rectangle crop area (percentage 0-100)
+  const [rect, setRect] = useState<Rect>({
+    top: 10,
+    left: 10,
+    width: 80,
+    height: 80
+  });
+  
+  const [activeHandle, setActiveHandle] = useState<string | null>(null);
 
   const startCamera = useCallback(async () => {
     setIsStarting(true);
@@ -80,22 +83,41 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
     }
   }, []);
 
-  const handlePointMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (activePoint === null || !containerRef.current) return;
+  const handleHandleMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (activeHandle === null || !containerRef.current) return;
 
-    const rect = containerRef.current.getBoundingClientRect();
+    const containerRect = containerRef.current.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+    const x = Math.max(0, Math.min(100, ((clientX - containerRect.left) / containerRect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((clientY - containerRect.top) / containerRect.height) * 100));
 
-    setPoints(prev => {
-      const newPoints = [...prev];
-      newPoints[activePoint] = { x, y };
-      return newPoints;
+    setRect(prev => {
+      let { top, left, width, height } = prev;
+      const right = left + width;
+      const bottom = top + height;
+
+      if (activeHandle === 'tl') {
+        const newLeft = Math.min(x, right - 5);
+        const newTop = Math.min(y, bottom - 5);
+        return { top: newTop, left: newLeft, width: right - newLeft, height: bottom - newTop };
+      } else if (activeHandle === 'tr') {
+        const newRight = Math.max(x, left + 5);
+        const newTop = Math.min(y, bottom - 5);
+        return { top: newTop, left, width: newRight - left, height: bottom - newTop };
+      } else if (activeHandle === 'bl') {
+        const newLeft = Math.min(x, right - 5);
+        const newBottom = Math.max(y, top + 5);
+        return { top, left: newLeft, width: right - newLeft, height: newBottom - top };
+      } else if (activeHandle === 'br') {
+        const newRight = Math.max(x, left + 5);
+        const newBottom = Math.max(y, top + 5);
+        return { top, left, width: newRight - left, height: newBottom - top };
+      }
+      return prev;
     });
-  }, [activePoint]);
+  }, [activeHandle]);
 
   const handleConfirm = useCallback(async () => {
     if (capturedImage && canvasRef.current) {
@@ -107,18 +129,17 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Calculate bounding box of the 4 points
-      const minX = Math.min(...points.map(p => p.x)) / 100 * img.width;
-      const minY = Math.min(...points.map(p => p.y)) / 100 * img.height;
-      const maxX = Math.max(...points.map(p => p.x)) / 100 * img.width;
-      const maxY = Math.max(...points.map(p => p.y)) / 100 * img.height;
+      const scaleX = img.width / 100;
+      const scaleY = img.height / 100;
 
-      const width = maxX - minX;
-      const height = maxY - minY;
+      const cropX = rect.left * scaleX;
+      const cropY = rect.top * scaleY;
+      const cropW = rect.width * scaleX;
+      const cropH = rect.height * scaleY;
 
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, minX, minY, width, height, 0, 0, width, height);
+      canvas.width = cropW;
+      canvas.height = cropH;
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
       canvas.toBlob((blob) => {
         if (blob) {
@@ -126,9 +147,9 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
           stopCamera();
           onCapture(file);
         }
-      }, "image/jpeg", 0.95);
+      }, "image/jpeg", 0.9);
     }
-  }, [capturedImage, points, onCapture, stopCamera]);
+  }, [capturedImage, rect, onCapture, stopCamera]);
 
   const handleRetake = useCallback(() => {
     setCapturedImage(null);
@@ -149,7 +170,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   }, [startCamera]);
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300 select-none">
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300 select-none">
       <div className="relative w-full max-w-xl bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl flex flex-col aspect-[3/4] md:aspect-video">
         
         {/* Header */}
@@ -169,42 +190,61 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         <div 
           ref={containerRef}
           className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none"
-          onMouseMove={handlePointMove}
-          onTouchMove={handlePointMove}
-          onMouseUp={() => setActivePoint(null)}
-          onTouchEnd={() => setActivePoint(null)}
+          onMouseMove={handleHandleMove}
+          onTouchMove={handleHandleMove}
+          onMouseUp={() => setActiveHandle(null)}
+          onTouchEnd={() => setActiveHandle(null)}
         >
           {capturedImage ? (
             <div className="relative w-full h-full flex items-center justify-center">
-              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none" />
+              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-50" />
               
               {isAdjusting && (
-                <div className="absolute inset-0 z-10">
-                   <svg className="w-full h-full pointer-events-none">
-                      <polygon 
-                        points={points.map(p => `${p.x}%,${p.y}%`).join(' ')}
-                        className="fill-indigo-500/20 stroke-indigo-500 stroke-2"
-                      />
-                   </svg>
-                   {points.map((p, i) => (
-                     <div
-                        key={i}
-                        onMouseDown={() => setActivePoint(i)}
-                        onTouchStart={() => setActivePoint(i)}
-                        style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                        className={cn(
-                          "absolute h-8 w-8 -ml-4 -mt-4 rounded-full border-2 border-white shadow-xl cursor-move pointer-events-auto flex items-center justify-center transition-transform",
-                          activePoint === i ? "scale-125 bg-indigo-500 border-indigo-400" : "bg-indigo-600/80"
-                        )}
-                     >
-                       <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
-                     </div>
-                   ))}
-                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold text-white/80 uppercase tracking-widest">
-                     {t('upload_section.crop_hint')}
-                   </div>
+                <div 
+                  className="absolute border-2 border-indigo-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] z-10"
+                  style={{ 
+                    top: `${rect.top}%`, 
+                    left: `${rect.left}%`, 
+                    width: `${rect.width}%`, 
+                    height: `${rect.height}%` 
+                  }}
+                >
+                  {/* Corner Handles */}
+                  {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
+                    <div
+                      key={h}
+                      onMouseDown={(e) => { e.stopPropagation(); setActiveHandle(h); }}
+                      onTouchStart={(e) => { e.stopPropagation(); setActiveHandle(h); }}
+                      className={cn(
+                        "absolute h-10 w-10 flex items-center justify-center pointer-events-auto",
+                        h === 'tl' && "-top-5 -left-5",
+                        h === 'tr' && "-top-5 -right-5",
+                        h === 'bl' && "-bottom-5 -left-5",
+                        h === 'br' && "-bottom-5 -right-5"
+                      )}
+                    >
+                      <div className="h-4 w-4 rounded-full bg-indigo-500 border-2 border-white shadow-lg"></div>
+                    </div>
+                  ))}
+                  
+                  {/* Visual Guide */}
+                  <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-20 pointer-events-none">
+                    <div className="border-r border-b border-white"></div>
+                    <div className="border-r border-b border-white"></div>
+                    <div className="border-b border-white"></div>
+                    <div className="border-r border-b border-white"></div>
+                    <div className="border-r border-b border-white"></div>
+                    <div className="border-b border-white"></div>
+                    <div className="border-r border-white"></div>
+                    <div className="border-r border-white"></div>
+                    <div></div>
+                  </div>
                 </div>
               )}
+              
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-indigo-600/90 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold text-white uppercase tracking-widest z-20">
+                {t('upload_section.crop_hint')}
+              </div>
             </div>
           ) : (
             <>
