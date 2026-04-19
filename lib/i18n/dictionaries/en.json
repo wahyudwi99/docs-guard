@@ -32,6 +32,8 @@
     "import_title": "Import Document",
     "drag_drop": "Drag & Drop or {browse}",
     "browse": "Browse Library",
+    "take_photo": "Take Photo",
+    "camera": "CAMERA",
     "pdf": "PDF",
     "image": "IMAGE"
   },

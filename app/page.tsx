@@ -10,8 +10,9 @@ import { FileInput } from "@/components/FileInput";
 import { CanvasDisplay } from "@/components/CanvasDisplay";
 import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
+import { CameraCapture } from "@/components/CameraCapture";
 import { useCallback, useState, useEffect } from "react";
-import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap } from "lucide-react";
+import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -25,6 +26,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
 
   const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
@@ -52,6 +54,18 @@ export default function Home() {
     clearDocument,
     drawDocumentOnCanvases,
   } = useDocument({ canvases });
+
+  const handleCameraCapture = useCallback((capturedFile: File) => {
+    // Create a mock event to reuse handleFileChange logic
+    const mockEvent = {
+      target: {
+        files: [capturedFile]
+      }
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
+    
+    handleFileChange(mockEvent);
+    setShowCamera(false);
+  }, [handleFileChange]);
 
   // Switch to design tab when file is uploaded
   useEffect(() => {
@@ -274,7 +288,42 @@ export default function Home() {
                          <p className="text-xs font-bold leading-relaxed">{error}</p>
                        </div>
                      )}
-                     <FileInput onFileChange={handleFileChange} />
+                     
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FileInput onFileChange={handleFileChange} />
+                        
+                        <div 
+                          onClick={() => setShowCamera(true)}
+                          className="group relative flex flex-col items-center justify-center p-10 border-2 border-dashed border-emerald-200/50 rounded-[32px] bg-emerald-50/20 hover:bg-white hover:border-emerald-400 hover:shadow-2xl hover:shadow-emerald-100 transition-all duration-500 ease-in-out cursor-pointer overflow-hidden"
+                        >
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-emerald-100/30 rounded-full blur-3xl scale-0 group-hover:scale-150 transition-transform duration-700"></div>
+                          
+                          <div className="relative z-10 flex flex-col items-center justify-center space-y-6 text-center">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
+                                <div className="relative flex h-20 w-20 items-center justify-center rounded-[24px] bg-white text-emerald-600 shadow-xl border border-emerald-50 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 ease-spring">
+                                  <Camera className="w-9 h-9" />
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <p className="text-[#1C1C1E] text-lg font-black tracking-tight leading-none">
+                                {t('upload_section.take_photo')}
+                              </p>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                {t('upload_section.camera')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                     </div>
+
+                     {showCamera && (
+                       <CameraCapture 
+                        onCapture={handleCameraCapture}
+                        onClose={() => setShowCamera(false)}
+                       />
+                     )}
                   </div>
                 )}
 
