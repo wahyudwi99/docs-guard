@@ -7,23 +7,26 @@ export const useSubscription = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
 
-  const PRODUCT_ID = 'docsguard_pro_monthly';
+  const PLANS = {
+    weekly: 'docsguard_pro_weekly',
+    monthly: 'docsguard_pro_monthly',
+    yearly: 'docsguard_pro_yearly',
+  };
 
   const fetchProducts = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) {
-      // Mock product for web
-      setProducts([{
-        identifier: PRODUCT_ID,
-        title: 'DocsGuard Pro Monthly',
-        description: 'Unlimited watermarks and premium features',
-        priceString: '$2.99',
-      }]);
+      // Mock products for web
+      setProducts([
+        { identifier: PLANS.weekly, title: 'Weekly Pro', priceString: '$2.99' },
+        { identifier: PLANS.monthly, title: 'Monthly Pro', priceString: '$6.99' },
+        { identifier: PLANS.yearly, title: 'Yearly Pro', priceString: '$29.99' },
+      ]);
       return;
     }
 
     try {
       const { products } = await NativePurchases.getProducts({
-        productIdentifiers: [PRODUCT_ID],
+        productIdentifiers: Object.values(PLANS),
         productType: PURCHASE_TYPE.SUBS,
       });
       setProducts(products);
@@ -32,19 +35,20 @@ export const useSubscription = () => {
     }
   }, []);
 
-  const subscribe = useCallback(async () => {
+  const subscribe = useCallback(async (planKey: keyof typeof PLANS = 'monthly') => {
+    const productIdentifier = PLANS[planKey];
     setLoading(true);
     try {
       if (!Capacitor.isNativePlatform()) {
         // Mock success on web after delay
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsPro(true);
-        alert('Successfully subscribed (Mock)');
+        alert(`Successfully subscribed to ${planKey} (Mock)`);
         return;
       }
 
       await NativePurchases.purchaseProduct({
-        productIdentifier: PRODUCT_ID,
+        productIdentifier,
         productType: PURCHASE_TYPE.SUBS,
       });
       

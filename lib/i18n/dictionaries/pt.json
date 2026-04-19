@@ -35,7 +35,6 @@
     "pdf": "PDF",
     "image": "IMAGEM"
   },
-
   "design_section": {
     "appearance": "Aparência",
     "new_file": "Novo Arquivo",
@@ -75,11 +74,26 @@
       "Processamento Local Prioritário",
       "Sem Anúncios (Em breve)"
     ],
-    "price": "€ 2,99",
-    "per_month": "/ Mês",
     "subscribe_now": "Assinar Agora",
     "restore": "Restaurar Compras",
-    "active": "Assinatura Pro Ativa"
+    "active": "Assinatura Pro Ativa",
+    "plans": {
+      "weekly": {
+        "title": "Semanal",
+        "price": "2,99 €",
+        "period": "/ Semana"
+      },
+      "monthly": {
+        "title": "Mensal",
+        "price": "6,99 €",
+        "period": "/ Mês"
+      },
+      "yearly": {
+        "title": "Anual",
+        "price": "29,99 €",
+        "period": "/ Ano"
+      }
+    }
   },
   "info_card": {
     "how_it_works": "Como funciona",

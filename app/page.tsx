@@ -27,6 +27,7 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
 
   const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
+  const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
 
   // Splash screen effect
   useEffect(() => {
@@ -348,11 +349,33 @@ export default function Home() {
                            ))}
                          </div>
 
+                         {!isPro && (
+                           <div className="grid grid-cols-3 gap-2 py-2">
+                             {(['weekly', 'monthly', 'yearly'] as const).map((plan) => (
+                               <button
+                                 key={plan}
+                                 onClick={() => setSelectedPlan(plan)}
+                                 className={cn(
+                                   "flex flex-col items-center gap-1 p-2 rounded-xl border transition-all",
+                                   selectedPlan === plan 
+                                     ? "bg-amber-100 border-amber-300 ring-2 ring-amber-400/20" 
+                                     : "bg-white/50 border-amber-100 hover:bg-white"
+                                 )}
+                               >
+                                 <span className="text-[10px] font-black uppercase text-amber-900/60">{t(`subscription_section.plans.${plan}.title`)}</span>
+                                 <span className="text-xs font-bold text-amber-900">{t(`subscription_section.plans.${plan}.price`)}</span>
+                               </button>
+                             ))}
+                           </div>
+                         )}
+
                          <div className="pt-2">
-                            <div className="flex items-baseline gap-1 mb-4">
-                              <span className="text-3xl font-black text-amber-950">{t('subscription_section.price')}</span>
-                              <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">{t('subscription_section.per_month')}</span>
-                            </div>
+                            {!isPro && (
+                              <div className="flex items-baseline gap-1 mb-4 justify-center">
+                                <span className="text-3xl font-black text-amber-950">{t(`subscription_section.plans.${selectedPlan}.price`)}</span>
+                                <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">{t(`subscription_section.plans.${selectedPlan}.period`)}</span>
+                              </div>
+                            )}
 
                             {isPro ? (
                               <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex items-center justify-center gap-2">
@@ -360,8 +383,8 @@ export default function Home() {
                                 {t('subscription_section.active')}
                               </div>
                             ) : (
-                              <button 
-                                onClick={subscribe}
+                              <button
+                                onClick={() => subscribe(selectedPlan)}
                                 disabled={subLoading}
                                 className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
                               >
@@ -374,8 +397,7 @@ export default function Home() {
                                   </>
                                 )}
                               </button>
-                            )}
-                            
+                            )}                            
                             <button 
                               onClick={restorePurchases}
                               disabled={subLoading}

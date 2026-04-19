@@ -74,8 +74,23 @@
       "Prioritas Pemrosesan Lokal",
       "Tanpa Iklan (Segera Hadir)"
     ],
-    "price": "Rp 45.000",
-    "per_month": "/ Bulan",
+    "plans": {
+      "weekly": {
+        "title": "Mingguan",
+        "price": "Rp 45.000",
+        "period": "/ Minggu"
+      },
+      "monthly": {
+        "title": "Bulanan",
+        "price": "Rp 109.000",
+        "period": "/ Bulan"
+      },
+      "yearly": {
+        "title": "Tahunan",
+        "price": "Rp 469.000",
+        "period": "/ Tahun"
+      }
+    },
     "subscribe_now": "Berlangganan Sekarang",
     "restore": "Pulihkan Pembelian",
     "active": "Langganan Pro Aktif"

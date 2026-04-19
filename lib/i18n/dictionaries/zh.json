@@ -35,7 +35,6 @@
     "pdf": "PDF",
     "image": "图像"
   },
-
   "design_section": {
     "appearance": "外观",
     "new_file": "新文件",
@@ -75,11 +74,26 @@
       "优先本地处理",
       "无广告（即将推出）"
     ],
-    "price": "¥18.00",
-    "per_month": "/ 月",
     "subscribe_now": "立即订阅",
     "restore": "恢复购买",
-    "active": "Pro 订阅已激活"
+    "active": "Pro 订阅已激活",
+    "plans": {
+      "weekly": {
+        "title": "每周",
+        "price": "¥18.00",
+        "period": "/ 周"
+      },
+      "monthly": {
+        "title": "每月",
+        "price": "¥48.00",
+        "period": "/ 月"
+      },
+      "yearly": {
+        "title": "每年",
+        "price": "¥198.00",
+        "period": "/ 年"
+      }
+    }
   },
   "info_card": {
     "how_it_works": "工作原理",

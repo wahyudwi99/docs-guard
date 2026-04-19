@@ -74,11 +74,26 @@
       "Procesamiento Local Prioritario",
       "Sin Anuncios (Próximamente)"
     ],
-    "price": "2,99 €",
-    "per_month": "/ Mes",
     "subscribe_now": "Suscribirse Ahora",
     "restore": "Restaurar Compras",
-    "active": "Suscripción Pro Activa"
+    "active": "Suscripción Pro Activa",
+    "plans": {
+      "weekly": {
+        "title": "Semanal",
+        "price": "2,99 €",
+        "period": "/ Semana"
+      },
+      "monthly": {
+        "title": "Mensual",
+        "price": "6,99 €",
+        "period": "/ Mes"
+      },
+      "yearly": {
+        "title": "Anual",
+        "price": "29,99 €",
+        "period": "/ Año"
+      }
+    }
   },
   "info_card": {
     "how_it_works": "Cómo funciona",

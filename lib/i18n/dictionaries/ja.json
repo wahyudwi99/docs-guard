@@ -74,11 +74,26 @@
       "優先ローカル処理",
       "広告なし（近日公開）"
     ],
-    "price": "¥450",
-    "per_month": "/ 月",
     "subscribe_now": "今すぐ購読",
     "restore": "購入を復元",
-    "active": "プロサブスクリプション有効"
+    "active": "プロサブスクリプション有効",
+    "plans": {
+      "weekly": {
+        "title": "週間",
+        "price": "¥450",
+        "period": "/ 週"
+      },
+      "monthly": {
+        "title": "月間",
+        "price": "¥1,000",
+        "period": "/ 月"
+      },
+      "yearly": {
+        "title": "年間",
+        "price": "¥4,500",
+        "period": "/ 年"
+      }
+    }
   },
   "info_card": {
     "how_it_works": "仕組み",

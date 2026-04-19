@@ -74,8 +74,23 @@
       "Priority Local Processing",
       "No Ads (Coming Soon)"
     ],
-    "price": "$2.99",
-    "per_month": "/ Month",
+    "plans": {
+      "weekly": {
+        "title": "Weekly",
+        "price": "$2.99",
+        "period": "/ Week"
+      },
+      "monthly": {
+        "title": "Monthly",
+        "price": "$6.99",
+        "period": "/ Month"
+      },
+      "yearly": {
+        "title": "Yearly",
+        "price": "$29.99",
+        "period": "/ Year"
+      }
+    },
     "subscribe_now": "Subscribe Now",
     "restore": "Restore Purchases",
     "active": "Pro Subscription Active"
