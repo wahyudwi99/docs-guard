@@ -220,7 +220,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
         </div>
 
         {/* Controls */}
-        <div className="p-8 flex justify-center items-center gap-8 bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 left-0 right-0">
+        <div className="relative z-[40] p-8 flex justify-center items-center gap-8 bg-black/40 border-t border-white/10">
           {capturedImage ? (
             <>
               <button 
