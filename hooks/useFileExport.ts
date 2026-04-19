@@ -36,17 +36,25 @@ export function useFileExport({ canvases, watermarkText, documentType }: UseFile
         });
 
         const pdfBlob = pdf.output("blob");
-        const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.pdf`;
+        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
         saveAndOpenBlob(pdfBlob, fileName, "application/pdf");
       } else {
         const canvas = canvases[0];
-        const imageDataUrl = canvas.toDataURL("image/png", 1.0);
-        const fileName = `docsguard-${watermarkText.replace(/\s/g, "_")}-${Date.now()}.png`;
+        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.png`;
 
         if (!isCapacitorApp()) {
-          const blob = await (await fetch(imageDataUrl)).blob();
-          saveAndOpenBlob(blob, fileName, "image/png");
+          // Use a Promise to handle toBlob correctly in an async function
+          const blob = await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob((b) => resolve(b), "image/png", 1.0);
+          });
+
+          if (blob) {
+            saveAndOpenBlob(blob, fileName, "image/png");
+          } else {
+            throw new Error("Failed to create blob from canvas");
+          }
         } else {
+          const imageDataUrl = canvas.toDataURL("image/png", 1.0);
           const base64Data = imageDataUrl.split(",")[1];
           await Filesystem.writeFile({
             path: fileName,

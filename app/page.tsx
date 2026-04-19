@@ -472,7 +472,7 @@ export default function Home() {
 
           {/* Hidden Canvas Processing Area */}
           {file && (
-            <div className="hidden pointer-events-none opacity-0 absolute -z-50">
+            <div className="pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0">
               <CanvasDisplay numPages={numPages} registerCanvas={registerCanvas} />
             </div>
           )}
