@@ -130,7 +130,11 @@ export function useFileExport({ canvases, watermarkText, documentType }: UseFile
         saveAndOpenBlob(blob, fileName, blob.type);
       }
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        console.log("Share cancelled by user");
+        return false;
+      }
       console.error("Error sharing file:", error);
       return false;
     }
