@@ -167,12 +167,11 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white bg-clip-padding border border-transparent">
               <Shield className="h-12 w-12" />
             </div>
             <div className="flex flex-col items-center gap-2">
               <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">{t('nav.subtitle')}</p>
             </div>
           </div>
           
@@ -203,7 +202,6 @@ export default function Home() {
             </div>
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">{t('nav.title')}</span>
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{t('nav.subtitle')}</span>
             </div>
           </div>
           <div>
@@ -229,7 +227,7 @@ export default function Home() {
                   <div className="h-1 w-1 rounded-full bg-emerald-300"></div>
                   <span className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest">{t('nav.privacy_banner_subtitle')}</span>
                 </div>
-                <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
                   {t('nav.privacy_banner')}
                 </p>
               </div>
@@ -294,7 +292,7 @@ export default function Home() {
                          <div className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-indigo-600 shrink-0">
                            <ImageIcon className="h-5 w-5" />
                          </div>
-                         <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                         <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
                            {t('upload_section.select_doc')}
                          </p>
                        </div>
@@ -495,11 +493,11 @@ export default function Home() {
                   <Info className="h-4 w-4" />
                   {t('info_card.how_it_works')}
                 </h3>
-                <p className="text-xs text-indigo-100 leading-relaxed">
+                <p className="text-xs text-indigo-100 leading-relaxed text-left">
                   {t('info_card.description')}
                 </p>
                 <div className="pt-2 border-t border-white/20">
-                  <p className="text-[10px] text-indigo-200/90 leading-relaxed italic">
+                  <p className="text-[10px] text-indigo-200/90 leading-relaxed italic text-left">
                     {t('info_card.privacy_notice')}
                   </p>
                 </div>
@@ -565,7 +563,9 @@ export default function Home() {
             <div className="p-6 md:p-8 bg-white border-t border-slate-100 flex flex-col gap-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
               <div className="flex flex-col justify-center text-center md:text-left">
                  <p className="text-sm font-bold text-slate-900">{t('preview_modal.final_verification')}</p>
-                 <p className="text-xs font-medium text-slate-400 leading-relaxed">{t('preview_modal.download_note')}</p>
+                 <p className="text-xs font-medium text-slate-400 leading-relaxed text-left">
+                   {t('preview_modal.download_note')}
+                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button 
