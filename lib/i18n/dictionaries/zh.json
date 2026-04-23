@@ -32,6 +32,8 @@
     "import_title": "导入文档",
     "drag_drop": "拖放或 {browse}",
     "browse": "浏览库",
+    "take_photo": "拍照",
+    "camera": "相机",
     "pdf": "PDF",
     "image": "图像"
   },

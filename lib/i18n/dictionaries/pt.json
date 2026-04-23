@@ -30,8 +30,10 @@
     "privacy_note": "Seus arquivos sont processados localmente e nunca são enviados para nenhum servidor.",
     "error_no_file": "Por favor, selecione um arquivo primeiro",
     "import_title": "Importar Documento",
-    "drag_drop": "Arraste & Solte ou {browse}",
-    "browse": "Procurar Biblioteca",
+    "drag_drop": "Arraste & Solte atau {browse}",
+    "browse": "Procurar na Biblioteca",
+    "take_photo": "Tirar Foto",
+    "camera": "CÂMARA",
     "pdf": "PDF",
     "image": "IMAGEM"
   },

@@ -167,9 +167,9 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-            <div className="relative h-24 w-24 flex items-center justify-center rounded-[32px] overflow-hidden bg-blue-500">
-              {/* Gradient layer separate from boundary to prevent sub-pixel artifacts */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600"></div>
+            <div className="relative h-24 w-24 flex items-center justify-center rounded-[32px] overflow-hidden bg-[#3b82f6] isolation-auto transform-gpu translate-z-0">
+              {/* Using a solid background on parent and absolute gradient to mask sub-pixel borders */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6] to-[#4f46e5] transform-gpu"></div>
               <Shield className="h-12 w-12 text-white relative z-10" />
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -227,8 +227,6 @@ export default function Home() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">{t('nav.privacy_banner_title')}</span>
-                  <div className="h-1 w-1 rounded-full bg-emerald-300"></div>
-                  <span className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest">{t('nav.privacy_banner_subtitle')}</span>
                 </div>
                 <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
                   {t('nav.privacy_banner')}

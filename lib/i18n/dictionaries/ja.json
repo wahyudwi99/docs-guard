@@ -30,8 +30,10 @@
     "privacy_note": "ファイルはローカルで処理され、サーバーにアップロードされることはありません。",
     "error_no_file": "最初にファイルを選択してください",
     "import_title": "ドキュメントをインポート",
-    "drag_drop": "ドラッグ＆ドロップまたは{browse}",
-    "browse": "ファイルを選択",
+    "drag_drop": "ドラッグ＆ドロップまたは {browse}",
+    "browse": "ライブラリをブラウズ",
+    "take_photo": "写真を撮る",
+    "camera": "カメラ",
     "pdf": "PDF",
     "image": "画像"
   },

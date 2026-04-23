@@ -32,6 +32,8 @@
     "import_title": "Импорт документа",
     "drag_drop": "Перетащите или {browse}",
     "browse": "выберите файл",
+    "take_photo": "Сделать фото",
+    "camera": "КАМЕРА",
     "pdf": "PDF",
     "image": "ФОТО"
   },
