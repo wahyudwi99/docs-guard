@@ -610,7 +610,7 @@ export default function Home() {
                   {isSharing ? t('preview_modal.sharing') : t('preview_modal.share')}
                 </button>
                 <button 
-                  onClick={handleFinalDownload}
+                  onClick={() => handleFinalDownload()}
                   disabled={isSaving || isSharing}
                   className={cn(
                     "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-2 sm:order-3",
