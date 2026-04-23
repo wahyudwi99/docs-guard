@@ -117,7 +117,14 @@
     "sharing": "Membagikan...",
     "saving": "Menyimpan...",
     "final_verification": "Verifikasi Akhir",
-    "download_note": "Menampilkan halaman pertama sebagai contoh. Unduh untuk menerapkan ke semua halaman."
+    "download_note": "Menampilkan halaman pertama sebagai contoh. Unduh untuk menerapkan ke semua halaman.",
+    "ad_title": "Buka Unduhan",
+    "ad_description": "Tonton iklan singkat untuk mengunduh dokumen secara gratis, atau tingkatkan ke Pro untuk akses instan.",
+    "watch_ad": "Tonton Iklan & Unduh",
+    "go_pro_cta": "Dapatkan Akses Pro",
+    "success_title": "Unduhan Berhasil!",
+    "success_description": "Dokumen Anda telah disimpan ke perangkat.",
+    "close": "Tutup"
   },
   "footer": {
     "copyright": "© {year} Dibuat dengan Privasi oleh Wahyu",

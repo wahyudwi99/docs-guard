@@ -117,7 +117,14 @@
     "sharing": "Sharing...",
     "saving": "Saving...",
     "final_verification": "Final Verification",
-    "download_note": "Previewing the first page as a sample. Download to apply to all pages."
+    "download_note": "Previewing the first page as a sample. Download to apply to all pages.",
+    "ad_title": "Unlock Download",
+    "ad_description": "Watch a short video to download your watermarked document for free, or upgrade to Pro for instant access.",
+    "watch_ad": "Watch Ad & Download",
+    "go_pro_cta": "Get Pro Access",
+    "success_title": "Download Successful!",
+    "success_description": "Your document has been saved to your device.",
+    "close": "Close"
   },
   "footer": {
     "copyright": "© {year} Build with Privacy by Wahyu",

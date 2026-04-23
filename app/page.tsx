@@ -27,6 +27,8 @@ export default function Home() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [showAdModal, setShowAdModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
 
   const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
@@ -139,12 +141,33 @@ export default function Home() {
     }
   }, [getPreviewUrls, drawWatermark]);
 
-  const handleFinalDownload = useCallback(async () => {
+  const handleFinalDownload = useCallback(async (isAdTriggered = false) => {
+    // If not Pro and haven't shown ad yet, show ad modal (unless ad was just watched)
+    if (!isPro && !isAdTriggered && !showAdModal && !showSuccessModal) {
+      setShowAdModal(true);
+      return;
+    }
+
     setIsSaving(true);
     const success = await saveToDevice();
     setIsSaving(false);
-    if (success) setPreviewUrls([]); // Clear preview after successful download
-  }, [saveToDevice]);
+    
+    if (success) {
+      setPreviewUrls([]); // Clear preview
+      setShowAdModal(false);
+      // Show success modal after a short delay to ensure cleanup
+      setTimeout(() => setShowSuccessModal(true), 300);
+    }
+  }, [saveToDevice, isPro, showAdModal, showSuccessModal]);
+
+  const handleWatchAdAndDownload = useCallback(() => {
+    // In a real app, trigger AdMob Reward video here.
+    setIsSaving(true);
+    // Simulate watching ad then proceed to download
+    setTimeout(() => {
+      handleFinalDownload(true);
+    }, 1500); // Simulate ad delay
+  }, [handleFinalDownload]);
 
   const handleShare = useCallback(async () => {
     setIsSharing(true);
@@ -604,6 +627,90 @@ export default function Home() {
       )}
 
       {/* Modern Mini Footer */}
+      {/* Ad Gateway Modal */}
+      {showAdModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
+            onClick={() => !isSaving && setShowAdModal(false)}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 mx-auto">
+              <Sparkles className="h-10 w-10 animate-pulse" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
+                {t('preview_modal.ad_title')}
+              </h3>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
+                {t('preview_modal.ad_description')}
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3 pt-2">
+              <button 
+                onClick={handleWatchAdAndDownload}
+                disabled={isSaving}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+              >
+                {isSaving ? (
+                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Zap className="h-4 w-4 fill-white" />
+                    {t('preview_modal.watch_ad')}
+                  </>
+                )}
+              </button>
+              <button 
+                onClick={() => {
+                  setShowAdModal(false);
+                  setActiveTab('subscription');
+                  setPreviewUrls([]);
+                }}
+                disabled={isSaving}
+                className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-amber-100 flex items-center justify-center gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                {t('preview_modal.go_pro_cta')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => setShowSuccessModal(false)}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-500 mx-auto">
+              <CheckCircle2 className="h-10 w-10" />
+            </div>
+            
+            <div className="space-y-2 text-center">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
+                {t('preview_modal.success_title')}
+              </h3>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
+                {t('preview_modal.success_description')}
+              </p>
+            </div>
+            
+            <button 
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm transition-all"
+            >
+              {t('preview_modal.close')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Page Limit Exceeded Modal */}
       {limitExceeded && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 animate-in fade-in duration-300">
