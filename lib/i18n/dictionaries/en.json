@@ -71,6 +71,11 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "Unlock the full power of privacy",
+    "days_left": "{days} Days Left",
+    "renew_button": "Renew Subscription",
+    "login_required_title": "Login Required",
+    "login_required_desc": "Please login to subscribe and protect your documents with Pro features.",
+    "login_with_google": "Login with Google",
     "features": [
       "Unlimited Batch Processing",
       "Custom Image Watermarks",

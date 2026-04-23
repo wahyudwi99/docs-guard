@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useSession, signIn } from "next-auth/react";
 
 export default function Home() {
   const { t, locale } = useI18n();
@@ -30,9 +31,22 @@ export default function Home() {
   const [showAdModal, setShowAdModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
+  const { data: session } = useSession();
+  const { isPro, loading: subLoading, subscriptionDaysLeft, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
+
+  const handleSubscribe = useCallback(async (plan: 'weekly' | 'monthly' | 'yearly') => {
+    if (!session) {
+      setShowLoginModal(true);
+      return;
+    }
+    const success = await subscribe(plan);
+    if (success) {
+      // In real app, DB would be updated via webhook and we'd refetch status
+    }
+  }, [session, subscribe]);
 
   // Splash screen effect
   useEffect(() => {
@@ -464,13 +478,32 @@ export default function Home() {
                             )}
 
                             {isPro ? (
-                              <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex items-center justify-center gap-2">
-                                <CheckCircle2 className="h-4 w-4" />
-                                {t('subscription_section.active')}
+                              <div className="space-y-4">
+                                <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    {t('subscription_section.active')}
+                                  </div>
+                                  {subscriptionDaysLeft !== null && (
+                                    <span className="text-[10px] uppercase tracking-widest opacity-70">
+                                      {t('subscription_section.days_left', { days: subscriptionDaysLeft })}
+                                    </span>
+                                  )}
+                                </div>
+                                {subscriptionDaysLeft !== null && subscriptionDaysLeft <= 7 && (
+                                  <button
+                                    onClick={() => handleSubscribe('monthly')}
+                                    disabled={subLoading}
+                                    className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
+                                  >
+                                    <Zap className="h-4 w-4 fill-white" />
+                                    {t('subscription_section.renew_button')}
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               <button
-                                onClick={() => subscribe(selectedPlan)}
+                                onClick={() => handleSubscribe(selectedPlan)}
                                 disabled={subLoading}
                                 className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
                               >
@@ -621,6 +654,46 @@ export default function Home() {
                   {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Login Required Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => setShowLoginModal(false)}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 mx-auto">
+              <Shield className="h-10 w-10" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
+                {t('subscription_section.login_required_title')}
+              </h3>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
+                {t('subscription_section.login_required_desc')}
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => signIn('google')}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+              >
+                <ImageIcon className="h-4 w-4" />
+                {t('subscription_section.login_with_google')}
+              </button>
+              <button 
+                onClick={() => setShowLoginModal(false)}
+                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
+              >
+                {t('preview_modal.close')}
+              </button>
             </div>
           </div>
         </div>

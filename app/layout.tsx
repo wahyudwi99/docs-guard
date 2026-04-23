@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { I18nProvider } from "@/hooks/useI18n";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "DocsGuard",
@@ -23,9 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <I18nProvider>
+        <Providers>
           {children}
-        </I18nProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -71,6 +71,11 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "Buka kekuatan penuh privasi",
+    "days_left": "{days} Hari Tersisa",
+    "renew_button": "Perpanjang Langganan",
+    "login_required_title": "Perlu Masuk",
+    "login_required_desc": "Silakan masuk untuk berlangganan dan melindungi dokumen Anda dengan fitur Pro.",
+    "login_with_google": "Masuk dengan Google",
     "features": [
       "Pemrosesan Batch Tanpa Batas",
       "Watermark Gambar Kustom",

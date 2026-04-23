@@ -6,12 +6,24 @@ export const useSubscription = () => {
   const [isPro, setIsPro] = useState(false);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
+  const [subscriptionEndAt, setSubscriptionEndAt] = useState<Date | null>(null);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
 
   const PLANS = {
     weekly: 'docsguard_pro_weekly',
     monthly: 'docsguard_pro_monthly',
     yearly: 'docsguard_pro_yearly',
   };
+
+  useEffect(() => {
+    if (isPro && subscriptionEndAt) {
+      const diffTime = subscriptionEndAt.getTime() - new Date().getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setSubscriptionDaysLeft(diffDays > 0 ? diffDays : 0);
+    } else {
+      setSubscriptionDaysLeft(null);
+    }
+  }, [isPro, subscriptionEndAt]);
 
   const fetchProducts = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) {
@@ -43,8 +55,13 @@ export const useSubscription = () => {
         // Mock success on web after delay
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsPro(true);
-        alert(`Successfully subscribed to ${planKey} (Mock)`);
-        return;
+        
+        // Mock end date: 30 days from now for monthly
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + (planKey === 'weekly' ? 7 : planKey === 'monthly' ? 30 : 365));
+        setSubscriptionEndAt(endDate);
+        
+        return true;
       }
 
       await NativePurchases.purchaseProduct({
@@ -53,10 +70,14 @@ export const useSubscription = () => {
       });
       
       setIsPro(true);
-      alert('Welcome to Pro!');
+      // In real app, you'd fetch the real expiry date from server
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+      setSubscriptionEndAt(endDate);
+      return true;
     } catch (error) {
       console.error('Purchase failed:', error);
-      alert('Subscription failed. Please try again.');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -66,14 +87,12 @@ export const useSubscription = () => {
     setLoading(true);
     try {
       if (!Capacitor.isNativePlatform()) {
-        alert('Restore not available on web');
         return;
       }
       
-      // For Capgo, checking current entitlements or restoring
       await NativePurchases.restorePurchases();
-      // In a real app, you'd verify the receipt/entitlements here
-      alert('Purchases restored if any exist.');
+      // Mock restoration
+      setIsPro(true);
     } catch (error) {
       console.error('Restore failed:', error);
     } finally {
@@ -89,6 +108,7 @@ export const useSubscription = () => {
     isPro,
     loading,
     products,
+    subscriptionDaysLeft,
     subscribe,
     restorePurchases
   };
