@@ -167,8 +167,10 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white bg-clip-padding border border-transparent">
-              <Shield className="h-12 w-12" />
+            <div className="relative h-24 w-24 flex items-center justify-center rounded-[32px] overflow-hidden bg-blue-500">
+              {/* Gradient layer separate from boundary to prevent sub-pixel artifacts */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600"></div>
+              <Shield className="h-12 w-12 text-white relative z-10" />
             </div>
             <div className="flex flex-col items-center gap-2">
               <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
