@@ -12,7 +12,7 @@ import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
 import { useCallback, useState, useEffect } from "react";
-import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera } from "lucide-react";
+import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -26,6 +26,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
 
   const { isPro, loading: subLoading, subscribe, restorePurchases } = useSubscription();
@@ -120,7 +121,7 @@ export default function Home() {
   }, [clearDocument, clearCanvases, resetWatermark]);
 
   // File Export logic - Passing canvases array
-  const { getPreviewUrls, saveToDevice } = useFileExport({ 
+  const { getPreviewUrls, saveToDevice, shareFile } = useFileExport({ 
     canvases, 
     watermarkText,
     documentType 
@@ -144,6 +145,13 @@ export default function Home() {
     setIsSaving(false);
     if (success) setPreviewUrls([]); // Clear preview after successful download
   }, [saveToDevice]);
+
+  const handleShare = useCallback(async () => {
+    setIsSharing(true);
+    const success = await shareFile();
+    setIsSharing(false);
+    if (success) setPreviewUrls([]); // Clear preview after successful share
+  }, [shareFile]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -567,8 +575,19 @@ export default function Home() {
                   {t('preview_modal.edit_again')}
                 </button>
                 <button 
+                  onClick={handleShare}
+                  disabled={isSharing || isSaving}
+                  className={cn(
+                    "px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
+                    isSharing ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-700"
+                  )}
+                >
+                  <Share2 className={cn("h-4 w-4", isSharing && "animate-pulse")} />
+                  {isSharing ? t('preview_modal.sharing') : t('preview_modal.share')}
+                </button>
+                <button 
                   onClick={handleFinalDownload}
-                  disabled={isSaving}
+                  disabled={isSaving || isSharing}
                   className={cn(
                     "px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
                     isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
