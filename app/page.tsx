@@ -167,7 +167,7 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-2xl shadow-indigo-200">
+            <div className="flex h-24 w-24 items-center justify-center rounded-[32px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
               <Shield className="h-12 w-12" />
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -195,7 +195,7 @@ export default function Home() {
       </div>
 
       {/* iOS Style Navigation Bar */}
-      <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+      <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)] pt-[env(safe-area-inset-top)]">
         <div className="max-w-5xl mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-3 group transition-all">
             <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-indigo-200">
@@ -521,10 +521,10 @@ export default function Home() {
           ></div>
           
           {/* Modal Container */}
-          <div className="relative w-full max-w-4xl bg-white rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+          <div className="relative w-full max-w-4xl bg-white rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col max-h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-40px)]">
             
             {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+            <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
               <div className="flex items-center gap-3">
                  <div className="h-10 w-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
                    <CheckCircle2 className="h-6 w-6" />
@@ -562,15 +562,15 @@ export default function Home() {
             </div>
 
             {/* Footer Actions */}
-            <div className="p-8 bg-white border-t border-slate-100 flex flex-col md:flex-row gap-4">
-              <div className="flex-1 flex flex-col justify-center">
+            <div className="p-6 md:p-8 bg-white border-t border-slate-100 flex flex-col gap-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+              <div className="flex flex-col justify-center text-center md:text-left">
                  <p className="text-sm font-bold text-slate-900">{t('preview_modal.final_verification')}</p>
                  <p className="text-xs font-medium text-slate-400 leading-relaxed">{t('preview_modal.download_note')}</p>
               </div>
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button 
                   onClick={() => setPreviewUrls([])}
-                  className="px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-xs uppercase tracking-widest"
+                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest order-3 sm:order-1"
                 >
                   {t('preview_modal.edit_again')}
                 </button>
@@ -578,7 +578,7 @@ export default function Home() {
                   onClick={handleShare}
                   disabled={isSharing || isSaving}
                   className={cn(
-                    "px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
+                    "px-4 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-1 sm:order-2",
                     isSharing ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-700"
                   )}
                 >
@@ -589,7 +589,7 @@ export default function Home() {
                   onClick={handleFinalDownload}
                   disabled={isSaving || isSharing}
                   className={cn(
-                    "px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2",
+                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-2 sm:order-3",
                     isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
                   )}
                 >
