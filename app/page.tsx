@@ -172,6 +172,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col items-center gap-2">
               <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">{t('nav.subtitle')}</p>
             </div>
           </div>
           
