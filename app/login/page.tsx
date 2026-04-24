@@ -4,12 +4,13 @@ import { Shield, Lock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
+import { signIn } from "next-auth/react";
+
 export default function LoginPage() {
   const { t } = useI18n();
 
   const handleLogin = () => {
-    // Mock login for static export
-    window.location.href = "/";
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (
