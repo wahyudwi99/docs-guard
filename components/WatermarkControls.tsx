@@ -361,7 +361,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                 max={50}
                 step={1}
                 value={blurStrength}
-                onValueChange={(val) => setBlurStrength(val[0])}
+                onValueChange={setBlurStrength}
                 className="cursor-pointer"
               />
             </div>
