@@ -19,7 +19,6 @@
     "@capacitor/share": "^7.0.4",
     "@capgo/native-purchases": "^7.18.0",
     "@codetrix-studio/capacitor-google-auth": "^3.3.6",
-    "@revenuecat/purchases-capacitor": "^10.4.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "google-auth-library": "^10.6.2",
