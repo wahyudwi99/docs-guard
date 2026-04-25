@@ -77,7 +77,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     try {
       const { Purchases } = await import('@revenuecat/purchases-capacitor');
-      const info = await Purchases.getCustomerInfo();
+      const response = await Purchases.getCustomerInfo();
+      // In some versions it returns { customerInfo: ... }, in others just info
+      const info = (response as any).customerInfo || response;
       setCustomerInfo(info);
       const active = info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
       setIsPro(active);
