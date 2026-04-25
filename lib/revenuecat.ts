@@ -1,16 +1,22 @@
-import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
 const APPLE_API_KEY = process.env.NEXT_PUBLIC_REVENUECAT_APPLE_KEY || 'appl_placeholder';
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_REVENUECAT_GOOGLE_KEY || 'goog_placeholder';
 
+// Helper to get Purchases dynamically to avoid SSR/Module issues
+const getPurchases = async () => {
+  if (typeof window === 'undefined' || !Capacitor.isNativePlatform()) return null;
+  const { Purchases } = await import('@revenuecat/purchases-capacitor');
+  return Purchases;
+};
+
 export const initRevenueCat = async () => {
-  if (!Capacitor.isNativePlatform()) {
-    console.log('RevenueCat: Not a native platform, skipping initialization.');
+  if (typeof window === 'undefined' || !Capacitor.isNativePlatform()) {
     return;
   }
 
   try {
+    const { Purchases, LOG_LEVEL } = await import('@revenuecat/purchases-capacitor');
     await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
     
     if (Capacitor.getPlatform() === 'ios') {
@@ -26,7 +32,8 @@ export const initRevenueCat = async () => {
 };
 
 export const getOfferings = async () => {
-  if (!Capacitor.isNativePlatform()) return null;
+  const Purchases = await getPurchases();
+  if (!Purchases) return null;
   try {
     return await Purchases.getOfferings();
   } catch (error) {
@@ -36,7 +43,8 @@ export const getOfferings = async () => {
 };
 
 export const getCustomerInfo = async () => {
-  if (!Capacitor.isNativePlatform()) return null;
+  const Purchases = await getPurchases();
+  if (!Purchases) return null;
   try {
     return await Purchases.getCustomerInfo();
   } catch (error) {

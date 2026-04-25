@@ -1,10 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { Purchases, PACKAGE_TYPE, PurchasesPackage, CustomerInfo } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
 const PRO_ENTITLEMENT_ID = 'pro';
+
+// Types from RevenueCat to maintain type safety without direct top-level import
+type PurchasesPackage = any;
+type CustomerInfo = any;
 
 interface SubscriptionContextType {
   isPro: boolean;
@@ -26,20 +29,21 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const fetchOffering = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) {
+      // Use dynamic import for PACKAGE_TYPE if needed, or just use strings/numbers if known
       setPackages([
         { 
           identifier: 'weekly', 
-          packageType: PACKAGE_TYPE.WEEKLY, 
+          packageType: 'WEEKLY', 
           product: { title: 'Weekly Pro', priceString: '$2.99', description: 'Weekly subscription', currencyCode: 'USD', price: 2.99, identifier: 'weekly' } 
         } as any,
         { 
           identifier: 'monthly', 
-          packageType: PACKAGE_TYPE.MONTHLY, 
+          packageType: 'MONTHLY', 
           product: { title: 'Monthly Pro', priceString: '$6.99', description: 'Monthly subscription', currencyCode: 'USD', price: 6.99, identifier: 'monthly' } 
         } as any,
         { 
           identifier: 'yearly', 
-          packageType: PACKAGE_TYPE.ANNUAL, 
+          packageType: 'ANNUAL', 
           product: { title: 'Yearly Pro', priceString: '$29.99', description: 'Yearly subscription', currencyCode: 'USD', price: 29.99, identifier: 'yearly' } 
         } as any,
       ]);
@@ -47,6 +51,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
 
     try {
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
       const offerings = await Purchases.getOfferings();
       if (offerings.current !== null && offerings.current.availablePackages.length !== 0) {
         setPackages(offerings.current.availablePackages);
@@ -58,13 +63,14 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const checkSubscriptionStatus = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) {
-      const mockPro = localStorage.getItem('mock_is_pro') === 'true';
+      const mockPro = typeof window !== 'undefined' ? localStorage.getItem('mock_is_pro') === 'true' : false;
       setIsPro(mockPro);
       setLoading(false);
       return;
     }
 
     try {
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
       const info = await Purchases.getCustomerInfo();
       setCustomerInfo(info);
       setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
@@ -81,10 +87,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (!Capacitor.isNativePlatform()) {
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsPro(true);
-        localStorage.setItem('mock_is_pro', 'true');
+        if (typeof window !== 'undefined') localStorage.setItem('mock_is_pro', 'true');
         return true;
       }
 
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
       const result = await Purchases.purchasePackage({ aPackage: rcPackage });
       setCustomerInfo(result.customerInfo);
       const active = result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
@@ -105,10 +112,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       if (!Capacitor.isNativePlatform()) {
         setIsPro(true);
-        localStorage.setItem('mock_is_pro', 'true');
+        if (typeof window !== 'undefined') localStorage.setItem('mock_is_pro', 'true');
         return true;
       }
       
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
       const info = await Purchases.restorePurchases();
       setCustomerInfo(info);
       const active = info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
@@ -133,33 +141,42 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     let callbackId: any;
     
     const setupListener = async () => {
-      callbackId = await Purchases.addCustomerInfoUpdateListener((info) => {
-        setCustomerInfo(info);
-        setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
-      });
+      try {
+        const { Purchases } = await import('@revenuecat/purchases-capacitor');
+        callbackId = await Purchases.addCustomerInfoUpdateListener((info) => {
+          setCustomerInfo(info);
+          setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
+        });
+      } catch (e) {
+        console.error("Failed to setup RC listener", e);
+      }
     };
 
     setupListener();
 
     return () => {
       if (callbackId) {
-        Purchases.removeCustomerInfoUpdateListener({ listenerToRemove: callbackId });
+        import('@revenuecat/purchases-capacitor').then(({ Purchases }) => {
+          Purchases.removeCustomerInfoUpdateListener({ listenerToRemove: callbackId });
+        }).catch(e => console.error("Failed to remove RC listener", e));
       }
     };
   }, []);
 
+  const contextValue = {
+    isPro,
+    loading,
+    packages,
+    customerInfo,
+    subscribe,
+    restorePurchases,
+    checkSubscriptionStatus
+  };
+
   return (
-    <SubscriptionContext.Provider value={{
-      isPro,
-      loading,
-      packages,
-      customerInfo,
-      subscribe,
-      restorePurchases,
-      checkSubscriptionStatus
-    }}>
+    <SubscriptionContext value={contextValue}>
       {children}
-    </SubscriptionContext.Provider>
+    </SubscriptionContext>
   );
 };
 

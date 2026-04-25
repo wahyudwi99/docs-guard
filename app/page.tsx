@@ -5,7 +5,6 @@ import { useDocument } from "@/hooks/useDocument";
 import { useWatermark } from "@/hooks/useWatermark";
 import { useFileExport } from "@/hooks/useFileExport";
 import { useSubscription } from "@/hooks/useSubscription";
-import { PACKAGE_TYPE } from "@revenuecat/purchases-capacitor";
 import Link from "next/link";
 
 import { FileInput } from "@/components/FileInput";
@@ -52,11 +51,12 @@ export default function Home() {
       return;
     }
     
-    // Find matching package
+    // Find matching package using identifier or internal packageType string
+    // This avoids needing the PACKAGE_TYPE enum at top level
     const pkg = packages.find(p => {
-      if (planKey === 'weekly') return p.packageType === PACKAGE_TYPE.WEEKLY;
-      if (planKey === 'monthly') return p.packageType === PACKAGE_TYPE.MONTHLY;
-      if (planKey === 'yearly') return p.packageType === PACKAGE_TYPE.ANNUAL;
+      if (planKey === 'weekly') return p.packageType === 'WEEKLY' || p.identifier === 'weekly';
+      if (planKey === 'monthly') return p.packageType === 'MONTHLY' || p.identifier === 'monthly';
+      if (planKey === 'yearly') return p.packageType === 'ANNUAL' || p.identifier === 'yearly';
       return false;
     }) || packages[0];
 
