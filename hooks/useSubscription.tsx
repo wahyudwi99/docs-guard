@@ -22,8 +22,8 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isPro, setIsPro] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isPro, setIsPro] = useState(process.env.NODE_ENV === 'development');
+  const [loading, setLoading] = useState(process.env.NODE_ENV !== 'development');
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
@@ -62,6 +62,12 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, []);
 
   const checkSubscriptionStatus = useCallback(async () => {
+    if (process.env.NODE_ENV === 'development') {
+      setIsPro(true);
+      setLoading(false);
+      return;
+    }
+
     if (!Capacitor.isNativePlatform()) {
       const mockPro = typeof window !== 'undefined' ? localStorage.getItem('mock_is_pro') === 'true' : false;
       setIsPro(mockPro);
@@ -136,7 +142,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [fetchOffering, checkSubscriptionStatus]);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (process.env.NODE_ENV === 'development' || !Capacitor.isNativePlatform()) return;
 
     let callbackId: any;
     
