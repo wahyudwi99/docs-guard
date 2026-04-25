@@ -27,7 +27,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const authenticated = status === 'authenticated';
 
   const handleSignIn = () => {
-    const callbackUrl = window.location.href;
+    // BUG-005 Fix: Use proper origin for Capacitor or web
+    const origin = (typeof window !== 'undefined' && window.location.origin.includes('localhost') && Capacitor.isNativePlatform())
+      ? 'https://docsguard.app' // Replace with real production domain
+      : window.location.origin;
+
+    const callbackUrl = origin;
     router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   };
 

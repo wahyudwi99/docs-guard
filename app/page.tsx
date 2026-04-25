@@ -34,7 +34,7 @@ export default function Home() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
 
-  const { data: session, status: authStatus } = useSession();
+  const { data: session } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const router = useRouter();
@@ -49,6 +49,7 @@ export default function Home() {
       setActiveTab('subscription');
     }
     
+    // BUG-006 Fix: Only proceed if packages are loaded
     if (autoSub && session && packages.length > 0) {
       // Clear the param and trigger subscribe
       const newParams = new URLSearchParams(searchParams.toString());
@@ -57,12 +58,16 @@ export default function Home() {
       
       handleSubscribe(autoSub as any);
     }
-  }, [session, packages, searchParams, router]);
+  }, [session, packages, searchParams, router, handleSubscribe]);
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
-      // Use custom sign-in page with callback to return and auto-trigger
-      const callbackUrl = `${window.location.origin}?tab=subscription&autoSubscribe=${planKey}`;
+      // BUG-005 Fix: Use proper origin for Capacitor or web
+      const origin = (typeof window !== 'undefined' && window.location.origin.includes('localhost') && Capacitor.isNativePlatform())
+        ? 'https://docsguard.app' // Replace with real production domain
+        : window.location.origin;
+
+      const callbackUrl = `${origin}?tab=subscription&autoSubscribe=${planKey}`;
       router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
