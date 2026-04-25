@@ -8,4 +8,5 @@
 - [-] BUG-008 (Terkait TASK-008): ReferenceError: Cannot access 'handleSubscribe' before initialization. Cara reproduksi: Buka halaman utama aplikasi, error akan muncul di console/layar karena hoisting issue pada useEffect.
 - [-] BUG-009 (Terkait TASK-008): ReferenceError: password is not defined. Cara reproduksi: Buka halaman utama aplikasi, error muncul karena state password terhapus secara tidak sengaja saat refactoring.
 - [-] BUG-010 (Terkait TASK-008): Type error: Cannot find name 'Capacitor' di app/page.tsx. Cara reproduksi: Jalankan proses build atau linting, error muncul karena Capacitor digunakan tanpa di-import.
+- [-] BUG-011 (Terkait TASK-008): Type error: Cannot find name 'Capacitor' di components/Paywall.tsx. Cara reproduksi: Jalankan proses build atau linting, error muncul karena Capacitor digunakan tanpa di-import.
 - [-] OPTIMIZE-001 (Terkait TASK-008): Implementasi Native Google Sign-In untuk iOS guna menghindari kendala redirect webview di Capacitor.

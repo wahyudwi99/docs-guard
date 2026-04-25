@@ -6,6 +6,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { Check, X, Shield, Zap, Lock } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Capacitor } from '@capacitor/core';
 
 interface PaywallProps {
   onClose?: () => void;
