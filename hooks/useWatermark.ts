@@ -65,7 +65,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     // Redraw the base document first to clear any old watermark on all pages
     await redrawDocument(canvases);
 
-    canvases.forEach((canvas, canvasIndex) => {
+    // Use Promise.all to ensure all drawing operations are completed
+    const drawPromises = canvases.map(async (canvas, canvasIndex) => {
       const context = canvas.getContext("2d");
       if (!context) return;
 
@@ -73,20 +74,16 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       const pageBlurAreas = blurAreas.filter(a => a.pageIndex === canvasIndex);
       pageBlurAreas.forEach(area => {
         context.save();
-        // Simple blur effect using canvas filter or stack blur
-        // For simplicity and better performance, we use filter if supported
         context.filter = `blur(${blurStrength}px)`;
-        // Draw the same area from the canvas itself to blur it
         context.drawImage(canvas, area.x, area.y, area.width, area.height, area.x, area.y, area.width, area.height);
         context.restore();
       });
 
-      if (watermarkMode === "blur") return; // Only draw blur, no watermark if in blur mode
+      if (watermarkMode === "blur") return;
 
       context.save();
       context.globalAlpha = watermarkOpacity;
       
-      // Orientation Logic
       let angle = 0;
       if (orientation === "diagonal") angle = -Math.PI / 4;
       else if (orientation === "vertical") angle = -Math.PI / 2;
@@ -141,6 +138,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
       context.restore();
     });
+
+    await Promise.all(drawPromises);
   }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
   // Redraw watermark whenever its properties or document changes
