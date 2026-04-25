@@ -131,5 +131,40 @@
     "copyright": "© {year} Built with Privacy by Wahyu",
     "security_protocol": "Protocolo de Seguridad",
     "local_first": "Local Primero"
+  },
+  "privacy": {
+    "title": "Política de Privacidad Amnesia Total",
+    "hero_title": "Amnesia Total",
+    "hero_subtitle": "Diseñamos DocsGuard para que sea la herramienta de documentos más privada del mundo. Literalmente no podemos ver sus archivos.",
+    "amnesia": {
+      "title": "Amnesia Total",
+      "description": "Tan pronto como cierra la aplicación o finaliza una sesión, todos los rastros de sus documentos se borran de la memoria. No guardamos historial, registros ni caché de su contenido privado."
+    },
+    "on_device": {
+      "title": "100% en el dispositivo",
+      "description": "Sus archivos nunca salen de su teléfono. Todo el marcado de agua, el desenfoque y el cifrado ocurren localmente utilizando el hardware de su dispositivo."
+    },
+    "zero_cloud": {
+      "title": "Cero Nube",
+      "description": "No tenemos servidores para almacenar documentos. No hay un botón de 'subir' a nuestra nube porque no hay nube. Sus datos le pertenecen a usted."
+    },
+    "zero_selling": {
+      "title": "Cero Venta",
+      "description": "Como no recopilamos sus datos, no tenemos nada que vender. Nuestro modelo de negocio se basa en suscripciones, no en su información personal."
+    },
+    "commitment_title": "Nuestro Compromiso",
+    "commitment_description": "En DocsGuard, creemos que la privacidad es un derecho humano fundamental. Las herramientas de documentos 'gratuitas' tradicionales a menudo procesan sus archivos en sus servidores, entrenando potencialmente modelos de IA o creando perfiles. Nosotros tomamos el enfoque opuesto.",
+    "features": [
+      "Sin seguimiento del contenido de los archivos",
+      "Sin recolección de metadatos de documentos",
+      "Sin análisis de terceros en sus archivos privados",
+      "Procesamiento abierto y transparente"
+    ],
+    "technical_title": "Seguridad Técnica",
+    "technical_description": "Cuando aplica una marca de agua o desenfoca un área, utilizamos la API Canvas del navegador o las API móviles nativas. El archivo resultante se genera en memoria y se ofrece para descargar. Una vez que se cierra la ventana o la aplicación, el sistema operativo libera esa memoria.",
+    "contact_title": "Contacto",
+    "contact_description": "Si tiene preguntas sobre nuestra política 'Amnesia Total', puede comunicarse con nuestro equipo de seguridad. Estamos comprometidos a mantener los más altos estándares de privacidad en el dispositivo.",
+    "back_button": "Atrás",
+    "last_updated": "Última actualización: {date}"
   }
 }

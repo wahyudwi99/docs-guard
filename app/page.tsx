@@ -5,6 +5,7 @@ import { useDocument } from "@/hooks/useDocument";
 import { useWatermark } from "@/hooks/useWatermark";
 import { useFileExport } from "@/hooks/useFileExport";
 import { useSubscription } from "@/hooks/useSubscription";
+import { PACKAGE_TYPE } from "@revenuecat/purchases-capacitor";
 import Link from "next/link";
 
 import { FileInput } from "@/components/FileInput";
@@ -35,7 +36,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const { data: session } = useSession();
-  const { isPro, loading: subLoading, subscriptionDaysLeft, subscribe, restorePurchases } = useSubscription();
+  const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
   const [metadataOptions, setMetadataOptions] = useState({
@@ -45,16 +46,30 @@ export default function Home() {
     nuclearClean: false,
   });
 
-  const handleSubscribe = useCallback(async (plan: 'weekly' | 'monthly' | 'yearly') => {
+  const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
       setShowLoginModal(true);
       return;
     }
-    const success = await subscribe(plan);
+    
+    // Find matching package
+    const pkg = packages.find(p => {
+      if (planKey === 'weekly') return p.packageType === PACKAGE_TYPE.WEEKLY;
+      if (planKey === 'monthly') return p.packageType === PACKAGE_TYPE.MONTHLY;
+      if (planKey === 'yearly') return p.packageType === PACKAGE_TYPE.ANNUAL;
+      return false;
+    }) || packages[0];
+
+    if (!pkg) {
+      console.error("No package found for", planKey);
+      return;
+    }
+
+    const success = await subscribe(pkg);
     if (success) {
       // In real app, DB would be updated via webhook and we'd refetch status
     }
-  }, [session, subscribe]);
+  }, [session, subscribe, packages]);
 
   // Splash screen effect
   useEffect(() => {

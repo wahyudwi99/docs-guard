@@ -131,5 +131,40 @@
     "copyright": "© {year} Built with Privacy by Wahyu",
     "security_protocol": "安全协议",
     "local_first": "本地优先"
+  },
+  "privacy": {
+    "title": "全面遗忘隐私政策",
+    "hero_title": "全面遗忘",
+    "hero_subtitle": "我们将 DocsGuard 设计为地球上最私密的文档工具。我们完全无法看到您的文件。",
+    "amnesia": {
+      "title": "全面遗忘",
+      "description": "一旦您关闭应用程序或结束会话，您文档的所有痕迹都会从内存中抹去。我们不保留您的私密内容的任何历史记录、日志或缓存。"
+    },
+    "on_device": {
+      "title": "100% 在设备上",
+      "description": "您的文件永远不会离开您的手机。所有的水印、模糊和加密都是使用您设备的硬件在本地完成的。"
+    },
+    "zero_cloud": {
+      "title": "零云端",
+      "description": "我们没有存储文档的服务器。我们的云端没有“上传”按钮，因为根本没有云端。您的数据属于您。"
+    },
+    "zero_selling": {
+      "title": "零销售",
+      "description": "既然我们不收集您的数据，我们就没有任何东西可以出售。我们的商业模式基于订阅，而不是您的个人信息。"
+    },
+    "commitment_title": "我们的承诺",
+    "commitment_description": "在 DocsGuard，我们相信隐私是一项基本人权。传统的“免费”文档工具通常在他们的服务器上处理您的文件，可能会训练 AI 模型或构建用户画像。我们采取完全相反的方法。",
+    "features": [
+      "不追踪文件内容",
+      "不获取文档元数据",
+      "不对您的私密文件进行第三方分析",
+      "公开透明的处理过程"
+    ],
+    "technical_title": "技术安全",
+    "technical_description": "当您应用水印或模糊区域时，我们使用浏览器的 Canvas API 或原生的移动 API。生成的文件在内存中生成并提供下载。一旦窗口或应用关闭，该内存就会被操作系统释放。",
+    "contact_title": "联系我们",
+    "contact_description": "如果您对我们的“全面遗忘”政策有任何疑问，可以联系我们的安全团队。我们致力于保持最高标准的设备端隐私保护。",
+    "back_button": "返回",
+    "last_updated": "最后更新：{date}"
   }
 }

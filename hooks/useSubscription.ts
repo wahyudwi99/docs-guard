@@ -1,82 +1,99 @@
-import { useState, useEffect, useCallback } from 'react';
-import { NativePurchases, PURCHASE_TYPE } from '@capgo/native-purchases';
+"use client";
+
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { Purchases, PACKAGE_TYPE, PurchasesPackage, CustomerInfo } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
-export const useSubscription = () => {
+const PRO_ENTITLEMENT_ID = 'pro';
+
+interface SubscriptionContextType {
+  isPro: boolean;
+  loading: boolean;
+  packages: PurchasesPackage[];
+  customerInfo: CustomerInfo | null;
+  subscribe: (rcPackage: PurchasesPackage) => Promise<boolean>;
+  restorePurchases: () => Promise<boolean>;
+  checkSubscriptionStatus: () => Promise<void>;
+}
+
+const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
+
+export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isPro, setIsPro] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState<any[]>([]);
-  const [subscriptionEndAt, setSubscriptionEndAt] = useState<Date | null>(null);
-  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
-  const PLANS = {
-    weekly: 'docsguard_pro_weekly',
-    monthly: 'docsguard_pro_monthly',
-    yearly: 'docsguard_pro_yearly',
-  };
-
-  useEffect(() => {
-    if (isPro && subscriptionEndAt) {
-      const diffTime = subscriptionEndAt.getTime() - new Date().getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setSubscriptionDaysLeft(diffDays > 0 ? diffDays : 0);
-    } else {
-      setSubscriptionDaysLeft(null);
-    }
-  }, [isPro, subscriptionEndAt]);
-
-  const fetchProducts = useCallback(async () => {
+  const fetchOffering = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) {
-      // Mock products for web
-      setProducts([
-        { identifier: PLANS.weekly, title: 'Weekly Pro', priceString: '$2.99' },
-        { identifier: PLANS.monthly, title: 'Monthly Pro', priceString: '$6.99' },
-        { identifier: PLANS.yearly, title: 'Yearly Pro', priceString: '$29.99' },
+      setPackages([
+        { 
+          identifier: 'weekly', 
+          packageType: PACKAGE_TYPE.WEEKLY, 
+          product: { title: 'Weekly Pro', priceString: '$2.99', description: 'Weekly subscription', currencyCode: 'USD', price: 2.99, identifier: 'weekly' } 
+        } as any,
+        { 
+          identifier: 'monthly', 
+          packageType: PACKAGE_TYPE.MONTHLY, 
+          product: { title: 'Monthly Pro', priceString: '$6.99', description: 'Monthly subscription', currencyCode: 'USD', price: 6.99, identifier: 'monthly' } 
+        } as any,
+        { 
+          identifier: 'yearly', 
+          packageType: PACKAGE_TYPE.ANNUAL, 
+          product: { title: 'Yearly Pro', priceString: '$29.99', description: 'Yearly subscription', currencyCode: 'USD', price: 29.99, identifier: 'yearly' } 
+        } as any,
       ]);
       return;
     }
 
     try {
-      const { products } = await NativePurchases.getProducts({
-        productIdentifiers: Object.values(PLANS),
-        productType: PURCHASE_TYPE.SUBS,
-      });
-      setProducts(products);
+      const offerings = await Purchases.getOfferings();
+      if (offerings.current !== null && offerings.current.availablePackages.length !== 0) {
+        setPackages(offerings.current.availablePackages);
+      }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching offerings:', error);
     }
   }, []);
 
-  const subscribe = useCallback(async (planKey: keyof typeof PLANS = 'monthly') => {
-    const productIdentifier = PLANS[planKey];
+  const checkSubscriptionStatus = useCallback(async () => {
+    if (!Capacitor.isNativePlatform()) {
+      const mockPro = localStorage.getItem('mock_is_pro') === 'true';
+      setIsPro(mockPro);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const info = await Purchases.getCustomerInfo();
+      setCustomerInfo(info);
+      setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const subscribe = useCallback(async (rcPackage: PurchasesPackage) => {
     setLoading(true);
     try {
       if (!Capacitor.isNativePlatform()) {
-        // Mock success on web after delay
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsPro(true);
-        
-        // Mock end date: 30 days from now for monthly
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + (planKey === 'weekly' ? 7 : planKey === 'monthly' ? 30 : 365));
-        setSubscriptionEndAt(endDate);
-        
+        localStorage.setItem('mock_is_pro', 'true');
         return true;
       }
 
-      await NativePurchases.purchaseProduct({
-        productIdentifier,
-        productType: PURCHASE_TYPE.SUBS,
-      });
-      
-      setIsPro(true);
-      // In real app, you'd fetch the real expiry date from server
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + 30);
-      setSubscriptionEndAt(endDate);
-      return true;
-    } catch (error) {
-      console.error('Purchase failed:', error);
+      const result = await Purchases.purchasePackage({ aPackage: rcPackage });
+      setCustomerInfo(result.customerInfo);
+      const active = result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
+      setIsPro(active);
+      return active;
+    } catch (error: any) {
+      if (!error.userCancelled) {
+        console.error('Purchase failed:', error);
+      }
       return false;
     } finally {
       setLoading(false);
@@ -87,29 +104,61 @@ export const useSubscription = () => {
     setLoading(true);
     try {
       if (!Capacitor.isNativePlatform()) {
-        return;
+        setIsPro(true);
+        localStorage.setItem('mock_is_pro', 'true');
+        return true;
       }
       
-      await NativePurchases.restorePurchases();
-      // Mock restoration
-      setIsPro(true);
+      const info = await Purchases.restorePurchases();
+      setCustomerInfo(info);
+      const active = info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
+      setIsPro(active);
+      return active;
     } catch (error) {
       console.error('Restore failed:', error);
+      return false;
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    fetchOffering();
+    checkSubscriptionStatus();
+  }, [fetchOffering, checkSubscriptionStatus]);
 
-  return {
-    isPro,
-    loading,
-    products,
-    subscriptionDaysLeft,
-    subscribe,
-    restorePurchases
-  };
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const listener = Purchases.addCustomerInfoUpdateListener((info) => {
+      setCustomerInfo(info);
+      setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
+    });
+
+    return () => {
+      // Cleanup if possible
+    };
+  }, []);
+
+  return (
+    <SubscriptionContext.Provider value={{
+      isPro,
+      loading,
+      packages,
+      customerInfo,
+      subscribe,
+      restorePurchases,
+      checkSubscriptionStatus
+    }}>
+      {children}
+    </SubscriptionContext.Provider>
+  );
+};
+
+export const useSubscription = () => {
+  const context = useContext(SubscriptionContext);
+  if (context === undefined) {
+    throw new Error('useSubscription must be used within a SubscriptionProvider');
+  }
+  return context;
 };
