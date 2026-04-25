@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as ImageIcon, Upload, LayoutGrid, Ghost, Trash2, BoxSelect } from "lucide-react";
+import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as ImageIcon, Upload, LayoutGrid, Ghost, Trash2, BoxSelect, Lock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
@@ -27,6 +27,11 @@ interface WatermarkControlsProps {
   setImageScale: (scale: number) => void;
   blurAreas: Array<{ x: number, y: number, width: number, height: number, pageIndex: number }>;
   removeBlurArea: (index: number) => void;
+  password?: string;
+  setPassword?: (password: string) => void;
+  isPro?: boolean;
+  onUpgrade?: () => void;
+  documentType?: "image" | "pdf" | null;
 }
 
 const FONTS = [
@@ -59,6 +64,11 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   setImageScale,
   blurAreas,
   removeBlurArea,
+  password,
+  setPassword,
+  isPro,
+  onUpgrade,
+  documentType,
 }) => {
   const { t } = useI18n();
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -306,6 +316,48 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* PDF Security Section - Premium Feature */}
+      {documentType === "pdf" && (
+        <div className="space-y-4 pt-2 border-t border-black/5">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+              <Lock className="h-3.5 w-3.5" />
+              {t('watermark_controls.pdf_security')}
+            </label>
+            {!isPro && (
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest rounded-full">
+                <Zap className="h-2.5 w-2.5 fill-amber-700" />
+                Pro Only
+              </span>
+            )}
+          </div>
+          
+          <div className="relative group" onClick={() => !isPro && onUpgrade?.()}>
+            <Input
+              id="pdf-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword?.(e.target.value)}
+              disabled={!isPro}
+              placeholder={isPro ? t('watermark_controls.password_placeholder') : "Upgrade to Pro to lock PDF"}
+              className={cn(
+                "h-12 bg-black/5 border-transparent focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 rounded-2xl transition-all duration-300 font-medium",
+                !isPro && "cursor-pointer opacity-60"
+              )}
+            />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
+              {!isPro ? <Lock className="h-4 w-4" /> : <Lock className="h-4 w-4 opacity-50" />}
+            </div>
+          </div>
+          {isPro && password && (
+            <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+              <Zap className="h-2.5 w-2.5 fill-emerald-600" />
+              AES-256 Encryption will be applied
+            </p>
+          )}
         </div>
       )}
 

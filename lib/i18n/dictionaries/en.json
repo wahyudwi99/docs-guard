@@ -71,7 +71,9 @@
     "vertical": "Vertical",
     "visibility": "Visibility",
     "subtle": "Subtle",
-    "visible": "Visible"
+    "visible": "Visible",
+    "pdf_security": "PDF Security",
+    "password_placeholder": "Set PDF Open Password..."
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -85,9 +87,9 @@
       "Unlimited Batch Processing",
       "Unlimited Blur Areas",
       "Custom Image Watermarks",
+      "PDF Password Protection & Encryption",
       "Premium Font Collection",
-      "Priority Local Processing",
-      "No Ads (Coming Soon)"
+      "Priority Local Processing"
     ],
     "plans": {
       "weekly": {

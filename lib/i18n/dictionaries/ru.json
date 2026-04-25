@@ -65,7 +65,9 @@
     "vertical": "Вертикально",
     "visibility": "Видимость",
     "subtle": "Едва заметно",
-    "visible": "Видимо"
+    "visible": "Видимо",
+    "pdf_security": "Защита PDF",
+    "password_placeholder": "Установить пароль для открытия PDF..."
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",

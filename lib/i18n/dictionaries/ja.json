@@ -65,7 +65,9 @@
     "vertical": "垂直",
     "visibility": "透明度",
     "subtle": "控えめ",
-    "visible": "はっきり"
+    "visible": "はっきり",
+    "pdf_security": "PDFセキュリティ",
+    "password_placeholder": "PDF閲覧パスワードを設定..."
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",

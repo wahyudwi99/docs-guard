@@ -71,7 +71,9 @@
     "vertical": "Vertikal",
     "visibility": "Visibilitas",
     "subtle": "Halus",
-    "visible": "Terlihat"
+    "visible": "Terlihat",
+    "pdf_security": "Keamanan PDF",
+    "password_placeholder": "Atur Kata Sandi Buka PDF..."
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",

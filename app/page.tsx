@@ -36,6 +36,7 @@ export default function Home() {
   const { data: session } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
+  const [password, setPassword] = useState("");
 
   const handleSubscribe = useCallback(async (plan: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
@@ -143,7 +144,9 @@ export default function Home() {
   const { getPreviewUrls, saveToDevice, shareFile } = useFileExport({ 
     canvases, 
     watermarkText,
-    documentType 
+    documentType,
+    password,
+    isPro
   });
 
   const handleOpenPreview = useCallback(async () => {
@@ -411,6 +414,11 @@ export default function Home() {
                         setImageScale={setImageScale}
                         blurAreas={blurAreas}
                         removeBlurArea={removeBlurArea}
+                        password={password}
+                        setPassword={setPassword}
+                        isPro={isPro}
+                        onUpgrade={() => setActiveTab('subscription')}
+                        documentType={documentType}
                       />
                       <div className="pt-4 space-y-4">
                          <button 
