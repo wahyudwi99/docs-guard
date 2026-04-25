@@ -1,16 +1,11 @@
 "use client";
 
 import { I18nProvider } from "@/hooks/useI18n";
-import { ReactNode, useEffect } from "react";
-import { initRevenueCat } from "@/lib/revenuecat";
+import { ReactNode } from "react";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { SessionProvider } from "next-auth/react";
 
 export function Providers({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    initRevenueCat();
-  }, []);
-
   return (
     <SessionProvider>
       <SubscriptionProvider>
