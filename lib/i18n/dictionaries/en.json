@@ -63,6 +63,7 @@
     "select_image_hint": "Select PNG/JPG",
     "image_scale": "Image Scale",
     "blur_instruction": "Drag on the document preview to select areas to blur.",
+    "blur_strength": "Blur Strength",
     "blur_areas": "Blur Areas",
     "no_blur_areas": "No blur areas selected yet.",
     "orientation": "Orientation",

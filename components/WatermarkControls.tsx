@@ -39,6 +39,8 @@ interface WatermarkControlsProps {
   isPro?: boolean;
   onUpgrade?: () => void;
   documentType?: "image" | "pdf" | null;
+  blurStrength: number;
+  setBlurStrength: (strength: number) => void;
 }
 
 const FONTS = [
@@ -78,6 +80,8 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   isPro,
   onUpgrade,
   documentType,
+  blurStrength,
+  setBlurStrength,
 }) => {
   const { t } = useI18n();
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -335,6 +339,31 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
                   </div>
                 ))
               )}
+            </div>
+          </div>
+
+          <div className="space-y-4 bg-black/5 p-5 rounded-[24px] border border-black/[0.02]">
+            <div className="flex items-center justify-between">
+              <label htmlFor="blur-strength" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+                <BoxSelect className="h-3 w-3" />
+                {t('watermark_controls.blur_strength')}
+              </label>
+              <div className="px-3 py-1 bg-white rounded-full shadow-sm border border-black/5">
+                <span className="text-[10px] font-black text-indigo-600 tabular-nums">
+                  {blurStrength}px
+                </span>
+              </div>
+            </div>
+            <div className="px-1">
+              <Slider
+                id="blur-strength"
+                min={1}
+                max={50}
+                step={1}
+                value={blurStrength}
+                onValueChange={(val) => setBlurStrength(val[0])}
+                className="cursor-pointer"
+              />
             </div>
           </div>
         </div>

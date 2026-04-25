@@ -125,6 +125,8 @@ export default function Home() {
     blurAreas,
     addBlurArea,
     removeBlurArea,
+    blurStrength,
+    setBlurStrength,
     resetWatermark,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
@@ -193,6 +195,7 @@ export default function Home() {
     }
 
     setIsSaving(true);
+    await drawWatermark();
     const success = await saveToDevice();
     setIsSaving(false);
     
@@ -305,9 +308,10 @@ export default function Home() {
           {/* Canvas Processing & Blur Selection Area */}
           {file && (
             <div className={cn(
-              watermarkMode === 'blur' && activeTab === 'design' 
-                ? "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700" 
-                : "pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0"
+              "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700",
+              (watermarkMode === 'blur' && activeTab === 'design') 
+                ? "block" 
+                : "invisible fixed -z-50 pointer-events-none"
             )}>
               <div className="space-y-3 mb-4">
                 <div className="flex items-center gap-2 text-indigo-600">
@@ -477,6 +481,8 @@ export default function Home() {
                         isPro={isPro}
                         onUpgrade={() => setActiveTab('subscription')}
                         documentType={documentType}
+                        blurStrength={blurStrength}
+                        setBlurStrength={setBlurStrength}
                       />
                       <div className="pt-4 space-y-4">
                          <button 

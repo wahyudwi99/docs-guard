@@ -63,6 +63,7 @@
     "select_image_hint": "Pilih PNG/JPG",
     "image_scale": "Skala Gambar",
     "blur_instruction": "Tarik kursor pada pratinjau dokumen untuk memilih area yang ingin disensor (blur).",
+    "blur_strength": "Ketebalan Sensor",
     "blur_areas": "Area Sensor",
     "no_blur_areas": "Belum ada area sensor yang dipilih.",
     "orientation": "Orientasi",

@@ -34,6 +34,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
   // Blur states
   const [blurAreas, setBlurAreas] = useState<BlurArea[]>([]);
+  const [blurStrength, setBlurStrength] = useState(10);
 
   const resetWatermark = useCallback(() => {
     setWatermarkMode("text");
@@ -47,6 +48,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setWatermarkImage(null);
     setImageScale(0.5);
     setBlurAreas([]);
+    setBlurStrength(10);
   }, []);
 
   const addBlurArea = useCallback((area: BlurArea) => {
@@ -73,7 +75,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
         context.save();
         // Simple blur effect using canvas filter or stack blur
         // For simplicity and better performance, we use filter if supported
-        context.filter = 'blur(10px)';
+        context.filter = `blur(${blurStrength}px)`;
         // Draw the same area from the canvas itself to blur it
         context.drawImage(canvas, area.x, area.y, area.width, area.height, area.x, area.y, area.width, area.height);
         context.restore();
@@ -139,12 +141,12 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
       context.restore();
     });
-  }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, redrawDocument]);
+  }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
   // Redraw watermark whenever its properties or document changes
   useEffect(() => {
     drawWatermark();
-  }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, drawWatermark]);
+  }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   return {
     watermarkMode,
@@ -170,6 +172,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     blurAreas,
     addBlurArea,
     removeBlurArea,
+    blurStrength,
+    setBlurStrength,
     resetWatermark,
     drawWatermark,
   };
