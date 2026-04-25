@@ -12,6 +12,7 @@ type CustomerInfo = any;
 interface SubscriptionContextType {
   isPro: boolean;
   loading: boolean;
+  subscriptionDaysLeft: number | null;
   packages: PurchasesPackage[];
   customerInfo: CustomerInfo | null;
   subscribe: (rcPackage: PurchasesPackage) => Promise<boolean>;
@@ -24,6 +25,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isPro, setIsPro] = useState(process.env.NODE_ENV === 'development');
   const [loading, setLoading] = useState(process.env.NODE_ENV !== 'development');
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(process.env.NODE_ENV === 'development' ? 365 : null);
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
@@ -64,6 +66,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const checkSubscriptionStatus = useCallback(async () => {
     if (process.env.NODE_ENV === 'development') {
       setIsPro(true);
+      setSubscriptionDaysLeft(365);
       setLoading(false);
       return;
     }
@@ -172,6 +175,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const contextValue = {
     isPro,
     loading,
+    subscriptionDaysLeft,
     packages,
     customerInfo,
     subscribe,
