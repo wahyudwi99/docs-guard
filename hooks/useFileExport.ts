@@ -17,6 +17,7 @@ interface UseFileExportProps {
     stripGps: boolean;
     nuclearClean: boolean;
   };
+  file?: File | null;
 }
 
 export function useFileExport({ 
@@ -25,7 +26,8 @@ export function useFileExport({
   documentType, 
   password, 
   isPro,
-  metadataOptions 
+  metadataOptions,
+  file
 }: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(() => {
@@ -38,11 +40,22 @@ export function useFileExport({
     if (canvases.length === 0) return null;
 
     if (documentType === "pdf") {
-      const pdf = new jsPDF({
+      // Use jsPDF encryption as pdf-lib doesn't support it in this version
+      const pdfOptions: any = {
         orientation: canvases[0].width > canvases[0].height ? "l" : "p",
         unit: "px",
         format: [canvases[0].width, canvases[0].height]
-      });
+      };
+
+      if (isPro && password) {
+        pdfOptions.encryption = {
+          userPassword: password,
+          ownerPassword: password,
+          userPermissions: ["print", "modify", "copy", "annot-forms"]
+        };
+      }
+
+      const pdf = new jsPDF(pdfOptions);
 
       canvases.forEach((canvas, index) => {
         if (index > 0) {
@@ -51,68 +64,35 @@ export function useFileExport({
         pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
       });
 
-      let pdfBytes = pdf.output("arraybuffer");
-
-      // Apply metadata stripping and password protection if user is Pro
-      if (isPro) {
-        try {
-          const pdfDoc = await PDFDocument.load(pdfBytes);
-          
-          // Apply metadata stripping if options are provided
-          if (metadataOptions) {
-            if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
-              pdfDoc.setAuthor("");
-              pdfDoc.setCreator("");
-              pdfDoc.setProducer("");
-            }
-            if (metadataOptions.stripCreationDate || metadataOptions.nuclearClean) {
-              pdfDoc.setCreationDate(new Date(0));
-              pdfDoc.setModificationDate(new Date(0));
-            }
-            if (metadataOptions.nuclearClean) {
-              pdfDoc.setTitle("");
-              pdfDoc.setSubject("");
-              pdfDoc.setKeywords([]);
-            }
-          }
-
-          // Apply password protection if provided
-          if (password) {
-            // @ts-ignore
-            pdfDoc.encrypt({
-              userPassword: password,
-              ownerPassword: password,
-              permissions: {
-                printing: "highResolution",
-                modifying: false,
-                copying: false,
-                annotating: false,
-                fillingForms: false,
-                contentAccessibility: true,
-                documentAssembly: false,
-              },
-            });
-          }
-          
-          pdfBytes = await pdfDoc.save();
-        } catch (error) {
-          console.error("Error processing PDF (metadata/encryption):", error);
+      // Apply metadata stripping if user is Pro
+      if (isPro && metadataOptions) {
+        if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
+          pdf.setProperties({ author: "", creator: "", producer: "" });
+        }
+        if (metadataOptions.nuclearClean) {
+          pdf.setProperties({ title: "", subject: "", keywords: "" });
         }
       }
 
-      const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+      const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
     } else {
       const canvas = canvases[0];
-      const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.png`;
+      const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg") || file?.name.toLowerCase().endsWith(".jpeg");
+      const exportType = isOriginalJpg ? "image/jpeg" : "image/png";
+      const fileExt = isOriginalJpg ? "jpg" : "png";
+      
+      const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
       const blob = await new Promise<Blob | null>((resolve) => {
-        // PNG export from canvas naturally strips EXIF/GPS metadata
-        canvas.toBlob((b) => resolve(b), "image/png", 1.0);
+        // Drawing to canvas and exporting naturally strips all metadata (EXIF/GPS)
+        // This satisfies the "Nuclear Clean" and "Strip GPS/Author" requirements
+        // Selective metadata retention is not supported as canvas doesn't preserve it.
+        canvas.toBlob((b) => resolve(b), exportType, 0.95);
       });
-      return { blob, fileName, contentType: "image/png" };
+      return { blob, fileName, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions]);
+  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file]);
 
   const saveToDevice = useCallback(async () => {
     const result = await generateBlobAndFileName();

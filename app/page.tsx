@@ -169,7 +169,8 @@ export default function Home() {
     documentType,
     password,
     isPro,
-    metadataOptions
+    metadataOptions,
+    file
   });
 
   const handleOpenPreview = useCallback(async () => {

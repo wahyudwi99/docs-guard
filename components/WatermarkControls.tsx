@@ -135,6 +135,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
             )}
           >
             {t('watermark_controls.blur_mode')}
+            {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
           </button>
         </div>
       </div>

@@ -130,13 +130,21 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    const listener = Purchases.addCustomerInfoUpdateListener((info) => {
-      setCustomerInfo(info);
-      setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
-    });
+    let callbackId: any;
+    
+    const setupListener = async () => {
+      callbackId = await Purchases.addCustomerInfoUpdateListener((info) => {
+        setCustomerInfo(info);
+        setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
+      });
+    };
+
+    setupListener();
 
     return () => {
-      // Cleanup if possible
+      if (callbackId) {
+        Purchases.removeCustomerInfoUpdateListener({ listenerToRemove: callbackId });
+      }
     };
   }, []);
 
