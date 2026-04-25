@@ -2,6 +2,7 @@
 - [-] BUG-012 (Terkait TASK-007): Type error: Property 'entitlements' does not exist on type '{ customerInfo: CustomerInfo; }' di hooks/useSubscription.tsx. Cara reproduksi: Jalankan proses build atau linting, error muncul karena response dari getCustomerInfo() perlu diekstrak property customerInfo-nya.
 - [-] BUG-013 (Terkait TASK-007): Type error: Property 'appUserId' does not exist on type '{ appUserID: string; }'. Cara reproduksi: Jalankan npm run build, error muncul karena typo penamaan properti SDK RevenueCat.
 - [-] BUG-014 (Terkait TASK-008): Next.js build error: useSearchParams() should be wrapped in a suspense boundary. Cara reproduksi: Jalankan npm run build, error muncul karena fitur SSR Next.js mewajibkan Suspense untuk penggunaan search params.
-- [-] BUG-015 (Terkait iOS Build): iOS Xcode build error: Could not resolve package dependencies (capacitor-swift-pm conflict). Diatasi secara permanen dengan menghapus RevenueCat dan beralih ke @capgo/native-purchases yang lebih ringan dan kompatibel dengan Capacitor v7.
+- [-] BUG-015 (Terkait iOS Build): iOS Xcode build error: Could not resolve package dependencies (capacitor-swift-pm conflict). Diatasi secara permanen dengan beralih ke @capgo/native-purchases v7.7.13 yang strictly menggunakan Swift PM v7, sehingga selaras dengan plugin lainnya.
 - [-] BUG-016 (Terkait Refactoring): Module not found: Can't resolve '@/lib/revenuecat' di components/Providers.tsx. Cara reproduksi: Jalankan npm run build atau dev, error muncul karena import helper RevenueCat yang sudah dihapus masih tertinggal.
 - [-] OPTIMIZE-001 (Terkait TASK-008): Implementasi Native Google Sign-In untuk iOS guna menghindari kendala redirect webview di Capacitor.
+Applied fuzzy match at line 1.

@@ -17,7 +17,7 @@
     "@capacitor/filesystem": "^7.1.8",
     "@capacitor/ios": "^7.6.2",
     "@capacitor/share": "^7.0.4",
-    "@capgo/native-purchases": "^7.18.0",
+    "@capgo/native-purchases": "^7.7.13",
     "@codetrix-studio/capacitor-google-auth": "^3.3.6",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
