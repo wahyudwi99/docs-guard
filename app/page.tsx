@@ -302,6 +302,38 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Canvas Processing & Blur Selection Area */}
+          {file && (
+            <div className={cn(
+              watermarkMode === 'blur' && activeTab === 'design' 
+                ? "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700" 
+                : "pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0"
+            )}>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center gap-2 text-indigo-600">
+                  <Layout className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Preview</span>
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                  {t('watermark_controls.blur_instruction')}
+                </p>
+              </div>
+              <CanvasDisplay 
+                numPages={numPages} 
+                registerCanvas={registerCanvas} 
+                isSelectionMode={watermarkMode === 'blur'}
+                onAreaSelected={(area) => {
+                  if (!isPro && blurAreas.length >= 2) {
+                    setActiveTab('subscription');
+                    return;
+                  }
+                  addBlurArea(area);
+                }}
+                blurAreas={blurAreas}
+              />
+            </div>
+          )}
+
           {/* Main Control Card */}
           <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60">
             <div className="flex flex-col gap-6">
@@ -571,38 +603,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Canvas Processing & Blur Selection Area */}
-          {file && (
-            <div className={cn(
-              watermarkMode === 'blur' && activeTab === 'design' 
-                ? "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700" 
-                : "pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0"
-            )}>
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center gap-2 text-indigo-600">
-                  <Layout className="h-4 w-4" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Preview</span>
-                </div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-                  {t('watermark_controls.blur_instruction')}
-                </p>
-              </div>
-              <CanvasDisplay 
-                numPages={numPages} 
-                registerCanvas={registerCanvas} 
-                isSelectionMode={watermarkMode === 'blur'}
-                onAreaSelected={(area) => {
-                  if (!isPro && blurAreas.length >= 2) {
-                    setActiveTab('subscription');
-                    return;
-                  }
-                  addBlurArea(area);
-                }}
-                blurAreas={blurAreas}
-              />
-            </div>
-          )}
 
           {/* Info Card */}
           <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
