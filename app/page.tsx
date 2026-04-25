@@ -754,7 +754,7 @@ export default function Home() {
             
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => signIn('google')}
+                onClick={() => console.log('Login disabled for testing')}
                 className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
               >
                 <ImageIcon className="h-4 w-4" />
