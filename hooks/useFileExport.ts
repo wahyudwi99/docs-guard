@@ -14,7 +14,7 @@ interface UseFileExportProps {
   metadataOptions?: {
     stripAuthor: boolean;
     stripCreationDate: boolean;
-    stripGps: boolean;
+    stripGPS: boolean;
     nuclearClean: boolean;
   };
   file?: File | null;
