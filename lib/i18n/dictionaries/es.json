@@ -19,6 +19,7 @@
     "title": "Bienvenido de nuevo",
     "subtitle": "Inicia sesión para proteger tus documentos localmente.",
     "google_button": "Continuar con Google",
+    "apple_button": "Continuar con Apple",
     "secure_badge": "Acceso seguro",
     "privacy_note": "Tus credenciales nunca se almacenan. Solo usamos Google para la identificación.",
     "footer_privacy": "Al iniciar sesión, aceptas nuestra Política de privacidad",

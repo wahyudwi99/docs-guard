@@ -13,6 +13,10 @@ export default function LoginPage() {
     signIn("google", { callbackUrl: "/" });
   };
 
+  const handleAppleLogin = () => {
+    signIn("apple", { callbackUrl: "/" });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans">
       {/* Background Blobs */}
@@ -50,7 +54,7 @@ export default function LoginPage() {
           </div>
 
           {/* Login Card */}
-          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60 space-y-6">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60 space-y-4">
             
             <button
               onClick={handleLogin}
@@ -79,7 +83,19 @@ export default function LoginPage() {
               </span>
             </button>
 
-            <div className="relative">
+            <button
+              onClick={handleAppleLogin}
+              className="group w-full py-4 bg-black border border-black rounded-2xl flex items-center justify-center gap-3 transition-all hover:bg-slate-900 active:scale-95 shadow-sm"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
+                <path d="M17.057 14.825c.018 2.3 1.963 3.074 1.983 3.084-.017.053-.31 1.066-1.017 2.097-.61.894-1.243 1.784-2.245 1.802-.983.018-1.3-.584-2.422-.584-1.121 0-1.474.566-2.404.602-.983.036-1.713-.965-2.325-1.855-1.253-1.815-2.21-5.12-1.025-7.173.588-1.018 1.636-1.663 2.774-1.681 1.017-.018 1.974.686 2.592.686.619 0 1.791-.849 3.007-.726.51.021 1.944.205 2.864 1.55-.074.046-1.713.998-1.696 2.978l-.012.222zm-2.433-8.524c.52-.63.87-1.505.774-2.383-.755.03-1.669.505-2.21 1.144-.485.562-.909 1.455-.796 2.315.843.066 1.712-.446 2.232-1.076z" />
+              </svg>
+              <span className="text-sm font-bold text-white">
+                {t('login.apple_button')}
+              </span>
+            </button>
+
+            <div className="relative pt-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-100"></div>
               </div>

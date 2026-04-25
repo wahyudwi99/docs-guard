@@ -19,6 +19,7 @@
     "title": "Welcome Back",
     "subtitle": "Sign in to protect your documents locally.",
     "google_button": "Continue with Google",
+    "apple_button": "Continue with Apple",
     "secure_badge": "Secure Access",
     "privacy_note": "Your credentials are never stored. We only use Google for identification.",
     "footer_privacy": "By signing in, you agree to our Privacy Policy",

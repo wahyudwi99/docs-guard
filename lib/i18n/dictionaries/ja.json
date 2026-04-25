@@ -19,6 +19,7 @@
     "title": "おかえりなさい",
     "subtitle": "ドキュメントをローカルで保護するためにサインインしてください。",
     "google_button": "Google で続行",
+    "apple_button": "Apple で続行",
     "secure_badge": "セキュアアクセス",
     "privacy_note": "認証情報は保存されません。Google は本人確認のためのみに使用されます。",
     "footer_privacy": "サインインすることで、プライバシーポリシーに同意したものとみなされます。",
