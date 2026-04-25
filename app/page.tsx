@@ -332,7 +332,7 @@ export default function Home() {
               "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700",
               (watermarkMode === 'blur' && activeTab === 'design') 
                 ? "block" 
-                : "invisible absolute -top-[9999px] -left-[9999px] pointer-events-none"
+                : "fixed -left-[9999px] top-0 pointer-events-none opacity-0"
             )}>
               <div className="space-y-3 mb-4">
                 <div className="flex items-center gap-2 text-indigo-600">

@@ -95,22 +95,43 @@ export function useFileExport({
   }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file]);
 
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
-    if (onBeforeExport) await onBeforeExport();
-    const result = await generateBlobAndFileName();
-    if (!result || !result.blob) return false;
-
-    const { blob, fileName, contentType } = result;
-
     try {
-      if (!isCapacitorApp()) {
+      if (onBeforeExport) {
+        console.log("Running onBeforeExport...");
+        await onBeforeExport();
+      }
+      
+      console.log("Generating blob...");
+      const result = await generateBlobAndFileName();
+      
+      if (!result || !result.blob) {
+        console.error("Failed to generate blob result");
+        return false;
+      }
+
+      const { blob, fileName, contentType } = result;
+      console.log(`Blob generated: ${fileName} (${blob.size} bytes), type: ${contentType}`);
+
+      const isNative = isCapacitorApp();
+      console.log(`Is Capacitor Native: ${isNative}`);
+
+      if (!isNative) {
+        console.log("Triggering web download...");
         saveAndOpenBlob(blob, fileName, contentType);
       } else {
+        console.log("Triggering Capacitor file save...");
         const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve) => {
+        const base64Promise = new Promise<string>((resolve, reject) => {
           reader.onloadend = () => {
-            const base64Data = (reader.result as string).split(",")[1];
-            resolve(base64Data);
+            const result = reader.result as string;
+            if (result) {
+              const base64Data = result.split(",")[1];
+              resolve(base64Data);
+            } else {
+              reject(new Error("FileReader result is empty"));
+            }
           };
+          reader.onerror = () => reject(reader.error);
           reader.readAsDataURL(blob);
         });
 
@@ -121,6 +142,7 @@ export function useFileExport({
           directory: Directory.Documents,
           recursive: true,
         });
+        console.log("Capacitor file saved to Documents");
       }
       return true;
     } catch (error) {

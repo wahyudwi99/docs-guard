@@ -12,12 +12,23 @@ export function cn(...inputs: ClassValue[]) {
 export function saveAndOpenBlob(blob: Blob, filename: string, contentType: string) {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
+  a.style.display = "none";
   a.href = url;
   a.download = filename;
+  
+  // Required for Firefox
   document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
+  
+  // Small delay to ensure browser handles the click
+  setTimeout(() => {
+    a.click();
+    
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+  }, 0);
 }
 
 /**
@@ -25,5 +36,8 @@ export function saveAndOpenBlob(blob: Blob, filename: string, contentType: strin
  * This is a client-side check.
  */
 export function isCapacitorApp(): boolean {
-  return typeof window !== "undefined" && typeof (window as any).Capacitor !== "undefined";
+  if (typeof window === "undefined") return false;
+  
+  const win = window as any;
+  return !!(win.Capacitor && win.Capacitor.isNativePlatform && win.Capacitor.isNativePlatform());
 }
