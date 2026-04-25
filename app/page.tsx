@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useSession, signIn } from "next-auth/react";
 
 export default function Home() {
   const { t, locale } = useI18n();
@@ -34,7 +33,8 @@ export default function Home() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const { data: session } = useSession();
+  // Mock session for testing without auth
+  const session = { user: { name: "Tester" } };
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
@@ -46,10 +46,13 @@ export default function Home() {
   });
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
+    // Auth check disabled for testing
+    /*
     if (!session) {
       setShowLoginModal(true);
       return;
     }
+    */
     
     // Find matching package using identifier or internal packageType string
     // This avoids needing the PACKAGE_TYPE enum at top level
