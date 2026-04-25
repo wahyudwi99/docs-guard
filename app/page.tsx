@@ -325,7 +325,7 @@ export default function Home() {
               </div>
             ) : (
               <button 
-                onClick={() => signIn('google')}
+                onClick={() => router.push('/auth/signin')}
                 className="h-9 px-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2"
               >
                 <User className="h-3.5 w-3.5" />
