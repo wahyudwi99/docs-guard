@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
 
+import { useSession } from 'next-auth/react';
+
 const PRO_ENTITLEMENT_ID = 'pro';
 
 // Types from RevenueCat to maintain type safety without direct top-level import
@@ -23,9 +25,10 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isPro, setIsPro] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(365);
+  const { data: session } = useSession();
+  const [isPro, setIsPro] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
@@ -64,11 +67,52 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, []);
 
   const checkSubscriptionStatus = useCallback(async () => {
-    setIsPro(true);
-    setSubscriptionDaysLeft(365);
-    setLoading(false);
-    return;
+    if (!Capacitor.isNativePlatform()) {
+      const mockPro = typeof window !== 'undefined' && localStorage.getItem('mock_is_pro') === 'true';
+      setIsPro(mockPro);
+      setSubscriptionDaysLeft(mockPro ? 365 : 0);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      const info = await Purchases.getCustomerInfo();
+      setCustomerInfo(info);
+      const active = info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
+      setIsPro(active);
+      
+      // Calculate days left if active
+      if (active && info.entitlements.active[PRO_ENTITLEMENT_ID].expirationDate) {
+        const expiry = new Date(info.entitlements.active[PRO_ENTITLEMENT_ID].expirationDate).getTime();
+        const now = new Date().getTime();
+        const diff = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+        setSubscriptionDaysLeft(diff > 0 ? diff : 0);
+      }
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // Sync RevenueCat with NextAuth session
+  useEffect(() => {
+    const syncUser = async () => {
+      if (!Capacitor.isNativePlatform()) return;
+      
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      if (session?.user?.email) {
+        await Purchases.logIn({ appUserId: session.user.email });
+        checkSubscriptionStatus();
+      } else {
+        // Option to log out or keep anonymous
+        // await Purchases.logOut();
+      }
+    };
+    
+    syncUser();
+  }, [session, checkSubscriptionStatus]);
 
   const subscribe = useCallback(async (rcPackage: PurchasesPackage) => {
     setLoading(true);

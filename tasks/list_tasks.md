@@ -4,3 +4,5 @@
 - [-] TASK-004: Pembersihan Metadata Selektif (Metadata Stripper) untuk PDF & JPG
 - [-] TASK-005: Pengembangan Layar Kebijakan Privasi "Amnesia Total"
 - [-] TASK-006: Integrasi RevenueCat dan Global SubscriptionService
+- [-] TASK-007: Implementasi Status Berlangganan Riil dan Perbaikan Sinkronisasi RevenueCat
+- [ ] TASK-008: Integrasi Alur Sign-in Google Sebelum Pembayaran Pro Plan pada iOS

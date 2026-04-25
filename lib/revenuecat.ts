@@ -10,7 +10,7 @@ const getPurchases = async () => {
   return Purchases;
 };
 
-export const initRevenueCat = async () => {
+export const initRevenueCat = async (appUserId?: string) => {
   if (typeof window === 'undefined' || !Capacitor.isNativePlatform()) {
     return;
   }
@@ -19,15 +19,38 @@ export const initRevenueCat = async () => {
     const { Purchases, LOG_LEVEL } = await import('@revenuecat/purchases-capacitor');
     await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
     
-    if (Capacitor.getPlatform() === 'ios') {
-      await Purchases.configure({ apiKey: APPLE_API_KEY });
-    } else if (Capacitor.getPlatform() === 'android') {
-      await Purchases.configure({ apiKey: GOOGLE_API_KEY });
-    }
+    const configuration = {
+      apiKey: Capacitor.getPlatform() === 'ios' ? APPLE_API_KEY : GOOGLE_API_KEY,
+      appUserId: appUserId || undefined,
+    };
     
-    console.log('RevenueCat initialized successfully');
+    await Purchases.configure(configuration);
+    
+    console.log('RevenueCat initialized successfully', appUserId ? `with user: ${appUserId}` : '');
   } catch (error) {
     console.error('RevenueCat initialization failed:', error);
+  }
+};
+
+export const loginRevenueCat = async (appUserId: string) => {
+  const Purchases = await getPurchases();
+  if (!Purchases) return null;
+  try {
+    return await Purchases.logIn({ appUserId });
+  } catch (error) {
+    console.error('Error logging into RevenueCat:', error);
+    return null;
+  }
+};
+
+export const logoutRevenueCat = async () => {
+  const Purchases = await getPurchases();
+  if (!Purchases) return null;
+  try {
+    return await Purchases.logOut();
+  } catch (error) {
+    console.error('Error logging out of RevenueCat:', error);
+    return null;
   }
 };
 
