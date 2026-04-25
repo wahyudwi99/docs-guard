@@ -14,6 +14,7 @@ import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
 import { useCallback, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Capacitor } from "@capacitor/core";
 import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
