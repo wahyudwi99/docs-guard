@@ -40,26 +40,6 @@ export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Handle post-login redirection/actions
-  useEffect(() => {
-    const autoSub = searchParams.get('autoSubscribe');
-    const tab = searchParams.get('tab');
-    
-    if (tab === 'subscription') {
-      setActiveTab('subscription');
-    }
-    
-    // BUG-006 Fix: Only proceed if packages are loaded
-    if (autoSub && session && packages.length > 0) {
-      // Clear the param and trigger subscribe
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.delete('autoSubscribe');
-      router.replace(`?${newParams.toString()}`, { scroll: false });
-      
-      handleSubscribe(autoSub as any);
-    }
-  }, [session, packages, searchParams, router, handleSubscribe]);
-
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
       // BUG-005 Fix: Use proper origin for Capacitor or web
@@ -91,6 +71,26 @@ export default function Home() {
       setShowSuccessModal(true);
     }
   }, [session, subscribe, packages, router]);
+
+  // Handle post-login redirection/actions
+  useEffect(() => {
+    const autoSub = searchParams.get('autoSubscribe');
+    const tab = searchParams.get('tab');
+    
+    if (tab === 'subscription') {
+      setActiveTab('subscription');
+    }
+    
+    // BUG-006 Fix: Only proceed if packages are loaded
+    if (autoSub && session && packages.length > 0) {
+      // Clear the param and trigger subscribe
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('autoSubscribe');
+      router.replace(`?${newParams.toString()}`, { scroll: false });
+      
+      handleSubscribe(autoSub as any);
+    }
+  }, [session, packages, searchParams, router, handleSubscribe]);
 
   // Splash screen effect
   useEffect(() => {
