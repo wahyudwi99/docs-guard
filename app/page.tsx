@@ -13,6 +13,7 @@ import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
 import { useCallback, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,20 +35,36 @@ export default function Home() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const { data: session } = useSession();
+  const { data: session, status: authStatus } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
-  const [password, setPassword] = useState("");
-  const [metadataOptions, setMetadataOptions] = useState({
-    stripAuthor: true,
-    stripCreationDate: true,
-    stripGPS: true,
-    nuclearClean: false,
-  });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle post-login redirection/actions
+  useEffect(() => {
+    const autoSub = searchParams.get('autoSubscribe');
+    const tab = searchParams.get('tab');
+    
+    if (tab === 'subscription') {
+      setActiveTab('subscription');
+    }
+    
+    if (autoSub && session && packages.length > 0) {
+      // Clear the param and trigger subscribe
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('autoSubscribe');
+      router.replace(`?${newParams.toString()}`, { scroll: false });
+      
+      handleSubscribe(autoSub as any);
+    }
+  }, [session, packages, searchParams, router]);
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
-      setShowLoginModal(true);
+      // Use custom sign-in page with callback to return and auto-trigger
+      const callbackUrl = `${window.location.origin}?tab=subscription&autoSubscribe=${planKey}`;
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
     
@@ -67,9 +84,9 @@ export default function Home() {
 
     const success = await subscribe(pkg);
     if (success) {
-      // In real app, DB would be updated via webhook and we'd refetch status
+      setShowSuccessModal(true);
     }
-  }, [session, subscribe, packages]);
+  }, [session, subscribe, packages, router]);
 
   // Splash screen effect
   useEffect(() => {

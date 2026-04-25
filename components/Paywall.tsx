@@ -5,6 +5,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
 import { Check, X, Shield, Zap, Lock } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface PaywallProps {
   onClose?: () => void;
@@ -14,6 +15,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const { packages, subscribe, loading, restorePurchases } = useSubscription();
   const { t } = useI18n();
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const features = [
     { icon: <Zap className="w-5 h-5 text-yellow-500" />, text: t('paywall_feature_unlimited_blur') || 'Unlimited Blur & Pixelation' },
@@ -23,6 +25,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   ];
 
   const authenticated = status === 'authenticated';
+
+  const handleSignIn = () => {
+    const callbackUrl = window.location.href;
+    router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
@@ -77,7 +84,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                 {t('subscription_section.login_required_desc') || 'Please login to subscribe and protect your documents with Pro features.'}
               </p>
               <button
-                onClick={() => signIn('google')}
+                onClick={handleSignIn}
                 className="w-full py-4 px-6 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-3"
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
