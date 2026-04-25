@@ -67,7 +67,16 @@
     "subtle": "Sutil",
     "visible": "Visible",
     "pdf_security": "Seguridad de PDF",
-    "password_placeholder": "Establecer contraseña para abrir PDF..."
+    "password_placeholder": "Establecer contraseña para abrir PDF...",
+    "metadata_stripper": {
+      "title": "Eliminador de metadatos",
+      "description": "Seleccione los metadatos que desea eliminar del archivo",
+      "strip_author": "Eliminar autor / propietario",
+      "strip_creation_date": "Eliminar fecha de creación",
+      "strip_gps": "Eliminar GPS / ubicación",
+      "nuclear_clean": "Limpieza total (Todo)",
+      "pro_only": "Solo Pro"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -117,13 +126,6 @@
     "saving": "Guardando...",
     "final_verification": "Verificación Final",
     "download_note": "Vista previa de la primera página como ejemplo. Descargar para aplicar a todas las páginas."
-  },
-  "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
-    "security_protocol": "Protocolo de Seguridad",
-    "local_first": "Local Primero"
-  }
-}mplo. Descargar para aplicar a todas las páginas."
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",

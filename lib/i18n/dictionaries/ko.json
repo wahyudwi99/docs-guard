@@ -67,7 +67,16 @@
     "subtle": "희미하게",
     "visible": "선명하게",
     "pdf_security": "PDF 보안",
-    "password_placeholder": "PDF 열기 암호 설정..."
+    "password_placeholder": "PDF 열기 암호 설정...",
+    "metadata_stripper": {
+      "title": "메타데이터 제거기",
+      "description": "파일에서 제거할 메타데이터를 선택하세요",
+      "strip_author": "작성자 / 소유자 제거",
+      "strip_creation_date": "생성 날짜 제거",
+      "strip_gps": "GPS / 위치 정보 제거",
+      "nuclear_clean": "완전 삭제 (전체)",
+      "pro_only": "Pro 전용"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -117,13 +126,6 @@
     "saving": "저장 중...",
     "final_verification": "최종 확인",
     "download_note": "첫 페이지만 샘플로 미리 봅니다. 모든 페이지에 적용하려면 다운로드하세요."
-  },
-  "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
-    "security_protocol": "보안 프로토콜",
-    "local_first": "로컬 우선"
-  }
-}� 적용하려면 다운로드하세요."
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",

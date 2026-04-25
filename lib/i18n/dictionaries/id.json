@@ -73,7 +73,16 @@
     "subtle": "Halus",
     "visible": "Terlihat",
     "pdf_security": "Keamanan PDF",
-    "password_placeholder": "Atur Kata Sandi Buka PDF..."
+    "password_placeholder": "Atur Kata Sandi Buka PDF...",
+    "metadata_stripper": {
+      "title": "Pembersih Metadata",
+      "description": "Pilih metadata yang ingin dihapus dari file",
+      "strip_author": "Hapus Penulis / Pemilik",
+      "strip_creation_date": "Hapus Tanggal Pembuatan",
+      "strip_gps": "Hapus GPS / Lokasi",
+      "nuclear_clean": "Pembersihan Total (Semua)",
+      "pro_only": "Hanya Pro"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",

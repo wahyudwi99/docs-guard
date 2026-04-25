@@ -73,7 +73,16 @@
     "subtle": "Subtle",
     "visible": "Visible",
     "pdf_security": "PDF Security",
-    "password_placeholder": "Set PDF Open Password..."
+    "password_placeholder": "Set PDF Open Password...",
+    "metadata_stripper": {
+      "title": "Metadata Stripper",
+      "description": "Select metadata to remove from file",
+      "strip_author": "Remove Author / Owner",
+      "strip_creation_date": "Remove Creation Date",
+      "strip_gps": "Remove GPS / Location",
+      "nuclear_clean": "Nuclear Clean (All)",
+      "pro_only": "Pro Only"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",

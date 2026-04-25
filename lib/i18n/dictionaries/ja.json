@@ -67,7 +67,16 @@
     "subtle": "控えめ",
     "visible": "はっきり",
     "pdf_security": "PDFセキュリティ",
-    "password_placeholder": "PDF閲覧パスワードを設定..."
+    "password_placeholder": "PDF閲覧パスワードを設定...",
+    "metadata_stripper": {
+      "title": "メタデータ削除ツール",
+      "description": "ファイルから削除するメタデータを選択してください",
+      "strip_author": "作成者・所有者を削除",
+      "strip_creation_date": "作成日時を削除",
+      "strip_gps": "GPS・位置情報を削除",
+      "nuclear_clean": "強制クリーンアップ (すべて)",
+      "pro_only": "Pro版限定"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -122,12 +131,6 @@
     "copyright": "© {year} Built with Privacy by Wahyu",
     "security_protocol": "セキュリティプロトコル",
     "local_first": "ローカルファースト"
-  },
-  "errors": {
-    "unsupported_file": "サポートされていないファイル形式: {type}",
-    "failed_to_load": "ドキュメントの読み込みに失敗しました"
-  }
-}    "local_first": "ローカルファースト"
   },
   "errors": {
     "unsupported_file": "サポートされていないファイル形式: {type}",

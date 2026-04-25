@@ -28,7 +28,7 @@
   },
   "upload_section": {
     "select_doc": "选择一个文档开始。您的文件在本地处理，绝不会上传到任何服务器。",
-    "privacy_note": "您的文件在本地处理，绝不会上传到任何服务器。",
+    "privacy_note": "您的文件在本地处理，绝不会上传到 any 服务器。",
     "error_no_file": "请先选择一个文件",
     "import_title": "导入文档",
     "drag_drop": "拖放或 {browse}",
@@ -67,7 +67,16 @@
     "subtle": "微弱",
     "visible": "可见",
     "pdf_security": "PDF 安全",
-    "password_placeholder": "设置 PDF 打开密码..."
+    "password_placeholder": "设置 PDF 打开密码...",
+    "metadata_stripper": {
+      "title": "元数据清除器",
+      "description": "选择要从文件中删除的元数据",
+      "strip_author": "删除作者 / 所有者",
+      "strip_creation_date": "删除创建日期",
+      "strip_gps": "删除 GPS / 位置信息",
+      "nuclear_clean": "深度清理 (全部)",
+      "pro_only": "仅限专业版"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -117,13 +126,6 @@
     "saving": "保存中...",
     "final_verification": "最终确认",
     "download_note": "预览第一页作为示例。下载以应用于所有页面。"
-  },
-  "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
-    "security_protocol": "安全协议",
-    "local_first": "本地优先"
-  }
-}��面。"
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",

@@ -37,6 +37,12 @@ export default function Home() {
   const { isPro, loading: subLoading, subscriptionDaysLeft, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
+  const [metadataOptions, setMetadataOptions] = useState({
+    stripAuthor: true,
+    stripCreationDate: true,
+    stripGPS: true,
+    nuclearClean: false,
+  });
 
   const handleSubscribe = useCallback(async (plan: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
@@ -146,7 +152,8 @@ export default function Home() {
     watermarkText,
     documentType,
     password,
-    isPro
+    isPro,
+    metadataOptions
   });
 
   const handleOpenPreview = useCallback(async () => {
@@ -416,6 +423,8 @@ export default function Home() {
                         removeBlurArea={removeBlurArea}
                         password={password}
                         setPassword={setPassword}
+                        metadataOptions={metadataOptions}
+                        setMetadataOptions={setMetadataOptions}
                         isPro={isPro}
                         onUpgrade={() => setActiveTab('subscription')}
                         documentType={documentType}

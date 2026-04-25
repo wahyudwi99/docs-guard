@@ -11,9 +11,22 @@ interface UseFileExportProps {
   documentType: "image" | "pdf" | null;
   password?: string;
   isPro?: boolean;
+  metadataOptions?: {
+    stripAuthor: boolean;
+    stripCreationDate: boolean;
+    stripGps: boolean;
+    nuclearClean: boolean;
+  };
 }
 
-export function useFileExport({ canvases, watermarkText, documentType, password, isPro }: UseFileExportProps) {
+export function useFileExport({ 
+  canvases, 
+  watermarkText, 
+  documentType, 
+  password, 
+  isPro,
+  metadataOptions 
+}: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(() => {
     if (canvases.length === 0) return [];
@@ -40,34 +53,50 @@ export function useFileExport({ canvases, watermarkText, documentType, password,
 
       let pdfBytes = pdf.output("arraybuffer");
 
-      // Apply password protection if provided and user is Pro
-      if (password && isPro) {
+      // Apply metadata stripping and password protection if user is Pro
+      if (isPro) {
         try {
           const pdfDoc = await PDFDocument.load(pdfBytes);
-          // Note: pdf-lib doesn't support AES-256 encryption directly in the standard way for password protection 
-          // in its current version as easily as some other libs, but we can use its standard encryption.
-          // Actually, pdf-lib encryption support is limited. Let's check if there's a better way.
-          // Re-reading task: "Gunakan library `pdf-lib` untuk menerapkan enkripsi AES-256 pada file PDF."
           
-          // pdf-lib's encrypt method:
-          // @ts-ignore - Some versions might have different types
-          pdfDoc.encrypt({
-            userPassword: password,
-            ownerPassword: password,
-            permissions: {
-              printing: "highResolution",
-              modifying: false,
-              copying: false,
-              annotating: false,
-              fillingForms: false,
-              contentAccessibility: true,
-              documentAssembly: false,
-            },
-          });
+          // Apply metadata stripping if options are provided
+          if (metadataOptions) {
+            if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
+              pdfDoc.setAuthor("");
+              pdfDoc.setCreator("");
+              pdfDoc.setProducer("");
+            }
+            if (metadataOptions.stripCreationDate || metadataOptions.nuclearClean) {
+              pdfDoc.setCreationDate(new Date(0));
+              pdfDoc.setModificationDate(new Date(0));
+            }
+            if (metadataOptions.nuclearClean) {
+              pdfDoc.setTitle("");
+              pdfDoc.setSubject("");
+              pdfDoc.setKeywords([]);
+            }
+          }
+
+          // Apply password protection if provided
+          if (password) {
+            // @ts-ignore
+            pdfDoc.encrypt({
+              userPassword: password,
+              ownerPassword: password,
+              permissions: {
+                printing: "highResolution",
+                modifying: false,
+                copying: false,
+                annotating: false,
+                fillingForms: false,
+                contentAccessibility: true,
+                documentAssembly: false,
+              },
+            });
+          }
           
           pdfBytes = await pdfDoc.save();
         } catch (error) {
-          console.error("Error encrypting PDF:", error);
+          console.error("Error processing PDF (metadata/encryption):", error);
         }
       }
 
@@ -78,11 +107,12 @@ export function useFileExport({ canvases, watermarkText, documentType, password,
       const canvas = canvases[0];
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.png`;
       const blob = await new Promise<Blob | null>((resolve) => {
+        // PNG export from canvas naturally strips EXIF/GPS metadata
         canvas.toBlob((b) => resolve(b), "image/png", 1.0);
       });
       return { blob, fileName, contentType: "image/png" };
     }
-  }, [canvases, watermarkText, documentType, password, isPro]);
+  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions]);
 
   const saveToDevice = useCallback(async () => {
     const result = await generateBlobAndFileName();

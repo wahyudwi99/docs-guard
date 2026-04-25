@@ -67,7 +67,16 @@
     "subtle": "Едва заметно",
     "visible": "Видимо",
     "pdf_security": "Защита PDF",
-    "password_placeholder": "Установить пароль для открытия PDF..."
+    "password_placeholder": "Установить пароль для открытия PDF...",
+    "metadata_stripper": {
+      "title": "Очистка метаданных",
+      "description": "Выберите метаданные для удаления из файла",
+      "strip_author": "Удалить автора / владельца",
+      "strip_creation_date": "Удалить дату создания",
+      "strip_gps": "Удалить GPS / местоположение",
+      "nuclear_clean": "Полная очистка (Все)",
+      "pro_only": "Только для Pro"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
@@ -117,13 +126,6 @@
     "saving": "Сохранение...",
     "final_verification": "Финальная проверка",
     "download_note": "Просмотр первой страницы в качестве примера. Скачайте, чтобы применить ко всем страницам."
-  },
-  "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
-    "security_protocol": "Протокол безопасности",
-    "local_first": "Локально в приоритете"
-  }
-}те, чтобы применить ко всем страницам."
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",

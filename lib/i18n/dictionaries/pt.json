@@ -67,11 +67,20 @@
     "subtle": "Sutil",
     "visible": "Visível",
     "pdf_security": "Segurança de PDF",
-    "password_placeholder": "Definir senha para abrir PDF..."
+    "password_placeholder": "Definir senha para abrir PDF...",
+    "metadata_stripper": {
+      "title": "Removedor de Metadados",
+      "description": "Selecione os metadados para remover do arquivo",
+      "strip_author": "Remover Autor / Proprietário",
+      "strip_creation_date": "Remover Data de Criação",
+      "strip_gps": "Remover GPS / Localização",
+      "nuclear_clean": "Limpeza Total (Tudo)",
+      "pro_only": "Apenas Pro"
+    }
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
-    "pro_subtitle": "Desbloqueie todo o poder da privacidade",
+    "pro_subtitle": "Desbloqueie todo o poder de la privacidade",
     "features": [
       "Processamento em Lote Ilimitado",
       "Áreas de desfoque ilimitadas",
@@ -90,7 +99,7 @@
         "period": "/ Semana"
       },
       "monthly": {
-        "title": "Mensal",
+        "title": "Mensual",
         "price": "6,99 €",
         "period": "/ Mês"
       },
@@ -117,13 +126,6 @@
     "saving": "Salvando...",
     "final_verification": "Verificação Final",
     "download_note": "Visualizando a primeira página como amostra. Baixe para aplicar a todas as páginas."
-  },
-  "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
-    "security_protocol": "Protocolo de Segurança",
-    "local_first": "Local em Primeiro Lugar"
-  }
-}a aplicar a todas as páginas."
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",
