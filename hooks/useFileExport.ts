@@ -67,7 +67,7 @@ export function useFileExport({
       // Apply metadata stripping if user is Pro
       if (isPro && metadataOptions) {
         if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
-          pdf.setProperties({ author: "", creator: "", producer: "" });
+          pdf.setProperties({ author: "", creator: "" });
         }
         if (metadataOptions.nuclearClean) {
           pdf.setProperties({ title: "", subject: "", keywords: "" });
