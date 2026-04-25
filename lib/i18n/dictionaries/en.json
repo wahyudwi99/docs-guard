@@ -153,6 +153,41 @@
     "security_protocol": "Security Protocol",
     "local_first": "Local-First"
   },
+  "privacy": {
+    "title": "Amnesia Total Privacy Policy",
+    "hero_title": "Amnesia Total",
+    "hero_subtitle": "We designed DocsGuard to be the most private document tool on earth. We literally cannot see your files.",
+    "amnesia": {
+      "title": "Total Amnesia",
+      "description": "As soon as you close the app or finish a session, all traces of your documents are wiped from memory. We don't keep history, logs, or cache of your private content."
+    },
+    "on_device": {
+      "title": "100% On-Device",
+      "description": "Your files never leave your phone. All watermarking, blurring, and encryption happens locally using your device's hardware."
+    },
+    "zero_cloud": {
+      "title": "Zero Cloud",
+      "description": "We have no servers for storing documents. There is no 'upload' button to our cloud because there is no cloud. Your data belongs to you."
+    },
+    "zero_selling": {
+      "title": "Zero Selling",
+      "description": "Since we don't collect your data, we have nothing to sell. Our business model is based on subscriptions, not your personal information."
+    },
+    "commitment_title": "Our Commitment",
+    "commitment_description": "At DocsGuard, we believe privacy is a fundamental human right. Traditional 'free' document tools often process your files on their servers, potentially training AI models or building profiles. We take the opposite approach.",
+    "features": [
+      "No tracking of file contents",
+      "No document metadata harvesting",
+      "No third-party analytics on your private files",
+      "Open transparent processing"
+    ],
+    "technical_title": "Technical Security",
+    "technical_description": "When you apply a watermark or blur an area, we use the Browser's Canvas API or native Mobile APIs. The resulting file is generated in-memory and offered for download. Once the window or app is closed, that memory is released by the operating system.",
+    "contact_title": "Contact",
+    "contact_description": "If you have questions about our 'Amnesia Total' policy, you can reach out to our security team. We are committed to maintaining the highest standards of on-device privacy.",
+    "back_button": "Back",
+    "last_updated": "Last Updated: {date}"
+  },
   "errors": {
     "unsupported_file": "Unsupported file type: {type}",
     "failed_to_load": "Failed to load document",

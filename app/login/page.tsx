@@ -3,6 +3,7 @@
 import { Shield, Lock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import Link from "next/link";
 
 import { signIn } from "next-auth/react";
 
@@ -119,9 +120,9 @@ export default function LoginPage() {
           </div>
 
           {/* Footer Note */}
-          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <Link href="/privacy" className="block text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">
             {t('login.footer_privacy')}
-          </p>
+          </Link>
         </div>
       </main>
 

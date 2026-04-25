@@ -5,6 +5,7 @@ import { useDocument } from "@/hooks/useDocument";
 import { useWatermark } from "@/hooks/useWatermark";
 import { useFileExport } from "@/hooks/useFileExport";
 import { useSubscription } from "@/hooks/useSubscription";
+import Link from "next/link";
 
 import { FileInput } from "@/components/FileInput";
 import { CanvasDisplay } from "@/components/CanvasDisplay";
@@ -605,9 +606,9 @@ export default function Home() {
                     {t('info_card.privacy_notice')}
                   </p>
                 </div>
-                <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all">
+                <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
                   {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
-                </button>
+                </Link>
              </div>
           </div>
         </div>
@@ -884,7 +885,7 @@ export default function Home() {
              {t('footer.copyright', { year: new Date().getFullYear() })}
            </p>
            <div className="flex gap-6">
-             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">{t('footer.security_protocol')}</span>
+             <Link href="/privacy" className="text-[9px] font-black text-slate-300 hover:text-indigo-600 transition-colors uppercase tracking-widest">{t('footer.security_protocol')}</Link>
              <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">{t('footer.local_first')}</span>
            </div>
         </div>
