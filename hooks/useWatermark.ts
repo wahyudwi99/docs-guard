@@ -70,14 +70,31 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       const context = canvas.getContext("2d");
       if (!context) return;
 
-      // Draw blur areas first if any
+      // Draw blur areas if any
       const pageBlurAreas = blurAreas.filter(a => a.pageIndex === canvasIndex);
-      pageBlurAreas.forEach(area => {
-        context.save();
-        context.filter = `blur(${blurStrength}px)`;
-        context.drawImage(canvas, area.x, area.y, area.width, area.height, area.x, area.y, area.width, area.height);
-        context.restore();
-      });
+      if (pageBlurAreas.length > 0) {
+        // Create a temporary canvas to hold the original content for blurring
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
+        if (tempCtx) {
+          // Copy current canvas (original document) to temp
+          tempCtx.drawImage(canvas, 0, 0);
+          
+          pageBlurAreas.forEach(area => {
+            context.save();
+            context.filter = `blur(${blurStrength}px)`;
+            // Draw from tempCanvas to original canvas with blur filter
+            context.drawImage(
+              tempCanvas, 
+              area.x, area.y, area.width, area.height, 
+              area.x, area.y, area.width, area.height
+            );
+            context.restore();
+          });
+        }
+      }
 
       if (watermarkMode === "blur") return;
 

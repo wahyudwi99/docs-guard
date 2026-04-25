@@ -99,6 +99,8 @@ export function useFileExport({
       if (onBeforeExport) {
         console.log("Running onBeforeExport...");
         await onBeforeExport();
+        // Give the browser a moment to apply filters (blur) before capturing the canvas
+        await new Promise(resolve => setTimeout(resolve, 150));
       }
       
       console.log("Generating blob...");
