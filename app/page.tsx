@@ -33,7 +33,6 @@ export default function Home() {
   const [showAdModal, setShowAdModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const { data: session, status: authStatus } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
@@ -766,46 +765,6 @@ export default function Home() {
                   {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Login Required Modal */}
-      {showLoginModal && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
-            onClick={() => setShowLoginModal(false)}
-          ></div>
-          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 mx-auto">
-              <Shield className="h-10 w-10" />
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
-                {t('subscription_section.login_required_title')}
-              </h3>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
-                {t('subscription_section.login_required_desc')}
-              </p>
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => signIn('google')}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                {t('subscription_section.login_with_google')}
-              </button>
-              <button 
-                onClick={() => setShowLoginModal(false)}
-                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
-              >
-                {t('preview_modal.close')}
-              </button>
             </div>
           </div>
         </div>

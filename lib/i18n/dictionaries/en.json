@@ -120,7 +120,13 @@
     },
     "subscribe_now": "Subscribe Now",
     "restore": "Restore Purchases",
-    "active": "Pro Subscription Active"
+    "active": "Pro Subscription Active",
+    "paywall_feature_unlimited_blur": "Unlimited Blur & Pixelation",
+    "paywall_feature_password": "PDF Password Protection",
+    "paywall_feature_metadata": "Full Metadata Stripper",
+    "paywall_feature_high_quality": "High Quality Export",
+    "paywall_subtitle": "Unlock all premium features and protect your documents like a pro.",
+    "paywall_restore": "Restore Purchases"
   },
   "info_card": {
     "how_it_works": "How it works",
