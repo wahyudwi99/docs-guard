@@ -94,7 +94,8 @@ export function useFileExport({
     }
   }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file]);
 
-  const saveToDevice = useCallback(async () => {
+  const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
+    if (onBeforeExport) await onBeforeExport();
     const result = await generateBlobAndFileName();
     if (!result || !result.blob) return false;
 
@@ -128,7 +129,8 @@ export function useFileExport({
     }
   }, [generateBlobAndFileName]);
 
-  const shareFile = useCallback(async () => {
+  const shareFile = useCallback(async (onBeforeExport?: () => Promise<void>) => {
+    if (onBeforeExport) await onBeforeExport();
     const result = await generateBlobAndFileName();
     if (!result || !result.blob) return false;
 

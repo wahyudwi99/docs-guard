@@ -195,8 +195,7 @@ export default function Home() {
     }
 
     setIsSaving(true);
-    await drawWatermark();
-    const success = await saveToDevice();
+    const success = await saveToDevice(drawWatermark);
     setIsSaving(false);
     
     if (success) {
@@ -218,10 +217,10 @@ export default function Home() {
 
   const handleShare = useCallback(async () => {
     setIsSharing(true);
-    const success = await shareFile();
+    const success = await shareFile(drawWatermark);
     setIsSharing(false);
     if (success) setPreviewUrls([]); // Clear preview after successful share
-  }, [shareFile]);
+  }, [shareFile, drawWatermark]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -311,7 +310,7 @@ export default function Home() {
               "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700",
               (watermarkMode === 'blur' && activeTab === 'design') 
                 ? "block" 
-                : "invisible fixed -z-50 pointer-events-none"
+                : "invisible absolute -top-[9999px] -left-[9999px] pointer-events-none"
             )}>
               <div className="space-y-3 mb-4">
                 <div className="flex items-center gap-2 text-indigo-600">
