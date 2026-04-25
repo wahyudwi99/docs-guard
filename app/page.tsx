@@ -30,7 +30,6 @@ function HomeContent() {
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [showAdModal, setShowAdModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -194,7 +193,7 @@ function HomeContent() {
   }, [clearDocument, clearCanvases, resetWatermark]);
 
   // File Export logic - Passing canvases array
-  const { getPreviewUrls, saveToDevice, shareFile } = useFileExport({ 
+  const { getPreviewUrls, saveToDevice } = useFileExport({ 
     canvases, 
     watermarkText,
     documentType,
@@ -247,13 +246,6 @@ function HomeContent() {
       handleFinalDownload(true);
     }, 1500); // Simulate ad delay
   }, [handleFinalDownload]);
-
-  const handleShare = useCallback(async () => {
-    setIsSharing(true);
-    const success = await shareFile(drawWatermark);
-    setIsSharing(false);
-    if (success) setPreviewUrls([]); // Clear preview after successful share
-  }, [shareFile, drawWatermark]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -756,29 +748,18 @@ function HomeContent() {
                    {t('preview_modal.download_note')}
                  </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button 
                   onClick={() => setPreviewUrls([])}
-                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest order-3 sm:order-1"
+                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest order-2 sm:order-1"
                 >
                   {t('preview_modal.edit_again')}
                 </button>
                 <button 
-                  onClick={handleShare}
-                  disabled={isSharing || isSaving}
-                  className={cn(
-                    "px-4 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-1 sm:order-2",
-                    isSharing ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-700"
-                  )}
-                >
-                  <Share2 className={cn("h-4 w-4", isSharing && "animate-pulse")} />
-                  {isSharing ? t('preview_modal.sharing') : t('preview_modal.share')}
-                </button>
-                <button 
                   onClick={() => handleFinalDownload()}
-                  disabled={isSaving || isSharing}
+                  disabled={isSaving}
                   className={cn(
-                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-2 sm:order-3",
+                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-1 sm:order-2",
                     isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
                   )}
                 >

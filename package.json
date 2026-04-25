@@ -16,7 +16,6 @@
     "@capacitor/core": "7.6.2",
     "@capacitor/filesystem": "7.1.8",
     "@capacitor/ios": "7.6.2",
-    "@capacitor/share": "7.0.4",
     "@capgo/native-purchases": "^6.0.42",
     "@codetrix-studio/capacitor-google-auth": "3.3.6",
     "clsx": "^2.1.1",
