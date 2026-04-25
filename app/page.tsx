@@ -99,6 +99,9 @@ export default function Home() {
     setWatermarkImage,
     imageScale,
     setImageScale,
+    blurAreas,
+    addBlurArea,
+    removeBlurArea,
     resetWatermark,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
@@ -406,6 +409,8 @@ export default function Home() {
                         setWatermarkImage={setWatermarkImage}
                         imageScale={imageScale}
                         setImageScale={setImageScale}
+                        blurAreas={blurAreas}
+                        removeBlurArea={removeBlurArea}
                       />
                       <div className="pt-4 space-y-4">
                          <button 
@@ -533,10 +538,35 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hidden Canvas Processing Area */}
+          {/* Canvas Processing & Blur Selection Area */}
           {file && (
-            <div className="pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0">
-              <CanvasDisplay numPages={numPages} registerCanvas={registerCanvas} />
+            <div className={cn(
+              watermarkMode === 'blur' && activeTab === 'design' 
+                ? "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700" 
+                : "pointer-events-none opacity-0 absolute -z-50 overflow-hidden w-0 h-0"
+            )}>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center gap-2 text-indigo-600">
+                  <Layout className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Preview</span>
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                  {t('watermark_controls.blur_instruction')}
+                </p>
+              </div>
+              <CanvasDisplay 
+                numPages={numPages} 
+                registerCanvas={registerCanvas} 
+                isSelectionMode={watermarkMode === 'blur'}
+                onAreaSelected={(area) => {
+                  if (!isPro && blurAreas.length >= 2) {
+                    setActiveTab('subscription');
+                    return;
+                  }
+                  addBlurArea(area);
+                }}
+                blurAreas={blurAreas}
+              />
             </div>
           )}
 

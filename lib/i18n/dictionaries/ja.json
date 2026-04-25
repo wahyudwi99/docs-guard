@@ -72,6 +72,7 @@
     "pro_subtitle": "プライバシーの全機能を解放",
     "features": [
       "無制限の一括処理",
+      "無制限のぼかし領域",
       "カスタム画像の透かし",
       "プレミアムフォントコレクション",
       "優先ローカル処理",
@@ -119,6 +120,12 @@
     "copyright": "© {year} Built with Privacy by Wahyu",
     "security_protocol": "セキュリティプロトコル",
     "local_first": "ローカルファースト"
+  },
+  "errors": {
+    "unsupported_file": "サポートされていないファイル形式: {type}",
+    "failed_to_load": "ドキュメントの読み込みに失敗しました"
+  }
+}    "local_first": "ローカルファースト"
   },
   "errors": {
     "unsupported_file": "サポートされていないファイル形式: {type}",

@@ -72,6 +72,7 @@
     "pro_subtitle": "Desbloqueie todo o poder da privacidade",
     "features": [
       "Processamento em Lote Ilimitado",
+      "Áreas de desfoque ilimitadas",
       "Marcas d'Água de Imagem Personalizadas",
       "Coleção de Fontes Premium",
       "Processamento Local Prioritário",
@@ -114,6 +115,13 @@
     "saving": "Salvando...",
     "final_verification": "Verificação Final",
     "download_note": "Visualizando a primeira página como amostra. Baixe para aplicar a todas as páginas."
+  },
+  "footer": {
+    "copyright": "© {year} Built with Privacy by Wahyu",
+    "security_protocol": "Protocolo de Segurança",
+    "local_first": "Local em Primeiro Lugar"
+  }
+}a aplicar a todas as páginas."
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Wahyu",

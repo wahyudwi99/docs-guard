@@ -7,8 +7,16 @@ interface UseWatermarkProps {
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
-type WatermarkMode = "text" | "image";
+type WatermarkMode = "text" | "image" | "blur";
 type WatermarkLayout = "tiled" | "single";
+
+interface BlurArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  pageIndex: number;
+}
 
 export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("text");
@@ -24,6 +32,9 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [watermarkImage, setWatermarkImage] = useState<HTMLImageElement | null>(null);
   const [imageScale, setImageScale] = useState(0.5);
 
+  // Blur states
+  const [blurAreas, setBlurAreas] = useState<BlurArea[]>([]);
+
   const resetWatermark = useCallback(() => {
     setWatermarkMode("text");
     setWatermarkLayout("tiled");
@@ -35,6 +46,15 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setOrientation("diagonal");
     setWatermarkImage(null);
     setImageScale(0.5);
+    setBlurAreas([]);
+  }, []);
+
+  const addBlurArea = useCallback((area: BlurArea) => {
+    setBlurAreas(prev => [...prev, area]);
+  }, []);
+
+  const removeBlurArea = useCallback((index: number) => {
+    setBlurAreas(prev => prev.filter((_, i) => i !== index));
   }, []);
 
   const drawWatermark = useCallback(async () => {
@@ -43,9 +63,23 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     // Redraw the base document first to clear any old watermark on all pages
     await redrawDocument(canvases);
 
-    canvases.forEach(canvas => {
+    canvases.forEach((canvas, canvasIndex) => {
       const context = canvas.getContext("2d");
       if (!context) return;
+
+      // Draw blur areas first if any
+      const pageBlurAreas = blurAreas.filter(a => a.pageIndex === canvasIndex);
+      pageBlurAreas.forEach(area => {
+        context.save();
+        // Simple blur effect using canvas filter or stack blur
+        // For simplicity and better performance, we use filter if supported
+        context.filter = 'blur(10px)';
+        // Draw the same area from the canvas itself to blur it
+        context.drawImage(canvas, area.x, area.y, area.width, area.height, area.x, area.y, area.width, area.height);
+        context.restore();
+      });
+
+      if (watermarkMode === "blur") return; // Only draw blur, no watermark if in blur mode
 
       context.save();
       context.globalAlpha = watermarkOpacity;
@@ -105,12 +139,12 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
       context.restore();
     });
-  }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, redrawDocument]);
+  }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, redrawDocument]);
 
   // Redraw watermark whenever its properties or document changes
   useEffect(() => {
     drawWatermark();
-  }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, drawWatermark]);
+  }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, drawWatermark]);
 
   return {
     watermarkMode,
@@ -133,7 +167,11 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setWatermarkImage,
     imageScale,
     setImageScale,
+    blurAreas,
+    addBlurArea,
+    removeBlurArea,
     resetWatermark,
     drawWatermark,
   };
 }
+

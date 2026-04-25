@@ -1,5 +1,5 @@
 - [-] TASK-001: Implementasi Autentikasi One-Click (Google & Apple)
-- [ ] TASK-002: Fitur Blur pada Canvas dengan Batasan Freemium
+- [-] TASK-002: Fitur Blur pada Canvas dengan Batasan Freemium
 - [ ] TASK-003: Proteksi Password dan Enkripsi PDF (Fitur Premium)
 - [ ] TASK-004: Pembersihan Metadata Selektif (Metadata Stripper) untuk PDF & JPG
 - [ ] TASK-005: Pengembangan Layar Kebijakan Privasi "Amnesia Total"
