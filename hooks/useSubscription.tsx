@@ -80,7 +80,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     try {
       const { Purchases } = await import('@revenuecat/purchases-capacitor');
-      const info = await Purchases.getCustomerInfo();
+      const response = await Purchases.getCustomerInfo();
+      const info = (response as any).customerInfo || response;
       setCustomerInfo(info);
       setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
     } catch (error) {
@@ -126,7 +127,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       }
       
       const { Purchases } = await import('@revenuecat/purchases-capacitor');
-      const info = await Purchases.restorePurchases();
+      const response = await Purchases.restorePurchases();
+      const info = (response as any).customerInfo || response;
       setCustomerInfo(info);
       const active = info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
       setIsPro(active);
@@ -152,7 +154,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     const setupListener = async () => {
       try {
         const { Purchases } = await import('@revenuecat/purchases-capacitor');
-        callbackId = await Purchases.addCustomerInfoUpdateListener((info) => {
+        callbackId = await Purchases.addCustomerInfoUpdateListener((response) => {
+          const info = (response as any).customerInfo || response;
           setCustomerInfo(info);
           setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
         });
