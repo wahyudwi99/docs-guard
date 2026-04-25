@@ -4,6 +4,7 @@ import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
 import { Check, X, Shield, Zap, Lock } from 'lucide-react';
+import { signIn, useSession } from 'next-auth/react';
 
 interface PaywallProps {
   onClose?: () => void;
@@ -12,6 +13,7 @@ interface PaywallProps {
 export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const { packages, subscribe, loading, restorePurchases } = useSubscription();
   const { t } = useI18n();
+  const { data: session, status } = useSession();
 
   const features = [
     { icon: <Zap className="w-5 h-5 text-yellow-500" />, text: t('paywall_feature_unlimited_blur') || 'Unlimited Blur & Pixelation' },
@@ -19,6 +21,8 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
     { icon: <Shield className="w-5 h-5 text-green-500" />, text: t('paywall_feature_metadata') || 'Full Metadata Stripper' },
     { icon: <Check className="w-5 h-5 text-purple-500" />, text: t('paywall_feature_high_quality') || 'High Quality Export' },
   ];
+
+  const authenticated = status === 'authenticated';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
@@ -51,21 +55,36 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             ))}
           </div>
           
-          <div className="space-y-3">
-            {packages.map((pkg) => (
+          {authenticated ? (
+            <div className="space-y-3">
+              {packages.map((pkg) => (
+                <button
+                  key={pkg.identifier}
+                  disabled={loading}
+                  onClick={() => subscribe(pkg)}
+                  className="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <div className="flex justify-between items-center">
+                    <span>{pkg.product.title}</span>
+                    <span>{pkg.product.priceString}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                {t('subscription_section.login_required_desc') || 'Please login to subscribe and protect your documents with Pro features.'}
+              </p>
               <button
-                key={pkg.identifier}
-                disabled={loading}
-                onClick={() => subscribe(pkg)}
-                className="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all active:scale-95 disabled:opacity-50"
+                onClick={() => signIn('google')}
+                className="w-full py-4 px-6 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-3"
               >
-                <div className="flex justify-between items-center">
-                  <span>{pkg.product.title}</span>
-                  <span>{pkg.product.priceString}</span>
-                </div>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                {t('subscription_section.login_with_google') || 'Login with Google'}
               </button>
-            ))}
-          </div>
+            </div>
+          )}
           
           <button
             onClick={restorePurchases}

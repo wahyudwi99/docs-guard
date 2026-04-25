@@ -13,11 +13,12 @@ import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
 import { useCallback, useState, useEffect } from "react";
-import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2 } from "lucide-react";
+import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Home() {
   const { t, locale } = useI18n();
@@ -33,8 +34,7 @@ export default function Home() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Mock session for testing without auth
-  const session = { user: { name: "Tester" } };
+  const { data: session } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
@@ -46,13 +46,10 @@ export default function Home() {
   });
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
-    // Auth check disabled for testing
-    /*
     if (!session) {
       setShowLoginModal(true);
       return;
     }
-    */
     
     // Find matching package using identifier or internal packageType string
     // This avoids needing the PACKAGE_TYPE enum at top level
@@ -279,8 +276,30 @@ export default function Home() {
               <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">{t('nav.title')}</span>
             </div>
           </div>
-          <div>
+          <div className="flex items-center gap-4">
             <LanguageSwitcher />
+            {session ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex flex-col items-end leading-none">
+                  <span className="text-[10px] font-bold text-slate-900">{session.user?.name}</span>
+                  {isPro && <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Pro</span>}
+                </div>
+                <button 
+                  onClick={() => signOut()}
+                  className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => signIn('google')}
+                className="h-9 px-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2"
+              >
+                <User className="h-3.5 w-3.5" />
+                Login
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -754,10 +773,10 @@ export default function Home() {
             
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => console.log('Login disabled for testing')}
+                onClick={() => signIn('google')}
                 className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
               >
-                <ImageIcon className="h-4 w-4" />
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                 {t('subscription_section.login_with_google')}
               </button>
               <button 
