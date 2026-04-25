@@ -11,4 +11,5 @@
 - [-] BUG-011 (Terkait TASK-008): Type error: Cannot find name 'Capacitor' di components/Paywall.tsx. Cara reproduksi: Jalankan proses build atau linting, error muncul karena Capacitor digunakan tanpa di-import.
 - [-] BUG-012 (Terkait TASK-007): Type error: Property 'entitlements' does not exist on type '{ customerInfo: CustomerInfo; }' di hooks/useSubscription.tsx. Cara reproduksi: Jalankan proses build atau linting, error muncul karena response dari getCustomerInfo() perlu diekstrak property customerInfo-nya.
 - [-] BUG-013 (Terkait TASK-007): Type error: Property 'appUserId' does not exist on type '{ appUserID: string; }'. Cara reproduksi: Jalankan npm run build, error muncul karena typo penamaan properti SDK RevenueCat.
+- [-] BUG-014 (Terkait TASK-008): Next.js build error: useSearchParams() should be wrapped in a suspense boundary. Cara reproduksi: Jalankan npm run build, error muncul karena fitur SSR Next.js mewajibkan Suspense untuk penggunaan search params.
 - [-] OPTIMIZE-001 (Terkait TASK-008): Implementasi Native Google Sign-In untuk iOS guna menghindari kendala redirect webview di Capacitor.

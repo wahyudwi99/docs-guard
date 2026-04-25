@@ -12,7 +12,7 @@ import { CanvasDisplay } from "@/components/CanvasDisplay";
 import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
 import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
@@ -22,7 +22,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useSession, signIn, signOut } from "next-auth/react";
 
-export default function Home() {
+function HomeContent() {
   const { t, locale } = useI18n();
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -528,54 +528,62 @@ export default function Home() {
                         setImageScale={setImageScale}
                         blurAreas={blurAreas}
                         removeBlurArea={removeBlurArea}
+                        blurStrength={blurStrength}
+                        setBlurStrength={setBlurStrength}
+                        isPro={isPro}
                         password={password}
                         setPassword={setPassword}
                         metadataOptions={metadataOptions}
                         setMetadataOptions={setMetadataOptions}
-                        isPro={isPro}
-                        onUpgrade={() => setActiveTab('subscription')}
-                        documentType={documentType}
-                        blurStrength={blurStrength}
-                        setBlurStrength={setBlurStrength}
-                      />
-                      <div className="pt-4 space-y-4">
-                         <button 
-                           onClick={handleOpenPreview}
-                           className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700"
-                         >
-                           <Sparkles className="h-4 w-4" />
-                           {t('design_section.generate_preview')}
-                         </button>
-                         <button 
-                           onClick={handleNewFile}
-                           className="w-full py-4 bg-rose-50 text-rose-600 font-bold rounded-2xl border border-rose-100 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-rose-100"
-                         >
-                           <X className="h-4 w-4" />
-                           {t('design_section.remove_file')}
-                         </button>
-                         <div className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">{t('design_section.secure_note')}</span>
-                         </div>
-                      </div>
+                     />
+
+                     <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">
+                        <button 
+                          onClick={handleOpenPreview}
+                          disabled={isSaving}
+                          className="w-full py-5 bg-indigo-600 text-white font-black rounded-3xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-xs disabled:opacity-50"
+                        >
+                          {isSaving ? (
+                            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          ) : (
+                            <>
+                              <FileText className="h-5 w-5" />
+                              {t('design_section.generate_preview')}
+                            </>
+                          )}
+                        </button>
+                        <button 
+                          onClick={handleNewFile}
+                          className="w-full py-4 bg-slate-50 text-slate-500 font-bold rounded-2xl hover:bg-rose-50 hover:text-rose-600 transition-all text-[10px] uppercase tracking-widest"
+                        >
+                          {t('design_section.remove_file')}
+                        </button>
+                     </div>
                   </div>
                 )}
 
                 {activeTab === 'subscription' && (
-                  <div className="space-y-6">
-                    <div className="p-6 rounded-[24px] bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 relative overflow-hidden">
-                       <Zap className="absolute -right-4 -top-4 h-24 w-24 text-amber-200/50 -rotate-12" />
-                       <div className="relative z-10 space-y-4">
+                   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="relative p-8 rounded-[40px] bg-gradient-to-br from-amber-400 to-orange-500 overflow-hidden shadow-2xl shadow-orange-200 group">
+                       <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:scale-125 transition-transform duration-1000">
+                         <Zap className="h-32 w-32 text-white fill-white" />
+                       </div>
+                       
+                       <div className="relative z-10 space-y-6">
                          <div className="space-y-1">
-                           <h3 className="text-lg font-black text-amber-900 tracking-tight">{t('subscription_section.pro_title')}</h3>
-                           <p className="text-xs font-medium text-amber-700/80">{t('subscription_section.pro_subtitle')}</p>
+                           <h3 className="text-2xl font-black text-white tracking-tight">{t('subscription_section.pro_title')}</h3>
+                           <p className="text-xs font-bold text-amber-50 leading-relaxed">
+                             {t('subscription_section.pro_subtitle')}
+                           </p>
                          </div>
-                         
-                         <div className="space-y-2">
-                           {(t('subscription_section.features') as string[]).map((feature, i) => (
-                             <div key={i} className="flex items-center gap-2">
-                               <CheckCircle2 className="h-3.5 w-3.5 text-amber-500" />
-                               <span className="text-xs font-bold text-amber-800/70">{feature}</span>
+
+                         <div className="space-y-3">
+                           {((t('subscription_section.features') as unknown) as string[]).map((feature, i) => (
+                             <div key={i} className="flex items-center gap-3 text-white">
+                               <div className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center">
+                                 <CheckCircle2 className="h-3 w-3" />
+                               </div>
+                               <span className="text-[11px] font-bold">{feature}</span>
                              </div>
                            ))}
                          </div>
@@ -788,12 +796,12 @@ export default function Home() {
       {showAdModal && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div 
-            className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
-            onClick={() => !isSaving && setShowAdModal(false)}
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => setShowAdModal(false)}
           ></div>
           <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 mx-auto">
-              <Sparkles className="h-10 w-10 animate-pulse" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-50 text-amber-600 mx-auto">
+              <Zap className="h-10 w-10 fill-amber-500" />
             </div>
             
             <div className="space-y-2">
@@ -805,14 +813,14 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="flex flex-col gap-3 pt-2">
+            <div className="flex flex-col gap-3">
               <button 
                 onClick={handleWatchAdAndDownload}
                 disabled={isSaving}
                 className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
               >
                 {isSaving ? (
-                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 ) : (
                   <>
                     <Zap className="h-4 w-4 fill-white" />
@@ -824,20 +832,24 @@ export default function Home() {
                 onClick={() => {
                   setShowAdModal(false);
                   setActiveTab('subscription');
-                  setPreviewUrls([]);
                 }}
-                disabled={isSaving}
                 className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-amber-100 flex items-center justify-center gap-2"
               >
-                <CreditCard className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 fill-white" />
                 {t('preview_modal.go_pro_cta')}
+              </button>
+              <button 
+                onClick={() => setShowAdModal(false)}
+                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
+              >
+                {t('preview_modal.close')}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Download Success Modal */}
+      {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div 
@@ -845,11 +857,11 @@ export default function Home() {
             onClick={() => setShowSuccessModal(false)}
           ></div>
           <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-500 mx-auto">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-600 mx-auto">
               <CheckCircle2 className="h-10 w-10" />
             </div>
             
-            <div className="space-y-2 text-center">
+            <div className="space-y-2">
               <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
                 {t('preview_modal.success_title')}
               </h3>
@@ -860,7 +872,7 @@ export default function Home() {
             
             <button 
               onClick={() => setShowSuccessModal(false)}
-              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm transition-all"
+              className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold text-sm transition-all shadow-lg"
             >
               {t('preview_modal.close')}
             </button>
@@ -868,100 +880,42 @@ export default function Home() {
         </div>
       )}
 
-      {/* Page Limit Exceeded Modal */}
-      {limitExceeded && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
-            onClick={() => setLimitExceeded(false)}
-          ></div>
-          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-50 text-amber-500 mx-auto shadow-sm">
-              <Zap className="h-10 w-10 fill-amber-500" />
+      {/* Modern Mini Footer */}
+      <footer className="w-full py-12 px-6 bg-white border-t border-slate-100 mt-auto">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <div className="flex items-center gap-2 grayscale opacity-50">
+               <Shield className="h-4 w-4" />
+               <span className="text-xs font-black tracking-tight uppercase">DocsGuard</span>
             </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {t('errors.page_limit_exceeded')}
-              </h3>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed">
-                {t('errors.page_limit_description', { count: '>3' })}
-              </p>
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => {
-                  setLimitExceeded(false);
-                  setActiveTab('subscription');
-                }}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
-              >
-                <Zap className="h-4 w-4 fill-white" />
-                Upgrade to Pro
-              </button>
-              <button 
-                onClick={() => setLimitExceeded(false)}
-                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
-              >
-                Cancel
-              </button>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {t('footer.copyright', { year: new Date().getFullYear() })}
+            </p>
+          </div>
+          <div className="flex gap-8">
+            <div className="flex flex-col items-center md:items-end gap-1">
+              <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em]">{t('footer.security_protocol')}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                <div className="h-1 w-1 rounded-full bg-emerald-400"></div>
+                AES-256 {t('footer.local_first')}
+              </span>
             </div>
           </div>
         </div>
-      )}
-
-      <footer className="max-w-5xl mx-auto w-full px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-200/60 mt-8 relative z-10">
-        <div className="flex items-center gap-2 opacity-60">
-          <Shield className="h-4 w-4 text-indigo-600" />
-          <span className="text-xs font-black tracking-tighter text-[#1C1C1E] uppercase">{t('nav.title')}</span>
-        </div>
-        <div className="flex flex-col items-center md:items-end gap-2">
-           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-             {t('footer.copyright', { year: new Date().getFullYear() })}
-           </p>
-           <div className="flex gap-6">
-             <Link href="/privacy" className="text-[9px] font-black text-slate-300 hover:text-indigo-600 transition-colors uppercase tracking-widest">{t('footer.security_protocol')}</Link>
-             <span className="text-[9px] font-black text-slate-300 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-widest">{t('footer.local_first')}</span>
-           </div>
-        </div>
       </footer>
-      
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.05);
-          border-radius: 20px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 0, 0, 0.1);
-        }
-        
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes zoom-in {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        
-        .animate-in {
-          animation-duration: 0.3s;
-          animation-timing-function: ease-out;
-          animation-fill-mode: forwards;
-        }
-        
-        .fade-in { animation-name: fade-in; }
-        .zoom-in { animation-name: zoom-in; }
-      `}</style>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] animate-pulse">Initializing Lab...</p>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
