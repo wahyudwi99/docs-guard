@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export', // Disabled because NextAuth API routes are not compatible with static export.
+  output: 'export',
   images: {
     unoptimized: true,
   },

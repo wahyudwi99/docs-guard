@@ -4,18 +4,57 @@ import { Shield, Lock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import Link from "next/link";
+import { isCapacitorApp } from "@/lib/utils";
 
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const { t } = useI18n();
 
-  const handleLogin = () => {
-    signIn("google", { callbackUrl: "/" });
+  const handleLogin = async () => {
+    if (isCapacitorApp()) {
+      try {
+        const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
+        // Initialize if needed, though usually handled in capacitor.config.ts
+        const user = await GoogleAuth.signIn();
+        const idToken = user.authentication.idToken;
+        
+        // Pass the token to our NextAuth Credentials provider
+        await signIn("google-native", { 
+          idToken, 
+          callbackUrl: "/" 
+        });
+      } catch (error) {
+        console.error("Native Google Login failed", error);
+      }
+    } else {
+      signIn("google", { callbackUrl: "/" });
+    }
   };
 
-  const handleAppleLogin = () => {
-    signIn("apple", { callbackUrl: "/" });
+  const handleAppleLogin = async () => {
+    if (isCapacitorApp()) {
+      try {
+        const { SignInWithApple } = await import("@capacitor-community/apple-sign-in");
+        const response = await SignInWithApple.authorize({
+          clientId: "com.wahyu.docsguard",
+          redirectURI: "https://docsguard.com/api/auth/callback/apple",
+          scopes: "email name",
+        });
+        
+        const idToken = response.response.identityToken;
+        
+        // Pass the token to our NextAuth Credentials provider
+        await signIn("apple-native", { 
+          idToken, 
+          callbackUrl: "/" 
+        });
+      } catch (error) {
+        console.error("Native Apple Login failed", error);
+      }
+    } else {
+      signIn("apple", { callbackUrl: "/" });
+    }
   };
 
   return (
