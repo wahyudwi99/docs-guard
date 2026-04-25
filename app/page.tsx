@@ -37,6 +37,13 @@ export default function Home() {
   const { data: session } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
+  const [password, setPassword] = useState("");
+  const [metadataOptions, setMetadataOptions] = useState({
+    stripAuthor: true,
+    stripCreationDate: true,
+    stripGPS: true,
+    nuclearClean: false,
+  });
   const router = useRouter();
   const searchParams = useSearchParams();
 
