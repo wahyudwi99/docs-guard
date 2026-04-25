@@ -67,7 +67,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
     // Use Promise.all to ensure all drawing operations are completed
     const drawPromises = canvases.map(async (canvas, canvasIndex) => {
-      const context = canvas.getContext("2d");
+      const context = canvas.getContext("2d", { willReadFrequently: true });
       if (!context) return;
 
       // Draw blur areas if any

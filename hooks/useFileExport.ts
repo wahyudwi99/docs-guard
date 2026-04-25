@@ -30,10 +30,17 @@ export function useFileExport({
   file
 }: UseFileExportProps) {
   
-  const getPreviewUrls = useCallback(() => {
+  const getPreviewUrls = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     if (canvases.length === 0) return [];
+    
+    if (onBeforeExport) {
+      await onBeforeExport();
+      // Give browser time to paint
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+    
     // Only return the first page for preview as requested
-    return [canvases[0].toDataURL("image/png", 0.8)];
+    return [canvases[0].toDataURL("image/png", 0.9)];
   }, [canvases]);
 
   const generateBlobAndFileName = useCallback(async () => {

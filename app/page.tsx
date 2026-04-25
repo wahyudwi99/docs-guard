@@ -176,14 +176,18 @@ export default function Home() {
   });
 
   const handleOpenPreview = useCallback(async () => {
-    // Ensure everything is drawn before capturing
-    await drawWatermark();
-    
-    const urls = getPreviewUrls();
-    if (urls && urls.length > 0) {
-      setPreviewUrls(urls);
-    } else {
-      console.error("Failed to generate Preview URLs");
+    setIsSaving(true); // Show a loading state if possible
+    try {
+      const urls = await getPreviewUrls(drawWatermark);
+      if (urls && urls.length > 0) {
+        setPreviewUrls(urls);
+      } else {
+        console.error("Failed to generate Preview URLs");
+      }
+    } catch (err) {
+      console.error("Preview error:", err);
+    } finally {
+      setIsSaving(false);
     }
   }, [getPreviewUrls, drawWatermark]);
 

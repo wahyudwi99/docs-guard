@@ -61,7 +61,10 @@ export function useDocument({ canvases }: UseDocumentProps) {
 
       try {
         if (selectedFile.type.startsWith("image/")) {
-          await loadImage(selectedFile, currentCanvases[0]);
+          const canvas = currentCanvases[0];
+          const ctx = canvas.getContext("2d");
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+          await loadImage(selectedFile, canvas);
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
           if (!doc) {
@@ -73,8 +76,11 @@ export function useDocument({ canvases }: UseDocumentProps) {
           // Wait for all pages to render if canvases are available
           const renderPromises = [];
           for (let i = 1; i <= doc.numPages; i++) {
-            if (currentCanvases[i - 1]) {
-              renderPromises.push(renderPdfPageToCanvas(doc, i, currentCanvases[i - 1]));
+            const canvas = currentCanvases[i - 1];
+            if (canvas) {
+              const ctx = canvas.getContext("2d");
+              if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+              renderPromises.push(renderPdfPageToCanvas(doc, i, canvas));
             }
           }
           await Promise.all(renderPromises);
