@@ -105,7 +105,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       const { Purchases } = await import('@revenuecat/purchases-capacitor');
       if (session?.user?.email) {
-        await Purchases.logIn({ appUserId: session.user.email });
+        await Purchases.logIn({ appUserID: session.user.email });
         checkSubscriptionStatus();
       } else {
         // Option to log out or keep anonymous

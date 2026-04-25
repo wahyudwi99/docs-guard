@@ -21,7 +21,7 @@ export const initRevenueCat = async (appUserId?: string) => {
     
     const configuration = {
       apiKey: Capacitor.getPlatform() === 'ios' ? APPLE_API_KEY : GOOGLE_API_KEY,
-      appUserId: appUserId || undefined,
+      appUserID: appUserId || undefined,
     };
     
     await Purchases.configure(configuration);
@@ -36,7 +36,7 @@ export const loginRevenueCat = async (appUserId: string) => {
   const Purchases = await getPurchases();
   if (!Purchases) return null;
   try {
-    return await Purchases.logIn({ appUserId });
+    return await Purchases.logIn({ appUserID: appUserId });
   } catch (error) {
     console.error('Error logging into RevenueCat:', error);
     return null;
