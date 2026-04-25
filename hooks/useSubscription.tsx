@@ -23,9 +23,9 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isPro, setIsPro] = useState(process.env.NODE_ENV === 'development');
-  const [loading, setLoading] = useState(process.env.NODE_ENV !== 'development');
-  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(process.env.NODE_ENV === 'development' ? 365 : null);
+  const [isPro, setIsPro] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(365);
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
@@ -64,31 +64,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, []);
 
   const checkSubscriptionStatus = useCallback(async () => {
-    if (process.env.NODE_ENV === 'development') {
-      setIsPro(true);
-      setSubscriptionDaysLeft(365);
-      setLoading(false);
-      return;
-    }
-
-    if (!Capacitor.isNativePlatform()) {
-      const mockPro = typeof window !== 'undefined' ? localStorage.getItem('mock_is_pro') === 'true' : false;
-      setIsPro(mockPro);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { Purchases } = await import('@revenuecat/purchases-capacitor');
-      const response = await Purchases.getCustomerInfo();
-      const info = (response as any).customerInfo || response;
-      setCustomerInfo(info);
-      setIsPro(info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined);
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-    } finally {
-      setLoading(false);
-    }
+    setIsPro(true);
+    setSubscriptionDaysLeft(365);
+    setLoading(false);
+    return;
   }, []);
 
   const subscribe = useCallback(async (rcPackage: PurchasesPackage) => {
