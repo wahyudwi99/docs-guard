@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
   appName: 'docs-guard',
   webDir: 'out',
   plugins: {
-    GoogleAuth: {
-      scopes: ['profile', 'email'],
-      serverClientId: 'YOUR_SERVER_CLIENT_ID_FROM_GOOGLE_CONSOLE.apps.googleusercontent.com',
-      forceCodeForRefreshToken: true,
+    SocialLogin: {
+      google: {
+        serverClientId: 'YOUR_SERVER_CLIENT_ID_FROM_GOOGLE_CONSOLE.apps.googleusercontent.com',
+      },
     },
   },
 };

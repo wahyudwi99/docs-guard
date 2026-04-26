@@ -21,13 +21,18 @@ function SignInContent() {
   const handleGoogleSignIn = async () => {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
-        const user = await GoogleAuth.signIn();
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        const result = await SocialLogin.login({
+          provider: 'google',
+          options: {
+            scopes: ['email', 'profile'],
+          },
+        });
         
-        if (user.authentication.idToken) {
+        if (result.result.idToken) {
           // Sign in to NextAuth using the native ID token
           await signIn('google-native', {
-            idToken: user.authentication.idToken,
+            idToken: result.result.idToken,
             callbackUrl,
             redirect: true,
           });
