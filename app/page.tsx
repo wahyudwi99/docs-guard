@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { LoginModal } from "@/components/LoginModal";
 
 function HomeContent() {
   const { t, locale } = useI18n();
@@ -33,6 +34,7 @@ function HomeContent() {
   const [showAdModal, setShowAdModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const { data: session } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
@@ -49,13 +51,7 @@ function HomeContent() {
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
     if (!session) {
-      // BUG-005 Fix: Use proper origin for Capacitor or web
-      const origin = (typeof window !== 'undefined' && window.location.origin.includes('localhost') && Capacitor.isNativePlatform())
-        ? 'https://docsguard.app' // Replace with real production domain
-        : window.location.origin;
-
-      const callbackUrl = `${origin}?tab=subscription&autoSubscribe=${planKey}`;
-      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      setShowLoginModal(true);
       return;
     }
     
@@ -318,7 +314,7 @@ function HomeContent() {
               </div>
             ) : (
               <button 
-                onClick={() => router.push('/auth/signin')}
+                onClick={() => setShowLoginModal(true)}
                 className="h-9 px-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2"
               >
                 <User className="h-3.5 w-3.5" />
@@ -328,6 +324,11 @@ function HomeContent() {
           </div>
         </div>
       </header>
+
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+      />
 
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
         <div className="w-full space-y-6">
