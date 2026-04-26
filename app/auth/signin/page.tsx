@@ -29,7 +29,7 @@ function SignInContent() {
           },
         });
         
-        if (result.result.idToken) {
+        if (result.result.responseType === 'online' && result.result.idToken) {
           // Sign in to NextAuth using the native ID token
           await signIn('google-native', {
             idToken: result.result.idToken,
