@@ -36,8 +36,15 @@ function HomeContent() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
+
+  // Close login modal when session is established
+  useEffect(() => {
+    if (session && showLoginModal) {
+      setShowLoginModal(false);
+    }
+  }, [session, showLoginModal]);
   const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
   const [metadataOptions, setMetadataOptions] = useState({
@@ -50,6 +57,8 @@ function HomeContent() {
   const searchParams = useSearchParams();
 
   const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
+    if (status === 'loading') return;
+    
     if (!session) {
       setShowLoginModal(true);
       return;
@@ -299,7 +308,9 @@ function HomeContent() {
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            {session ? (
+            {status === 'loading' ? (
+              <div className="h-9 w-20 bg-slate-100 animate-pulse rounded-full" />
+            ) : session ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end leading-none">
                   <span className="text-[10px] font-bold text-slate-900">{session.user?.name}</span>

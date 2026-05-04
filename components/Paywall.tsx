@@ -84,7 +84,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             ))}
           </div>
           
-          {authenticated ? (
+          {status === 'loading' ? (
+            <div className="w-full py-12 flex items-center justify-center">
+              <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : authenticated ? (
             <div className="space-y-3">
               {packages.map((pkg) => (
                 <button
