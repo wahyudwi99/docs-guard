@@ -12,7 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
       import('@capgo/capacitor-social-login').then(({ SocialLogin }) => {
         SocialLogin.initialize({
           google: {
-            webClientId: 'YOUR_SERVER_CLIENT_ID_FROM_GOOGLE_CONSOLE.apps.googleusercontent.com',
+            webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'YOUR_SERVER_CLIENT_ID_FROM_GOOGLE_CONSOLE.apps.googleusercontent.com',
           },
         });
       });

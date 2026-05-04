@@ -63,9 +63,9 @@ export async function renderPdfPageToCanvas(
     await renderTask.promise;
     renderTasks.delete(canvas);
     page.cleanup(); // Clean up page resources.
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If it was cancelled, we don't want to throw an error up
-    if (error.name === "RenderingCancelledException") {
+    if (error instanceof Error && error.name === "RenderingCancelledException") {
       // console.log("PDF rendering cancelled for page", pageNumber);
     } else {
       renderTasks.delete(canvas);

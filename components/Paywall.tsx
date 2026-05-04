@@ -27,14 +27,30 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
 
   const authenticated = status === 'authenticated';
 
-  const handleSignIn = () => {
-    // BUG-005 Fix: Use proper origin for Capacitor or web
-    const origin = (typeof window !== 'undefined' && window.location.origin.includes('localhost') && Capacitor.isNativePlatform())
-      ? 'https://docsguard.app' // Replace with real production domain
-      : window.location.origin;
-
-    const callbackUrl = origin;
-    router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  const handleSignIn = async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        const result = await SocialLogin.login({
+          provider: 'google',
+          options: {
+            scopes: ['email', 'profile'],
+          },
+        });
+        
+        if (result.result.responseType === 'online' && result.result.idToken) {
+          await signIn('google-native', {
+            idToken: result.result.idToken,
+            callbackUrl: window.location.origin,
+            redirect: true,
+          });
+        }
+      } catch (error) {
+        console.error("Native Google Sign-In error:", error);
+      }
+    } else {
+      await signIn('google', { callbackUrl: window.location.origin });
+    }
   };
 
   return (

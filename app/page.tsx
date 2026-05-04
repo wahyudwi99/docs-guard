@@ -24,7 +24,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/LoginModal";
 
 function HomeContent() {
-  const { t, locale } = useI18n();
+  const { t, locale, logout } = useI18n();
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
@@ -306,7 +306,7 @@ function HomeContent() {
                   {isPro && <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Pro</span>}
                 </div>
                 <button 
-                  onClick={() => signOut()}
+                  onClick={() => logout()}
                   className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
                 >
                   <LogOut className="h-4 w-4" />

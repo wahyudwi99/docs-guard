@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { signOut } from 'next-auth/react';
+import { Capacitor } from '@capacitor/core';
 import en from '@/lib/i18n/dictionaries/en.json';
 import id from '@/lib/i18n/dictionaries/id.json';
 import ja from '@/lib/i18n/dictionaries/ja.json';
@@ -18,6 +20,7 @@ interface I18nContextType {
   locale: Language;
   setLocale: (lang: Language) => void;
   t: (path: string, variables?: Record<string, any>) => any;
+  logout: () => Promise<void>;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -42,6 +45,18 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('locale', lang);
   };
 
+  const logout = async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        await SocialLogin.logout({ provider: 'google' });
+      } catch (error) {
+        console.error("Native logout error:", error);
+      }
+    }
+    await signOut({ callbackUrl: '/' });
+  };
+
   const t = (path: string, variables?: Record<string, any>) => {
     const keys = path.split('.');
     let result: any = dictionaries[locale];
@@ -61,7 +76,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
+    <I18nContext.Provider value={{ locale, setLocale, t, logout }}>
       {children}
     </I18nContext.Provider>
   );

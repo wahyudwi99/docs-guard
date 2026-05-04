@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
-import { jsPDF } from "jspdf";
+import { jsPDF, jsPDFOptions } from "jspdf";
 import { PDFDocument } from "pdf-lib";
 
 interface UseFileExportProps {
@@ -47,7 +47,7 @@ export function useFileExport({
 
     if (documentType === "pdf") {
       // Use jsPDF encryption as pdf-lib doesn't support it in this version
-      const pdfOptions: any = {
+      const pdfOptions: jsPDFOptions = {
         orientation: canvases[0].width > canvases[0].height ? "l" : "p",
         unit: "px",
         format: [canvases[0].width, canvases[0].height]

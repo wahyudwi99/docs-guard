@@ -31,6 +31,12 @@ export function saveAndOpenBlob(blob: Blob, filename: string, contentType: strin
   }, 0);
 }
 
+interface CapacitorWindow extends Window {
+  Capacitor?: {
+    isNativePlatform?: () => boolean;
+  };
+}
+
 /**
  * Checks if the current environment is a Capacitor application.
  * This is a client-side check.
@@ -38,6 +44,6 @@ export function saveAndOpenBlob(blob: Blob, filename: string, contentType: strin
 export function isCapacitorApp(): boolean {
   if (typeof window === "undefined") return false;
   
-  const win = window as any;
+  const win = window as CapacitorWindow;
   return !!(win.Capacitor && win.Capacitor.isNativePlatform && win.Capacitor.isNativePlatform());
 }

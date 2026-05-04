@@ -6,3 +6,6 @@
 - [-] TASK-006: Integrasi RevenueCat dan Global SubscriptionService
 - [-] TASK-007: Implementasi Status Berlangganan Riil dan Perbaikan Sinkronisasi RevenueCat
 - [-] TASK-008: Integrasi Alur Sign-in Google Sebelum Pembayaran Pro Plan pada iOS
+- [-] TASK-009: Implementasi Sistem Pembayaran In-App untuk iOS menggunakan RevenueCat
+- [-] TASK-010: Implementasi Fitur Logout pada Hook useI18n dan Komponen UI
+- [-] TASK-011: Refaktor UI untuk Toggle Button Login/Logout Berdasarkan Status Sesi

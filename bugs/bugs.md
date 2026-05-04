@@ -5,4 +5,11 @@
 - [-] BUG-015 (Terkait iOS Build): iOS Xcode build error: Could not resolve package dependencies (capacitor-swift-pm conflict). Diatasi secara permanen dengan menghapus module @capacitor/share dan beralih ke @capgo/native-purchases v6 guna menghilangkan bentrokan versi Swift PM di Xcode.
 - [-] BUG-016 (Terkait Refactoring): Module not found: Can't resolve '@/lib/revenuecat' di components/Providers.tsx. Cara reproduksi: Jalankan npm run build atau dev, error muncul karena import helper RevenueCat yang sudah dihapus masih tertinggal.
 - [-] OPTIMIZE-001 (Terkait TASK-008): Implementasi Native Google Sign-In untuk iOS guna menghindari kendala redirect webview di Capacitor.
+- [-] BUG-017 (Terkait TASK-008): Redirect ke halaman `/auth/signin` di `Paywall.tsx` menyebabkan error 404 karena halaman tersebut tidak ada di struktur proyek.
+- [-] BUG-018 (Terkait TASK-007): Fungsi `checkSubscriptionStatus` di `useSubscription.tsx` belum mengimplementasikan logika pengecekan status langganan riil untuk platform native (masih kosong).
+- [-] BUG-019 (Terkait TASK-007): Logika `restorePurchases` di `useSubscription.tsx` secara otomatis menetapkan `isPro` menjadi `true` tanpa memverifikasi apakah ada transaksi yang berhasil dipulihkan dari store.
+- [-] BUG-020 (Terkait TASK-007): Properti `packageType` hilang dalam pemetaan paket di platform native pada `useSubscription.tsx`, yang dapat menyebabkan ketidakcocokan logika pemilihan paket di `app/page.tsx`.
+- [-] BUG-021 (Terkait Integritas Kode): Penggunaan tipe `any` yang meluas di `lib/auth.ts`, `lib/pdf.ts`, `lib/utils.ts`, dan `hooks/useSubscription.tsx` melanggar standar integritas teknis dan keamanan tipe data.
+- [-] BUG-022 (Terkait Konfigurasi): `webClientId` di `components/Providers.tsx` masih menggunakan nilai placeholder ("YOUR_SERVER_CLIENT_ID..."), yang akan menyebabkan kegagalan Google Sign-In pada platform native.
+- [-] BUG-023 (Terkait Integritas Kode): Penggunaan tipe `any` pada `pdfOptions` di `hooks/useFileExport.ts` melanggar standar integritas tipe data.
 Applied fuzzy match at line 1.
