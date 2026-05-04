@@ -21,9 +21,15 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.idToken) return null;
 
         try {
+          // Verify token against both web and native client IDs
+          const validAudiences = [
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+          ].filter(Boolean) as string[];
+
           const ticket = await googleClient.verifyIdToken({
             idToken: credentials.idToken,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: validAudiences,
           });
           const payload = ticket.getPayload();
 

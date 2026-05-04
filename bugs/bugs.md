@@ -12,4 +12,8 @@
 - [-] BUG-021 (Terkait Integritas Kode): Penggunaan tipe `any` yang meluas di `lib/auth.ts`, `lib/pdf.ts`, `lib/utils.ts`, dan `hooks/useSubscription.tsx` melanggar standar integritas teknis dan keamanan tipe data.
 - [-] BUG-022 (Terkait Konfigurasi): `webClientId` di `components/Providers.tsx` masih menggunakan nilai placeholder ("YOUR_SERVER_CLIENT_ID..."), yang akan menyebabkan kegagalan Google Sign-In pada platform native.
 - [-] BUG-023 (Terkait Integritas Kode): Penggunaan tipe `any` pada `pdfOptions` di `hooks/useFileExport.ts` melanggar standar integritas tipe data.
+- [ ] BUG-024 (Terkait Integritas Kode): Penggunaan tipe `any` masih ditemukan di beberapa file utama (`lib/auth.ts`, `hooks/useI18n.tsx`, `hooks/useSubscription.tsx`, `app/page.tsx`) meskipun BUG-021 dan BUG-023 telah ditandai selesai.
+- [ ] BUG-025 (Terkait TASK-007): Kalkulasi `subscriptionDaysLeft` di `hooks/useSubscription.tsx` menggunakan `Math.abs`, yang dapat memberikan hasil menyesatkan jika tanggal kadaluarsa sudah lewat (seharusnya menggunakan selisih langsung).
+- [ ] BUG-026 (Terkait Konfigurasi): Konfigurasi `webClientId` di `Providers.tsx` dan `apiKey` di `useSubscription.tsx` masih menyertakan string placeholder sebagai fallback, yang berisiko jika variabel lingkungan tidak terkonfigurasi.
+- [ ] BUG-027 (Terkait TASK-008): File `lib/auth.ts` mengacu pada halaman sign-in `/auth/signin`, namun halaman tersebut tidak ada di struktur proyek (404).
 Applied fuzzy match at line 1.

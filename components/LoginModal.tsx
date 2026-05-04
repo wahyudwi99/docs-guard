@@ -28,7 +28,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
           await signIn('google-native', {
             idToken: result.result.idToken,
             callbackUrl,
-            redirect: true,
+            redirect: false,
           });
           onClose();
         }
