@@ -39,6 +39,11 @@ function HomeContent() {
   const { data: session, status } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
 
+  useEffect(() => {
+    console.log("Auth Status:", status);
+    console.log("Session Data:", session);
+  }, [status, session]);
+
   // Handle auto-logout based on session expiration
   useEffect(() => {
     const sessionAny = session as any;
