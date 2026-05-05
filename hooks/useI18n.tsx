@@ -45,7 +45,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('locale', lang);
   };
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     if (Capacitor.isNativePlatform()) {
       try {
         const { SocialLogin } = await import('@capgo/capacitor-social-login');
@@ -55,7 +55,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     await signOut({ callbackUrl: '/' });
-  };
+  }, []);
 
   const t = (path: string, variables?: Record<string, any>) => {
     const keys = path.split('.');

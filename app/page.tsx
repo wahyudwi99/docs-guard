@@ -39,6 +39,25 @@ function HomeContent() {
   const { data: session, status } = useSession();
   const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
 
+  // Handle auto-logout based on session expiration
+  useEffect(() => {
+    const sessionAny = session as any;
+    if (sessionAny?.expiresAt) {
+      const expiresAt = sessionAny.expiresAt * 1000; // convert to ms
+      const now = Date.now();
+      const timeLeft = expiresAt - now;
+
+      if (timeLeft <= 0) {
+        logout();
+      } else {
+        const timer = setTimeout(() => {
+          logout();
+        }, timeLeft);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [session, logout]);
+
   // Close login modal when session is established
   useEffect(() => {
     if (session && showLoginModal) {

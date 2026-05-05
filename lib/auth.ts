@@ -10,6 +10,13 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       id: "google-native",
@@ -52,6 +59,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session?.user) {
         (session.user as any).id = token.sub;
+        (session as any).expiresAt = token.exp;
       }
       return session;
     },
@@ -65,5 +73,6 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 60, // 1 minute
+    updateAge: 24 * 60 * 60, // 24 hours (don't update JWT expiry until nearly gone)
   },
 };
