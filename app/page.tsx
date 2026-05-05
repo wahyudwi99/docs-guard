@@ -307,7 +307,6 @@ function HomeContent() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <LanguageSwitcher />
             {status === 'loading' ? (
               <div className="h-9 w-20 bg-slate-100 animate-pulse rounded-full" />
             ) : session ? (
@@ -402,9 +401,12 @@ function HomeContent() {
               
               {/* Header Section */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-indigo-600">
-                  <Sparkles className="h-4 w-4" />
-                  <span className="text-xs font-bold uppercase tracking-widest">{t('nav.lab')}</span>
+                <div className="flex items-center justify-between text-indigo-600">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-widest">{t('nav.lab')}</span>
+                  </div>
+                  <LanguageSwitcher />
                 </div>
                 <h2 className="text-2xl font-black text-[#1C1C1E] tracking-tight">{t('nav.tools')}</h2>
               </div>
