@@ -20,7 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SessionProvider>
+    <SessionProvider refetchInterval={30}>
       <SubscriptionProvider>
         <I18nProvider>
           {children}
