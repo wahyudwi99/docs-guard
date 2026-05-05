@@ -25,12 +25,22 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
         });
         
         if (result.result.responseType === 'online' && result.result.idToken) {
-          await signIn('google-native', {
+          console.log("Native login successful, signing into NextAuth...");
+          const res = await signIn('google-native', {
             idToken: result.result.idToken,
             callbackUrl,
             redirect: false,
           });
-          onClose();
+          
+          console.log("NextAuth signIn response:", res);
+          
+          if (res?.ok) {
+            onClose();
+            // Force a slight delay then reload to ensure session is picked up on native
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }
         }
       } catch (error) {
         console.error("Native Google Sign-In error:", error);

@@ -50,14 +50,19 @@ function HomeContent() {
     if (sessionAny?.expiresAt) {
       const expiresAt = sessionAny.expiresAt * 1000; // convert to ms
       const now = Date.now();
+      const buffer = 5000; // 5 seconds buffer
       const timeLeft = expiresAt - now;
 
-      if (timeLeft <= 0) {
+      console.log("Session Expires In:", timeLeft / 1000, "seconds");
+
+      if (timeLeft <= -buffer) { // Only logout if it's truly expired beyond buffer
+        console.log("Session expired, logging out...");
         logout();
       } else {
         const timer = setTimeout(() => {
+          console.log("Timer reached, logging out...");
           logout();
-        }, timeLeft);
+        }, Math.max(0, timeLeft));
         return () => clearTimeout(timer);
       }
     }
