@@ -24,7 +24,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { LoginModal } from "@/components/LoginModal";
 
 function HomeContent() {
-  const { t, locale, logout } = useI18n();
+  const { t, locale } = useI18n();
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
@@ -44,6 +44,18 @@ function HomeContent() {
     console.log("Session Data:", session);
   }, [status, session]);
 
+  const handleLogout = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        await SocialLogin.logout({ provider: 'google' });
+      } catch (error) {
+        console.error("Native logout error:", error);
+      }
+    }
+    await signOut({ callbackUrl: '/' });
+  }, []);
+
   // Handle auto-logout based on session expiration
   useEffect(() => {
     const sessionAny = session as any;
@@ -57,16 +69,16 @@ function HomeContent() {
 
       if (timeLeft <= -buffer) { // Only logout if it's truly expired beyond buffer
         console.log("Session expired, logging out...");
-        logout();
+        handleLogout();
       } else {
         const timer = setTimeout(() => {
           console.log("Timer reached, logging out...");
-          logout();
+          handleLogout();
         }, Math.max(0, timeLeft));
         return () => clearTimeout(timer);
       }
     }
-  }, [session, logout]);
+  }, [session, handleLogout]);
 
   // Close login modal when session is established
   useEffect(() => {
@@ -345,7 +357,7 @@ function HomeContent() {
                   {isPro && <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Pro</span>}
                 </div>
                 <button 
-                  onClick={() => logout()}
+                  onClick={handleLogout}
                   className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
                 >
                   <LogOut className="h-4 w-4" />

@@ -47,7 +47,16 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
         alert("Login Error: " + JSON.stringify(error));
       }
     } else {
-      await signIn('google', { callbackUrl });
+      // For web, we also use redirect: false and manually reload
+      // to ensure the session is picked up reliably.
+      const res = await signIn('google', { redirect: false, callbackUrl });
+      if (res?.ok) {
+        onClose();
+        window.location.reload();
+      } else if (res?.error) {
+        console.error("Web Google Sign-In error:", res.error);
+        alert("Login Error: Could not sign in with Google.");
+      }
     }
   };
 
