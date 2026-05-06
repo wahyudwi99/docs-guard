@@ -70,7 +70,7 @@ function HomeContent() {
       if (timeLeft <= -buffer) { // Only logout if it's truly expired beyond buffer
         console.log("Session expired, logging out...");
         handleLogout();
-      } else {
+      } else if (timeLeft < 2147483647) { // Only set timer if it's within 32-bit signed int range (~24.8 days)
         const timer = setTimeout(() => {
           console.log("Timer reached, logging out...");
           handleLogout();

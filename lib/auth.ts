@@ -72,7 +72,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 60, // 1 minute
-    updateAge: 24 * 60 * 60, // 24 hours (don't update JWT expiry until nearly gone)
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
   },
 };
