@@ -267,9 +267,10 @@ function HomeContent() {
                 </div>
                 <button 
                   onClick={handleLogout}
-                  className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                  className="h-9 px-4 rounded-full bg-rose-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-rose-700 transition-all active:scale-95 flex items-center gap-2 shadow-sm shadow-rose-100"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-3.5 w-3.5" />
+                  Logout
                 </button>
               </div>
             ) : (
