@@ -28,16 +28,15 @@ function HomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
-  const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'design'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [showAdModal, setShowAdModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const { data: session, status } = useSession();
-  const { isPro, loading: subLoading, subscriptionDaysLeft, packages, subscribe, restorePurchases } = useSubscription();
+  const { isPro } = useSubscription();
 
   useEffect(() => {
     console.log("Auth Status:", status);
@@ -86,7 +85,6 @@ function HomeContent() {
       setShowLoginModal(false);
     }
   }, [session, showLoginModal]);
-  const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [password, setPassword] = useState("");
   const [metadataOptions, setMetadataOptions] = useState({
     stripAuthor: true,
@@ -97,53 +95,14 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleSubscribe = useCallback(async (planKey: 'weekly' | 'monthly' | 'yearly') => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      setShowLoginModal(true);
-      return;
-    }
-    
-    // Find matching package using identifier or internal packageType string
-    // This avoids needing the PACKAGE_TYPE enum at top level
-    const pkg = packages.find(p => {
-      if (planKey === 'weekly') return p.packageType === 'WEEKLY' || p.identifier === 'weekly';
-      if (planKey === 'monthly') return p.packageType === 'MONTHLY' || p.identifier === 'monthly';
-      if (planKey === 'yearly') return p.packageType === 'ANNUAL' || p.identifier === 'yearly';
-      return false;
-    }) || packages[0];
-
-    if (!pkg) {
-      console.error("No package found for", planKey);
-      return;
-    }
-
-    const success = await subscribe(pkg);
-    if (success) {
-      setShowSuccessModal(true);
-    }
-  }, [session, subscribe, packages, router]);
-
   // Handle post-login redirection/actions
   useEffect(() => {
-    const autoSub = searchParams.get('autoSubscribe');
     const tab = searchParams.get('tab');
     
     if (tab === 'subscription') {
-      setActiveTab('subscription');
+      setActiveTab('design'); // Redirect to design if subscription was requested
     }
-    
-    // BUG-006 Fix: Only proceed if packages are loaded
-    if (autoSub && session && packages.length > 0) {
-      // Clear the param and trigger subscribe
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.delete('autoSubscribe');
-      router.replace(`?${newParams.toString()}`, { scroll: false });
-      
-      handleSubscribe(autoSub as any);
-    }
-  }, [session, packages, searchParams, router, handleSubscribe]);
+  }, [searchParams]);
 
   // Splash screen effect
   useEffect(() => {
@@ -265,33 +224,17 @@ function HomeContent() {
     }
   }, [getPreviewUrls, drawWatermark]);
 
-  const handleFinalDownload = useCallback(async (isAdTriggered = false) => {
-    // If not Pro and haven't shown ad yet, show ad modal (unless ad was just watched)
-    if (!isPro && !isAdTriggered && !showAdModal && !showSuccessModal) {
-      setShowAdModal(true);
-      return;
-    }
-
+  const handleFinalDownload = useCallback(async () => {
     setIsSaving(true);
     const success = await saveToDevice(drawWatermark);
     setIsSaving(false);
     
     if (success) {
       setPreviewUrls([]); // Clear preview
-      setShowAdModal(false);
       // Show success modal after a short delay to ensure cleanup
       setTimeout(() => setShowSuccessModal(true), 300);
     }
-  }, [saveToDevice, isPro, showAdModal, showSuccessModal]);
-
-  const handleWatchAdAndDownload = useCallback(() => {
-    // In a real app, trigger AdMob Reward video here.
-    setIsSaving(true);
-    // Simulate watching ad then proceed to download
-    setTimeout(() => {
-      handleFinalDownload(true);
-    }, 1500); // Simulate ad delay
-  }, [handleFinalDownload]);
+  }, [saveToDevice]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -354,7 +297,6 @@ function HomeContent() {
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end leading-none">
                   <span className="text-[10px] font-bold text-slate-900">{session.user?.name}</span>
-                  {isPro && <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Pro</span>}
                 </div>
                 <button 
                   onClick={handleLogout}
@@ -425,10 +367,6 @@ function HomeContent() {
                 registerCanvas={registerCanvas} 
                 isSelectionMode={watermarkMode === 'blur'}
                 onAreaSelected={(area) => {
-                  if (!isPro && blurAreas.length >= 2) {
-                    setActiveTab('subscription');
-                    return;
-                  }
                   addBlurArea(area);
                 }}
                 blurAreas={blurAreas}
@@ -475,16 +413,6 @@ function HomeContent() {
                 >
                   <Settings className="h-3.5 w-3.5" />
                   {t('tabs.design')}
-                </button>
-                <button 
-                  onClick={() => setActiveTab('subscription')}
-                  className={cn(
-                    "flex-1 py-2 px-4 rounded-[12px] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2",
-                    activeTab === 'subscription' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                  )}
-                >
-                  <Zap className={cn("h-3.5 w-3.5", isPro ? "text-amber-500 fill-amber-500" : "")} />
-                  {isPro ? t('tabs.pro_active') : t('tabs.go_pro')}
                 </button>
               </div>
 
@@ -608,113 +536,6 @@ function HomeContent() {
                      </div>
                   </div>
                 )}
-
-                {activeTab === 'subscription' && (
-                   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="relative p-8 rounded-[40px] bg-gradient-to-br from-amber-400 to-orange-500 overflow-hidden shadow-2xl shadow-orange-200 group">
-                       <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:scale-125 transition-transform duration-1000">
-                         <Zap className="h-32 w-32 text-white fill-white" />
-                       </div>
-                       
-                       <div className="relative z-10 space-y-6">
-                         <div className="space-y-1">
-                           <h3 className="text-2xl font-black text-white tracking-tight">{t('subscription_section.pro_title')}</h3>
-                           <p className="text-xs font-bold text-amber-50 leading-relaxed">
-                             {t('subscription_section.pro_subtitle')}
-                           </p>
-                         </div>
-
-                         <div className="space-y-3">
-                           {((t('subscription_section.features') as unknown) as string[]).map((feature, i) => (
-                             <div key={i} className="flex items-center gap-3 text-white">
-                               <div className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center">
-                                 <CheckCircle2 className="h-3 w-3" />
-                               </div>
-                               <span className="text-[11px] font-bold">{feature}</span>
-                             </div>
-                           ))}
-                         </div>
-
-                         {!isPro && (
-                           <div className="grid grid-cols-3 gap-2 py-2">
-                             {(['weekly', 'monthly', 'yearly'] as const).map((plan) => (
-                               <button
-                                 key={plan}
-                                 onClick={() => setSelectedPlan(plan)}
-                                 className={cn(
-                                   "flex flex-col items-center gap-1 p-2 rounded-xl border transition-all",
-                                   selectedPlan === plan 
-                                     ? "bg-amber-100 border-amber-300 ring-2 ring-amber-400/20" 
-                                     : "bg-white/50 border-amber-100 hover:bg-white"
-                                 )}
-                               >
-                                 <span className="text-[10px] font-black uppercase text-amber-900/60">{t(`subscription_section.plans.${plan}.title`)}</span>
-                                 <span className="text-xs font-bold text-amber-900">{t(`subscription_section.plans.${plan}.price`)}</span>
-                               </button>
-                             ))}
-                           </div>
-                         )}
-
-                         <div className="pt-2">
-                            {!isPro && (
-                              <div className="flex items-baseline gap-1 mb-4 justify-center">
-                                <span className="text-3xl font-black text-amber-950">{t(`subscription_section.plans.${selectedPlan}.price`)}</span>
-                                <span className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">{t(`subscription_section.plans.${selectedPlan}.period`)}</span>
-                              </div>
-                            )}
-
-                            {isPro ? (
-                              <div className="space-y-4">
-                                <div className="w-full py-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1">
-                                  <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    {t('subscription_section.active')}
-                                  </div>
-                                  {subscriptionDaysLeft !== null && (
-                                    <span className="text-[10px] uppercase tracking-widest opacity-70">
-                                      {t('subscription_section.days_left', { days: subscriptionDaysLeft })}
-                                    </span>
-                                  )}
-                                </div>
-                                {subscriptionDaysLeft !== null && subscriptionDaysLeft <= 7 && (
-                                  <button
-                                    onClick={() => handleSubscribe('monthly')}
-                                    disabled={subLoading}
-                                    className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
-                                  >
-                                    <Zap className="h-4 w-4 fill-white" />
-                                    {t('subscription_section.renew_button')}
-                                  </button>
-                                )}
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => handleSubscribe(selectedPlan)}
-                                disabled={subLoading}
-                                className="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-200 transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-600 disabled:opacity-50"
-                              >
-                                {subLoading ? (
-                                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                ) : (
-                                  <>
-                                    <CreditCard className="h-4 w-4" />
-                                    {t('subscription_section.subscribe_now')}
-                                  </>
-                                )}
-                              </button>
-                            )}                            
-                            <button 
-                              onClick={restorePurchases}
-                              disabled={subLoading}
-                              className="w-full mt-3 py-2 text-[10px] font-bold text-amber-700/60 uppercase tracking-widest hover:text-amber-800 transition-colors"
-                            >
-                              {t('subscription_section.restore')}
-                            </button>
-                         </div>
-                       </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -828,63 +649,6 @@ function HomeContent() {
       )}
 
       {/* Modern Mini Footer */}
-      {/* Ad Gateway Modal */}
-      {showAdModal && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
-            onClick={() => setShowAdModal(false)}
-          ></div>
-          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-50 text-amber-600 mx-auto">
-              <Zap className="h-10 w-10 fill-amber-500" />
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
-                {t('preview_modal.ad_title')}
-              </h3>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
-                {t('preview_modal.ad_description')}
-              </p>
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={handleWatchAdAndDownload}
-                disabled={isSaving}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
-              >
-                {isSaving ? (
-                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <Zap className="h-4 w-4 fill-white" />
-                    {t('preview_modal.watch_ad')}
-                  </>
-                )}
-              </button>
-              <button 
-                onClick={() => {
-                  setShowAdModal(false);
-                  setActiveTab('subscription');
-                }}
-                className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-amber-100 flex items-center justify-center gap-2"
-              >
-                <Sparkles className="h-4 w-4 fill-white" />
-                {t('preview_modal.go_pro_cta')}
-              </button>
-              <button 
-                onClick={() => setShowAdModal(false)}
-                className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm transition-all"
-              >
-                {t('preview_modal.close')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
