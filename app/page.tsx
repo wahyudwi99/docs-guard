@@ -267,7 +267,6 @@ function HomeContent() {
               <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/40"></div>
               <div className="h-1.5 w-1.5 rounded-full bg-indigo-600/60"></div>
             </div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('nav.lab')}</span>
           </div>
         </div>
       )}
@@ -383,7 +382,6 @@ function HomeContent() {
                 <div className="flex items-center justify-between text-indigo-600">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-widest">{t('nav.lab')}</span>
                   </div>
                   <LanguageSwitcher />
                 </div>
