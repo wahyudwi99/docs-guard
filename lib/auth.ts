@@ -3,8 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { OAuth2Client } from "google-auth-library";
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -28,6 +26,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.idToken) return null;
 
         try {
+          const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
           // Verify token against both web and native client IDs
           const validAudiences = [
             process.env.GOOGLE_CLIENT_ID,
