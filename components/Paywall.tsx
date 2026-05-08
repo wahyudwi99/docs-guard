@@ -4,9 +4,8 @@ import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
 import { Check, X, Shield, Zap, Lock } from 'lucide-react';
-import { signIn, useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { Capacitor } from '@capacitor/core';
 
 interface PaywallProps {
   onClose?: () => void;
@@ -15,7 +14,7 @@ interface PaywallProps {
 export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const { packages, subscribe, loading, restorePurchases } = useSubscription();
   const { t } = useI18n();
-  const { data: session, status } = useSession();
+  const { user: session, loading: isLoadingAuth, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const features = [
@@ -25,31 +24,13 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
     { icon: <Check className="w-5 h-5 text-purple-500" />, text: t('paywall_feature_high_quality') || 'High Quality Export' },
   ];
 
-  const authenticated = status === 'authenticated';
+  const authenticated = !!session;
 
   const handleSignIn = async () => {
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const { SocialLogin } = await import('@capgo/capacitor-social-login');
-        const result = await SocialLogin.login({
-          provider: 'google',
-          options: {
-            scopes: ['email', 'profile'],
-          },
-        });
-        
-        if (result.result.responseType === 'online' && result.result.idToken) {
-          await signIn('google-native', {
-            idToken: result.result.idToken,
-            callbackUrl: window.location.origin,
-            redirect: true,
-          });
-        }
-      } catch (error) {
-        console.error("Native Google Sign-In error:", error);
-      }
-    } else {
-      await signIn('google', { callbackUrl: window.location.origin });
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error("Google Sign-In error:", error);
     }
   };
 
@@ -84,7 +65,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             ))}
           </div>
           
-          {status === 'loading' ? (
+          {isLoadingAuth ? (
             <div className="w-full py-12 flex items-center justify-center">
               <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
             </div>

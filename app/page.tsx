@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 import { LoginModal } from "@/components/LoginModal";
 
 function HomeContent() {
@@ -35,49 +35,17 @@ function HomeContent() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { user: session, loading: isLoadingAuth, logout } = useAuth();
   const { isPro } = useSubscription();
 
   useEffect(() => {
-    console.log("Auth Status:", status);
+    console.log("Auth Status:", isLoadingAuth ? 'loading' : (session ? 'authenticated' : 'unauthenticated'));
     console.log("Session Data:", session);
-  }, [status, session]);
+  }, [isLoadingAuth, session]);
 
   const handleLogout = useCallback(async () => {
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const { SocialLogin } = await import('@capgo/capacitor-social-login');
-        await SocialLogin.logout({ provider: 'google' });
-      } catch (error) {
-        console.error("Native logout error:", error);
-      }
-    }
-    await signOut({ callbackUrl: '/' });
-  }, []);
-
-  // Handle auto-logout based on session expiration
-  useEffect(() => {
-    const sessionAny = session as any;
-    if (sessionAny?.expiresAt) {
-      const expiresAt = sessionAny.expiresAt * 1000; // convert to ms
-      const now = Date.now();
-      const buffer = 5000; // 5 seconds buffer
-      const timeLeft = expiresAt - now;
-
-      console.log("Session Expires In:", timeLeft / 1000, "seconds");
-
-      if (timeLeft <= -buffer) { // Only logout if it's truly expired beyond buffer
-        console.log("Session expired, logging out...");
-        handleLogout();
-      } else if (timeLeft < 2147483647) { // Only set timer if it's within 32-bit signed int range (~24.8 days)
-        const timer = setTimeout(() => {
-          console.log("Timer reached, logging out...");
-          handleLogout();
-        }, Math.max(0, timeLeft));
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [session, handleLogout]);
+    await logout();
+  }, [logout]);
 
   // Close login modal when session is established
   useEffect(() => {
@@ -290,12 +258,12 @@ function HomeContent() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {status === 'loading' ? (
+            {isLoadingAuth ? (
               <div className="h-9 w-20 bg-slate-100 animate-pulse rounded-full" />
             ) : session ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end leading-none">
-                  <span className="text-[10px] font-bold text-slate-900">{session.user?.name}</span>
+                  <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
                 </div>
                 <button 
                   onClick={handleLogout}
@@ -643,7 +611,6 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Modern Mini Footer */}
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">

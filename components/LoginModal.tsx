@@ -1,9 +1,8 @@
 "use client";
 
 import React from 'react';
-import { signIn } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { Shield, Lock, X } from 'lucide-react';
-import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface LoginModalProps {
@@ -13,50 +12,15 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalProps) {
+  const { loginWithGoogle } = useAuth();
+
   const handleGoogleSignIn = async () => {
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const { SocialLogin } = await import('@capgo/capacitor-social-login');
-        const result = await SocialLogin.login({
-          provider: 'google',
-          options: {
-            scopes: ['email', 'profile'],
-          },
-        });
-        
-        if (result.result.responseType === 'online' && result.result.idToken) {
-          console.log("Native login successful, signing into NextAuth...");
-          const res = await signIn('google-native', {
-            idToken: result.result.idToken,
-            callbackUrl,
-            redirect: false,
-          });
-          
-          console.log("NextAuth signIn response:", res);
-          
-          if (res?.ok) {
-            onClose();
-            // Force a slight delay then reload to ensure session is picked up on native
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          }
-        }
-      } catch (error) {
-        console.error("Native Google Sign-In error:", error);
-        alert("Login Error: " + JSON.stringify(error));
-      }
-    } else {
-      // For web, we also use redirect: false and manually reload
-      // to ensure the session is picked up reliably.
-      const res = await signIn('google', { redirect: false, callbackUrl });
-      if (res?.ok) {
-        onClose();
-        window.location.reload();
-      } else if (res?.error) {
-        console.error("Web Google Sign-In error:", res.error);
-        alert("Login Error: Could not sign in with Google.");
-      }
+    try {
+      await loginWithGoogle();
+      onClose();
+    } catch (error) {
+      console.error("Google Sign-In error:", error);
+      alert("Login Error: Could not sign in with Google.");
     }
   };
 
