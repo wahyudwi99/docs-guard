@@ -379,10 +379,7 @@ function HomeContent() {
               
               {/* Header Section */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-indigo-600">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
+                <div className="flex items-center justify-end text-indigo-600">
                   <LanguageSwitcher />
                 </div>
                 <h2 className="text-2xl font-black text-[#1C1C1E] tracking-tight">{t('nav.tools')}</h2>
@@ -710,7 +707,6 @@ export default function Home() {
     <Suspense fallback={
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] animate-pulse">Initializing Lab...</p>
       </div>
     }>
       <HomeContent />
