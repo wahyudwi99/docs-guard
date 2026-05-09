@@ -133,30 +133,6 @@ function HomeContent() {
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
 
-  // Real-time Preview: Trigger drawWatermark when settings change
-  useEffect(() => {
-    if (file && canvases.length > 0) {
-      drawWatermark();
-    }
-  }, [
-    file,
-    canvases,
-    watermarkMode,
-    watermarkLayout,
-    watermarkText,
-    watermarkColor,
-    watermarkOpacity,
-    fontFamily,
-    fontSize,
-    orientation,
-    watermarkImage,
-    imageScale,
-    blurAreas,
-    blurStrength,
-    drawWatermark
-  ]);
-
-
   const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Renew canvases and state to avoid "canvas already used" error
     clearCanvases();
@@ -164,6 +140,7 @@ function HomeContent() {
     setPreviewUrls([]);
     handleFileChange(e);
   }, [handleFileChange, clearCanvases, resetWatermark]);
+
 
   const handleCameraCapture = useCallback((capturedFile: File) => {
     // Create a mock event to reuse handleFileChange logic
@@ -219,7 +196,8 @@ function HomeContent() {
 
   const handleFinalDownload = useCallback(async () => {
     setIsSaving(true);
-    const success = await saveToDevice(drawWatermark);
+    // Ensure all pages are watermarked before saving
+    const success = await saveToDevice(() => drawWatermark(false));
     setIsSaving(false);
     
     if (success) {
@@ -231,13 +209,15 @@ function HomeContent() {
 
   const handleShare = useCallback(async () => {
     setIsSaving(true);
-    const success = await shareFile(drawWatermark);
+    // Ensure all pages are watermarked before sharing
+    const success = await shareFile(() => drawWatermark(false));
     setIsSaving(false);
     
     if (success) {
       setPreviewUrls([]); // Clear preview
     }
   }, [shareFile, drawWatermark]);
+
 
 
   return (

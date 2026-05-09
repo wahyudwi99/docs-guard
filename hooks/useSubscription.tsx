@@ -15,8 +15,8 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Always false for testing login/logout without payment interference
-  const [isPro] = useState(false);
+  // Always true for testing Pro features
+  const [isPro] = useState(true);
   const [loading] = useState(false);
   const [subscriptionDaysLeft] = useState<number | null>(null);
   const [packages] = useState<any[]>([]);

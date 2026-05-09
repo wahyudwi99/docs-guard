@@ -59,33 +59,39 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setBlurAreas(prev => prev.filter((_, i) => i !== index));
   }, []);
 
-  const drawWatermark = useCallback(async () => {
+  const drawWatermark = useCallback(async (onlyFirstPage = false) => {
     if (canvases.length === 0) return;
 
-    // Redraw the base document first to clear any old watermark on all pages
+    // Redraw the base document first to clear any old watermark
     await redrawDocument(canvases);
 
-    // Use Promise.all to ensure all drawing operations are completed
-    const drawPromises = canvases.map(async (canvas, canvasIndex) => {
+    // Limit to first page if requested (for performance)
+    const pagesToDraw = onlyFirstPage ? canvases.slice(0, 1) : canvases;
+
+    const drawPromises = pagesToDraw.map(async (canvas, canvasIndex) => {
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (!context) return;
+      
+      // Clear the canvas properly before each draw to remove previous watermark layers
+      // without resetting the canvas dimensions
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // We need to re-draw the document content after clearing
+      // This part is slightly redundant but necessary for a clean watermark layer
+      await redrawDocument([canvas]);
 
       // Draw blur areas if any
       const pageBlurAreas = blurAreas.filter(a => a.pageIndex === canvasIndex);
       if (pageBlurAreas.length > 0) {
-        // Create a temporary canvas to hold the original content for blurring
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext("2d");
         if (tempCtx) {
-          // Copy current canvas (original document) to temp
           tempCtx.drawImage(canvas, 0, 0);
-          
           pageBlurAreas.forEach(area => {
             context.save();
             context.filter = `blur(${blurStrength}px)`;
-            // Draw from tempCanvas to original canvas with blur filter
             context.drawImage(
               tempCanvas, 
               area.x, area.y, area.width, area.height, 
@@ -126,7 +132,6 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
           const horizontalSpacing = textWidth + spaceWidth * 4; 
           const verticalSpacing = textHeight * 4;
 
-          // Drawing relative to the rotated center
           for (let i = -canvas.width * 1.5; i < canvas.width * 1.5; i += horizontalSpacing) {
             for (let j = -canvas.height * 1.5; j < canvas.height * 1.5; j += verticalSpacing) {
               context.fillText(watermarkText, i, j);
@@ -164,16 +169,16 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
         }
         context.restore();
       }
-
     });
 
     await Promise.all(drawPromises);
   }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
-  // Redraw watermark whenever its properties or document changes
+  // Redraw watermark (only first page for real-time)
   useEffect(() => {
-    drawWatermark();
+    drawWatermark(true);
   }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
+
 
   return {
     watermarkMode,

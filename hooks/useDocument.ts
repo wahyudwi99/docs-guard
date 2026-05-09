@@ -62,9 +62,14 @@ export function useDocument({ canvases }: UseDocumentProps) {
       try {
         if (selectedFile.type.startsWith("image/")) {
           const canvas = currentCanvases[0];
-          const ctx = canvas.getContext("2d");
-          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-          await loadImage(selectedFile, canvas);
+          // Only load and draw if dimensions are not set (first time)
+          if (canvas.width === 0 || canvas.height === 0) {
+            await loadImage(selectedFile, canvas);
+          } else {
+            // Just clear and redraw from the existing state if needed, 
+            // but for images, the watermark logic handles the redraw.
+            // We only need the base image once.
+          }
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
           if (!doc) {
@@ -73,17 +78,18 @@ export function useDocument({ canvases }: UseDocumentProps) {
             setNumPages(doc.numPages);
           }
 
-          // Wait for all pages to render if canvases are available
+          // Render pages only if they haven't been rendered yet or if it's a new document
           const renderPromises = [];
           for (let i = 1; i <= doc.numPages; i++) {
             const canvas = currentCanvases[i - 1];
-            if (canvas) {
-              const ctx = canvas.getContext("2d");
-              if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // CRITICAL: Only render if canvas is empty/uninitialized to avoid resetting dimensions during real-time updates
+            if (canvas && (canvas.width === 0 || canvas.height === 0)) {
               renderPromises.push(renderPdfPageToCanvas(doc, i, canvas));
             }
           }
-          await Promise.all(renderPromises);
+          if (renderPromises.length > 0) {
+            await Promise.all(renderPromises);
+          }
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "RenderingCancelledException") {
