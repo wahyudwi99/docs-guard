@@ -73,12 +73,26 @@ export function useFileExport({
 
       // Apply metadata stripping if user is Pro
       if (isPro && metadataOptions) {
+        const properties: any = {};
+
         if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
-          pdf.setProperties({ author: "", creator: "" });
+          properties.author = " ";
+          properties.creator = " ";
         }
+        
+        if (metadataOptions.stripCreationDate || metadataOptions.nuclearClean) {
+          // jsPDF automatically adds creation date. 
+          // We set it to a fixed epoch date to "strip" the actual creation time.
+          properties.creationDate = new Date(0); 
+        }
+
         if (metadataOptions.nuclearClean) {
-          pdf.setProperties({ title: "", subject: "", keywords: "" });
+          properties.title = " ";
+          properties.subject = " ";
+          properties.keywords = " ";
         }
+
+        pdf.setProperties(properties);
       }
 
       const pdfBlob = pdf.output("blob");
