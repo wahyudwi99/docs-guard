@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: process.env.IS_CAPACITOR === 'true' ? 'export' : 'standalone',
   images: {
     unoptimized: true,
   },
