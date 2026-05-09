@@ -120,6 +120,7 @@ function HomeContent() {
     setFontSize,
     orientation,
     setOrientation,
+    watermarkImage,
     setWatermarkImage,
     imageScale,
     setImageScale,
@@ -131,6 +132,30 @@ function HomeContent() {
     resetWatermark,
     drawWatermark,
   } = useWatermark({ canvases, redrawDocument });
+
+  // Real-time Preview: Trigger drawWatermark when settings change
+  useEffect(() => {
+    if (file && canvases.length > 0) {
+      drawWatermark();
+    }
+  }, [
+    file,
+    canvases,
+    watermarkMode,
+    watermarkLayout,
+    watermarkText,
+    watermarkColor,
+    watermarkOpacity,
+    fontFamily,
+    fontSize,
+    orientation,
+    watermarkImage,
+    imageScale,
+    blurAreas,
+    blurStrength,
+    drawWatermark
+  ]);
+
 
   const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Renew canvases and state to avoid "canvas already used" error
@@ -324,22 +349,19 @@ function HomeContent() {
             </div>
           </div>
 
-          {/* Canvas Processing & Blur Selection Area */}
-          {file && (
-            <div className={cn(
-              "w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700",
-              (watermarkMode === 'blur' && activeTab === 'design') 
-                ? "block" 
-                : "fixed -left-[9999px] top-0 pointer-events-none opacity-0"
-            )}>
+          {/* Canvas Processing & Real-time Preview Area */}
+          {file && activeTab === 'design' && (
+            <div className="w-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <div className="space-y-3 mb-4">
                 <div className="flex items-center gap-2 text-indigo-600">
                   <Layout className="h-4 w-4" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Preview</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Real-time Preview</span>
                 </div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-                  {t('watermark_controls.blur_instruction')}
-                </p>
+                {watermarkMode === 'blur' && (
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                    {t('watermark_controls.blur_instruction')}
+                  </p>
+                )}
               </div>
               <CanvasDisplay 
                 numPages={numPages} 
@@ -352,6 +374,7 @@ function HomeContent() {
               />
             </div>
           )}
+
 
           {/* Main Control Card */}
           <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] border border-white/60">
@@ -488,20 +511,31 @@ function HomeContent() {
                      />
 
                      <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">
-                        <button 
-                          onClick={handleOpenPreview}
-                          disabled={isSaving}
-                          className="w-full py-5 bg-indigo-600 text-white font-black rounded-3xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-xs disabled:opacity-50"
-                        >
-                          {isSaving ? (
-                            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          ) : (
-                            <>
-                              <FileText className="h-5 w-5" />
-                              {t('design_section.generate_preview')}
-                            </>
-                          )}
-                        </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <button 
+                            onClick={() => handleShare()}
+                            disabled={isSaving}
+                            className={cn(
+                              "px-4 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
+                              isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-600"
+                            )}
+                          >
+                            <Share2 className={cn("h-4 w-4", isSaving && "animate-pulse")} />
+                            {isSaving ? t('preview_modal.sharing') : t('preview_modal.share')}
+                          </button>
+                          <button 
+                            onClick={() => handleFinalDownload()}
+                            disabled={isSaving}
+                            className={cn(
+                              "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
+                              isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
+                            )}
+                          >
+                            <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
+                            {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
+                          </button>
+                        </div>
+
                         <button 
                           onClick={handleNewFile}
                           className="w-full py-4 bg-slate-50 text-slate-500 font-bold rounded-2xl hover:bg-rose-50 hover:text-rose-600 transition-all text-[10px] uppercase tracking-widest"
@@ -509,6 +543,7 @@ function HomeContent() {
                           {t('design_section.remove_file')}
                         </button>
                      </div>
+
                   </div>
                 )}
               </div>
@@ -540,99 +575,6 @@ function HomeContent() {
           </div>
         </div>
       </main>
-
-      {/* Preview Modal Overlay */}
-      {previewUrls.length > 0 && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-lg" 
-            onClick={() => setPreviewUrls([])}
-          ></div>
-          
-          {/* Modal Container */}
-          <div className="relative w-full max-w-4xl bg-white rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col max-h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-40px)]">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                 <div className="h-10 w-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100">
-                   <CheckCircle2 className="h-6 w-6" />
-                 </div>
-                 <div>
-                   <h3 className="text-xl font-black text-slate-900 tracking-tight">{t('preview_modal.ready_title')}</h3>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('preview_modal.preview_note')}</p>
-                 </div>
-              </div>
-              <button 
-                onClick={() => setPreviewUrls([])}
-                className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Scrollable Preview Area */}
-            <div className="flex-1 overflow-auto bg-slate-200/50 p-8 flex flex-col items-center gap-8 min-h-[300px] custom-scrollbar">
-              {previewUrls.map((url, index) => (
-                <div key={index} className="relative shadow-2xl rounded-2xl overflow-hidden bg-white max-w-full">
-                  <img 
-                    src={url} 
-                    alt={`Watermarked Preview Page ${index + 1}`} 
-                    className="h-auto w-auto max-w-full block object-contain shadow-sm"
-                  />
-                  <div className="absolute top-4 right-4 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur-md font-bold">
-                    {t('preview_modal.sample_page')} {index + 1}
-                  </div>
-                </div>
-              ))}
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/80 px-4 py-2 rounded-full shadow-sm">
-                {t('preview_modal.all_pages_note', { numPages })}
-              </p>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="p-6 md:p-8 bg-white border-t border-slate-100 flex flex-col gap-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
-              <div className="flex flex-col justify-center text-center md:text-left">
-                 <p className="text-sm font-bold text-slate-900">{t('preview_modal.final_verification')}</p>
-                 <p className="text-xs font-medium text-slate-400 leading-relaxed text-left">
-                   {t('preview_modal.download_note')}
-                 </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button 
-                  onClick={() => setPreviewUrls([])}
-                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest"
-                >
-                  {t('preview_modal.edit_again')}
-                </button>
-                <button 
-                  onClick={() => handleShare()}
-                  disabled={isSaving}
-                  className={cn(
-                    "px-4 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
-                    isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-600"
-                  )}
-                >
-                  <Share2 className={cn("h-4 w-4", isSaving && "animate-pulse")} />
-                  {isSaving ? t('preview_modal.sharing') : t('preview_modal.share')}
-                </button>
-                <button 
-                  onClick={() => handleFinalDownload()}
-                  disabled={isSaving}
-                  className={cn(
-                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
-                    isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
-                  )}
-                >
-                  <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
-                  {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Success Modal */}
       {showSuccessModal && (
