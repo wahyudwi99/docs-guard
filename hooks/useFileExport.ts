@@ -71,29 +71,25 @@ export function useFileExport({
         pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
       });
 
-      // Apply metadata stripping if user is Pro
-      if (isPro && metadataOptions) {
-        const properties: any = {};
+      // AUTOMATIC PRIVACY: Always strip library and producer info by default
+      const properties: any = {
+        author: " ",
+        creator: " ",
+        producer: " ",
+        title: " ",
+        subject: " ",
+        keywords: " "
+      };
 
-        if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
-          properties.author = " ";
-          properties.creator = " ";
-        }
-        
+      // Advanced overrides if user is Pro
+      if (isPro && metadataOptions) {
         if (metadataOptions.stripCreationDate || metadataOptions.nuclearClean) {
-          // jsPDF automatically adds creation date. 
-          // We set it to a fixed epoch date to "strip" the actual creation time.
+          // Reset to epoch if specifically requested
           properties.creationDate = new Date(0); 
         }
-
-        if (metadataOptions.nuclearClean) {
-          properties.title = " ";
-          properties.subject = " ";
-          properties.keywords = " ";
-        }
-
-        pdf.setProperties(properties);
       }
+
+      pdf.setProperties(properties);
 
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
