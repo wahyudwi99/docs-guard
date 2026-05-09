@@ -67,23 +67,22 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     if (canvases.length === 0) return;
 
     // 1. Ensure Offscreen Cache is ready
-    // We check length and also if the first offscreen canvas has actual dimensions
-    const isCacheReady = offscreenCanvasesRef.current.length === canvases.length && 
-                         offscreenCanvasesRef.current.every(c => c.width > 0);
+    // We must check if the cache exists AND if it has been populated with actual document dimensions
+    // Default canvas size is 300x150, so we check if it's something else or use a more robust check
+    const isCachePopulated = offscreenCanvasesRef.current.length === canvases.length && 
+                             offscreenCanvasesRef.current.every(c => c.width > 0 && c.width !== 300);
 
-    if (!isCacheReady) {
-      // Create/Reset offscreen canvases
-      offscreenCanvasesRef.current = canvases.map(c => {
+    if (!isCachePopulated) {
+      // Create/Reset offscreen canvases with 0 dimensions to ensure they are seen as "not ready"
+      offscreenCanvasesRef.current = canvases.map(() => {
         const off = document.createElement("canvas");
-        // We must set initial dimensions from the visible canvases if they have them
-        if (c.width > 0) {
-          off.width = c.width;
-          off.height = c.height;
-        }
+        off.width = 0; 
+        off.height = 0;
         return off;
       });
       
       // Perform initial render of base document to the offscreen canvases
+      // This will set the correct widths/heights
       await redrawDocument(offscreenCanvasesRef.current);
     }
 
