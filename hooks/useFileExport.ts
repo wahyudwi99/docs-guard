@@ -1,8 +1,9 @@
 import { useCallback } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import { Media } from "@capacitor-community/media";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
 import { jsPDF, jsPDFOptions } from "jspdf";
-import { PDFDocument } from "pdf-lib";
 
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
@@ -72,7 +73,7 @@ export function useFileExport({
 
       // Apply metadata stripping if user is Pro
       if (isPro && metadataOptions) {
-        if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
+        if (metadataOptions.author || metadataOptions.nuclearClean) {
           pdf.setProperties({ author: "", creator: "" });
         }
         if (metadataOptions.nuclearClean) {
@@ -91,73 +92,136 @@ export function useFileExport({
       
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
       const blob = await new Promise<Blob | null>((resolve) => {
-        // Drawing to canvas and exporting naturally strips all metadata (EXIF/GPS)
-        // This satisfies the "Nuclear Clean" and "Strip GPS/Author" requirements
-        // Selective metadata retention is not supported as canvas doesn't preserve it.
         canvas.toBlob((b) => resolve(b), exportType, 0.95);
       });
       return { blob, fileName, contentType: exportType };
     }
   }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file]);
 
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        if (result) {
+          const base64Data = result.split(",")[1];
+          resolve(base64Data);
+        } else {
+          reject(new Error("FileReader result is empty"));
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
       if (onBeforeExport) {
-        console.log("Running onBeforeExport...");
         await onBeforeExport();
-        // Give the browser a moment to apply filters (blur) before capturing the canvas
         await new Promise(resolve => setTimeout(resolve, 150));
       }
       
-      console.log("Generating blob...");
       const result = await generateBlobAndFileName();
-      
-      if (!result || !result.blob) {
-        console.error("Failed to generate blob result");
-        return false;
-      }
+      if (!result || !result.blob) return false;
 
       const { blob, fileName, contentType } = result;
-      console.log(`Blob generated: ${fileName} (${blob.size} bytes), type: ${contentType}`);
-
       const isNative = isCapacitorApp();
-      console.log(`Is Capacitor Native: ${isNative}`);
 
       if (!isNative) {
-        console.log("Triggering web download...");
         saveAndOpenBlob(blob, fileName, contentType);
       } else {
-        console.log("Triggering Capacitor file save...");
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onloadend = () => {
-            const result = reader.result as string;
-            if (result) {
-              const base64Data = result.split(",")[1];
-              resolve(base64Data);
-            } else {
-              reject(new Error("FileReader result is empty"));
-            }
-          };
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(blob);
-        });
+        const base64Data = await blobToBase64(blob);
+        
+        // On Mobile, if it's an image, try saving to Gallery first
+        if (documentType === "image") {
+          try {
+            await Media.savePhoto({
+              path: base64Data,
+              albumName: "DocsGuard"
+            });
+            console.log("Saved to Gallery");
+            return true;
+          } catch (err) {
+            console.warn("Failed to save to Gallery, falling back to Filesystem", err);
+          }
+        }
 
-        const base64Data = await base64Promise;
-        await Filesystem.writeFile({
+        // Fallback or PDF: Save to Filesystem
+        const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
           directory: Directory.Documents,
           recursive: true,
         });
-        console.log("Capacitor file saved to Documents");
+        
+        console.log("Saved to Filesystem:", savedFile.uri);
       }
       return true;
     } catch (error) {
       console.error("Error saving file:", error);
       return false;
     }
+  }, [generateBlobAndFileName, documentType]);
+
+  const shareFile = useCallback(async (onBeforeExport?: () => Promise<void>) => {
+    try {
+      if (onBeforeExport) {
+        await onBeforeExport();
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+
+      const result = await generateBlobAndFileName();
+      if (!result || !result.blob) return false;
+
+      const { blob, fileName } = result;
+      const isNative = isCapacitorApp();
+
+      if (!isNative) {
+        // Web share API if available
+        if (navigator.share) {
+          const file = new File([blob], fileName, { type: blob.type });
+          await navigator.share({
+            files: [file],
+            title: "Watermarked Document",
+            text: "Sharing from DocsGuard"
+          });
+          return true;
+        } else {
+          // Fallback to download on web if share not supported
+          saveAndOpenBlob(blob, fileName, blob.type);
+          return true;
+        }
+      } else {
+        // Native Share
+        const base64Data = await blobToBase64(blob);
+        
+        // Write to cache directory for sharing
+        const tempPath = `share-${Date.now()}-${fileName}`;
+        const resultFile = await Filesystem.writeFile({
+          path: tempPath,
+          data: base64Data,
+          directory: Directory.Cache,
+        });
+
+        await Share.share({
+          title: fileName,
+          text: "Watermarked with DocsGuard",
+          url: resultFile.uri,
+          dialogTitle: "Share Document",
+        });
+        
+        // Clean up temp file after some time or immediately?
+        // Capacitor Share usually doesn't need the file to persist after the dialog opens, 
+        // but some apps might read it later. Let's keep it in Cache.
+        return true;
+      }
+    } catch (error) {
+      console.error("Error sharing file:", error);
+      return false;
+    }
   }, [generateBlobAndFileName]);
 
-  return { getPreviewUrls, saveToDevice };
+  return { getPreviewUrls, saveToDevice, shareFile };
 }
+

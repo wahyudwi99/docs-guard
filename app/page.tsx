@@ -166,7 +166,7 @@ function HomeContent() {
   }, [clearDocument, clearCanvases, resetWatermark]);
 
   // File Export logic - Passing canvases array
-  const { getPreviewUrls, saveToDevice } = useFileExport({ 
+  const { getPreviewUrls, saveToDevice, shareFile } = useFileExport({ 
     canvases, 
     watermarkText,
     documentType,
@@ -202,7 +202,18 @@ function HomeContent() {
       // Show success modal after a short delay to ensure cleanup
       setTimeout(() => setShowSuccessModal(true), 300);
     }
-  }, [saveToDevice]);
+  }, [saveToDevice, drawWatermark]);
+
+  const handleShare = useCallback(async () => {
+    setIsSaving(true);
+    const success = await shareFile(drawWatermark);
+    setIsSaving(false);
+    
+    if (success) {
+      setPreviewUrls([]); // Clear preview
+    }
+  }, [shareFile, drawWatermark]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -588,18 +599,29 @@ function HomeContent() {
                    {t('preview_modal.download_note')}
                  </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button 
                   onClick={() => setPreviewUrls([])}
-                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest order-2 sm:order-1"
+                  className="px-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest"
                 >
                   {t('preview_modal.edit_again')}
+                </button>
+                <button 
+                  onClick={() => handleShare()}
+                  disabled={isSaving}
+                  className={cn(
+                    "px-4 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
+                    isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-emerald-600"
+                  )}
+                >
+                  <Share2 className={cn("h-4 w-4", isSaving && "animate-pulse")} />
+                  {isSaving ? t('preview_modal.sharing') : t('preview_modal.share')}
                 </button>
                 <button 
                   onClick={() => handleFinalDownload()}
                   disabled={isSaving}
                   className={cn(
-                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 order-1 sm:order-2",
+                    "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
                     isSaving ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
                   )}
                 >
