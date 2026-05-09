@@ -133,20 +133,8 @@ export function useFileExport({
       } else {
         const base64Data = await blobToBase64(blob);
         
-        // On Mobile, if it's an image, try saving to Gallery first
-        if (documentType === "image") {
-          try {
-            await Media.savePhoto({
-              path: base64Data
-            });
-            console.log("Saved to Gallery");
-            return true;
-          } catch (err) {
-            console.warn("Failed to save to Gallery, falling back to Filesystem", err);
-          }
-        }
-
-        // Fallback or PDF: Save to Filesystem
+        // 1. Always save to Filesystem first (Documents folder)
+        // This ensures the file is in the "Files" app as requested
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
@@ -155,6 +143,20 @@ export function useFileExport({
         });
         
         console.log("Saved to Filesystem:", savedFile.uri);
+
+        // 2. For images, ALSO try to save to Gallery
+        if (documentType === "image") {
+          try {
+            // Use the file URI from Filesystem which is more stable than passing base64
+            await Media.savePhoto({
+              path: savedFile.uri
+            });
+            console.log("Saved to Gallery");
+          } catch (err) {
+            console.error("Failed to save to Gallery:", err);
+            // Don't return false here, because it's already saved to Filesystem
+          }
+        }
       }
       return true;
     } catch (error) {
