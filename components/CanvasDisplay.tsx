@@ -118,11 +118,13 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       onMouseUp={handleMouseUp}
       onTouchEnd={handleMouseUp}
     >
-      {Array.from({ length: displayedPages }).map((_, index) => (
-
+      {Array.from({ length: numPages }).map((_, index) => (
         <div 
           key={index} 
-          className="relative w-full flex justify-center bg-white shadow-lg rounded-lg overflow-hidden border border-slate-200"
+          className={cn(
+            "relative w-full flex justify-center bg-white shadow-lg rounded-lg overflow-hidden border border-slate-200",
+            previewLimit !== undefined && index >= previewLimit && "hidden"
+          )}
           onMouseDown={(e) => handleMouseDown(e, index)}
           onTouchStart={(e) => handleMouseDown(e, index)}
         >
@@ -130,6 +132,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
             ref={(el) => registerCanvas(el, index)}
             className="max-w-full h-auto"
           />
+
           
           {/* Selection Overlay */}
           {activePageIndex === index && isDragging && (
