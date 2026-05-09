@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 interface UseWatermarkProps {
   canvases: HTMLCanvasElement[];
@@ -36,6 +36,9 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const [blurAreas, setBlurAreas] = useState<BlurArea[]>([]);
   const [blurStrength, setBlurStrength] = useState(10);
 
+  // Offscreen cache to prevent redundant PDF rendering and dimension resets
+  const offscreenCanvasesRef = useRef<HTMLCanvasElement[]>([]);
+
   const resetWatermark = useCallback(() => {
     setWatermarkMode("text");
     setWatermarkLayout("tiled");
@@ -49,6 +52,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     setImageScale(0.5);
     setBlurAreas([]);
     setBlurStrength(10);
+    offscreenCanvasesRef.current = [];
   }, []);
 
   const addBlurArea = useCallback((area: BlurArea) => {
@@ -62,33 +66,50 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const drawWatermark = useCallback(async (onlyFirstPage = false) => {
     if (canvases.length === 0) return;
 
-    // Redraw the base document first to clear any old watermark
-    await redrawDocument(canvases);
+    // 1. Ensure Offscreen Cache is ready
+    if (offscreenCanvasesRef.current.length !== canvases.length) {
+      // Create new offscreen canvases matching the document
+      offscreenCanvasesRef.current = canvases.map(c => {
+        const off = document.createElement("canvas");
+        // Initial render to set dimensions
+        return off;
+      });
+      
+      // Perform initial render of base document to the offscreen canvases
+      await redrawDocument(offscreenCanvasesRef.current);
+    }
 
-    // Limit to first page if requested (for performance)
+    // Limit pages for preview
     const pagesToDraw = onlyFirstPage ? canvases.slice(0, 1) : canvases;
 
-    const drawPromises = pagesToDraw.map(async (canvas, canvasIndex) => {
+    const drawPromises = pagesToDraw.map(async (canvas, index) => {
+      const offscreen = offscreenCanvasesRef.current[index];
+      if (!offscreen) return;
+
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (!context) return;
-      
-      // Clear the canvas properly before each draw to remove previous watermark layers
-      // without resetting the canvas dimensions
+
+      // Match dimensions to offscreen (original document size)
+      if (canvas.width !== offscreen.width || canvas.height !== offscreen.height) {
+        canvas.width = offscreen.width;
+        canvas.height = offscreen.height;
+      }
+
+      // Clear and draw base document from cache
       context.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // We need to re-draw the document content after clearing
-      // This part is slightly redundant but necessary for a clean watermark layer
-      await redrawDocument([canvas]);
+      context.drawImage(offscreen, 0, 0);
 
       // Draw blur areas if any
-      const pageBlurAreas = blurAreas.filter(a => a.pageIndex === canvasIndex);
+      const pageBlurAreas = blurAreas.filter(a => a.pageIndex === index);
       if (pageBlurAreas.length > 0) {
+        // Create a temporary canvas for this page's blur operation
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext("2d");
         if (tempCtx) {
           tempCtx.drawImage(canvas, 0, 0);
+          
           pageBlurAreas.forEach(area => {
             context.save();
             context.filter = `blur(${blurStrength}px)`;
@@ -104,17 +125,17 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
       if (watermarkMode === "blur") return;
 
-      if (watermarkMode === "text") {
-        context.save();
-        context.globalAlpha = watermarkOpacity;
-        
-        let angle = 0;
-        if (orientation === "diagonal") angle = -Math.PI / 4;
-        else if (orientation === "vertical") angle = -Math.PI / 2;
+      context.save();
+      context.globalAlpha = watermarkOpacity;
+      
+      let angle = 0;
+      if (orientation === "diagonal") angle = -Math.PI / 4;
+      else if (orientation === "vertical") angle = -Math.PI / 2;
 
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.rotate(angle);
-        
+      context.translate(canvas.width / 2, canvas.height / 2);
+      context.rotate(angle);
+
+      if (watermarkMode === "text") {
         context.fillStyle = watermarkColor;
         const responsiveFontSize = (canvas.width / 800) * fontSize;
         context.font = `${responsiveFontSize}px ${fontFamily}`;
@@ -138,18 +159,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
             }
           }
         }
-        context.restore();
       } else if (watermarkMode === "image" && watermarkImage) {
-        context.save();
-        context.globalAlpha = watermarkOpacity;
-
-        let angle = 0;
-        if (orientation === "diagonal") angle = -Math.PI / 4;
-        else if (orientation === "vertical") angle = -Math.PI / 2;
-
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.rotate(angle);
-
         const baseWidth = (canvas.width / 4) * imageScale;
         const aspectRatio = watermarkImage.height / watermarkImage.width;
         const imgWidth = baseWidth;
@@ -167,8 +177,9 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
             }
           }
         }
-        context.restore();
       }
+
+      context.restore();
     });
 
     await Promise.all(drawPromises);
@@ -178,7 +189,6 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   useEffect(() => {
     drawWatermark(true);
   }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
-
 
   return {
     watermarkMode,

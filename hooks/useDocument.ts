@@ -78,18 +78,17 @@ export function useDocument({ canvases }: UseDocumentProps) {
             setNumPages(doc.numPages);
           }
 
-          // Render pages only if they haven't been rendered yet or if it's a new document
+          // Wait for all pages to render if canvases are available
           const renderPromises = [];
           for (let i = 1; i <= doc.numPages; i++) {
             const canvas = currentCanvases[i - 1];
-            // CRITICAL: Only render if canvas is empty/uninitialized to avoid resetting dimensions during real-time updates
-            if (canvas && (canvas.width === 0 || canvas.height === 0)) {
+            if (canvas) {
+              const ctx = canvas.getContext("2d");
+              if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
               renderPromises.push(renderPdfPageToCanvas(doc, i, canvas));
             }
           }
-          if (renderPromises.length > 0) {
-            await Promise.all(renderPromises);
-          }
+          await Promise.all(renderPromises);
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "RenderingCancelledException") {

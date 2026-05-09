@@ -15,6 +15,7 @@ interface CanvasDisplayProps {
   isSelectionMode?: boolean;
   onAreaSelected?: (area: BlurArea) => void;
   blurAreas?: BlurArea[];
+  previewLimit?: number;
 }
 
 export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ 
@@ -22,7 +23,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   registerCanvas,
   isSelectionMode = false,
   onAreaSelected,
-  blurAreas = []
+  blurAreas = [],
+  previewLimit
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -30,6 +32,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const displayedPages = previewLimit ? Math.min(numPages, previewLimit) : numPages;
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent, pageIndex: number) => {
     if (!isSelectionMode) return;
@@ -114,7 +118,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       onMouseUp={handleMouseUp}
       onTouchEnd={handleMouseUp}
     >
-      {Array.from({ length: numPages }).map((_, index) => (
+      {Array.from({ length: displayedPages }).map((_, index) => (
+
         <div 
           key={index} 
           className="relative w-full flex justify-center bg-white shadow-lg rounded-lg overflow-hidden border border-slate-200"
