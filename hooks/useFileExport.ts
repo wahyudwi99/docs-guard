@@ -73,7 +73,7 @@ export function useFileExport({
 
       // Apply metadata stripping if user is Pro
       if (isPro && metadataOptions) {
-        if (metadataOptions.author || metadataOptions.nuclearClean) {
+        if (metadataOptions.stripAuthor || metadataOptions.nuclearClean) {
           pdf.setProperties({ author: "", creator: "" });
         }
         if (metadataOptions.nuclearClean) {
@@ -137,8 +137,7 @@ export function useFileExport({
         if (documentType === "image") {
           try {
             await Media.savePhoto({
-              path: base64Data,
-              albumName: "DocsGuard"
+              path: base64Data
             });
             console.log("Saved to Gallery");
             return true;
