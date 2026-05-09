@@ -173,6 +173,48 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
+      {/* PDF Security Section - Global for PDF regardless of watermark mode */}
+      {documentType === "pdf" && (
+        <div className="space-y-3 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-indigo-600">
+              <Lock className="h-3.5 w-3.5" />
+              {t('watermark_controls.pdf_security')}
+            </label>
+            {!isPro && (
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest rounded-full">
+                <Zap className="h-2.5 w-2.5 fill-amber-700" />
+                Pro Only
+              </span>
+            )}
+          </div>
+          
+          <div className="relative group" onClick={() => !isPro && onUpgrade?.()}>
+            <Input
+              id="pdf-password-global"
+              type="password"
+              value={password || ""}
+              onChange={(e) => setPassword?.(e.target.value)}
+              disabled={!isPro}
+              placeholder={isPro ? t('watermark_controls.password_placeholder') : "Upgrade to Pro to lock PDF"}
+              className={cn(
+                "h-12 bg-white border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 rounded-2xl transition-all duration-300 font-medium",
+                !isPro && "cursor-pointer opacity-60"
+              )}
+            />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
+              {!isPro ? <Lock className="h-4 w-4" /> : <Lock className="h-4 w-4 opacity-50" />}
+            </div>
+          </div>
+          {isPro && password && (
+            <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+              <Zap className="h-2.5 w-2.5 fill-emerald-600" />
+              AES-256 Encryption will be applied
+            </p>
+          )}
+        </div>
+      )}
+
       {watermarkMode === "text" && (
         <>
           {/* Text Input Group */}
@@ -195,48 +237,6 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               </div>
             </div>
           </div>
-
-          {/* PDF Security Section - Moved here for visibility */}
-          {documentType === "pdf" && (
-            <div className="space-y-3 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-indigo-600">
-                  <Lock className="h-3.5 w-3.5" />
-                  {t('watermark_controls.pdf_security')}
-                </label>
-                {!isPro && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest rounded-full">
-                    <Zap className="h-2.5 w-2.5 fill-amber-700" />
-                    Pro Only
-                  </span>
-                )}
-              </div>
-              
-              <div className="relative group" onClick={() => !isPro && onUpgrade?.()}>
-                <Input
-                  id="pdf-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword?.(e.target.value)}
-                  disabled={!isPro}
-                  placeholder={isPro ? t('watermark_controls.password_placeholder') : "Upgrade to Pro to lock PDF"}
-                  className={cn(
-                    "h-12 bg-white border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 rounded-2xl transition-all duration-300 font-medium",
-                    !isPro && "cursor-pointer opacity-60"
-                  )}
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
-                  {!isPro ? <Lock className="h-4 w-4" /> : <Lock className="h-4 w-4 opacity-50" />}
-                </div>
-              </div>
-              {isPro && password && (
-                <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
-                  <Zap className="h-2.5 w-2.5 fill-emerald-600" />
-                  AES-256 Encryption will be applied
-                </p>
-              )}
-            </div>
-          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-3">

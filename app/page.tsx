@@ -504,6 +504,7 @@ function HomeContent() {
                         blurStrength={blurStrength}
                         setBlurStrength={setBlurStrength}
                         isPro={isPro}
+                        documentType={documentType}
                         password={password}
                         setPassword={setPassword}
                         metadataOptions={metadataOptions}
