@@ -134,7 +134,6 @@ export function useFileExport({
         const base64Data = await blobToBase64(blob);
         
         // 1. Always save to Filesystem first (Documents folder)
-        // This ensures the file is in the "Files" app as requested
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
@@ -144,17 +143,28 @@ export function useFileExport({
         
         console.log("Saved to Filesystem:", savedFile.uri);
 
-        // 2. For images, ALSO try to save to Gallery
+        // 2. Additional handling per type
         if (documentType === "image") {
           try {
-            // Use the file URI from Filesystem which is more stable than passing base64
             await Media.savePhoto({
               path: savedFile.uri
             });
             console.log("Saved to Gallery");
           } catch (err) {
             console.error("Failed to save to Gallery:", err);
-            // Don't return false here, because it's already saved to Filesystem
+          }
+        } else if (documentType === "pdf") {
+          // On iOS, sometimes saving to Documents isn't enough to "see" it immediately
+          // Triggering a share dialog for PDF is the standard way to "Save to Files"
+          try {
+             await Share.share({
+               title: fileName,
+               text: "Your watermarked PDF is ready",
+               url: savedFile.uri,
+               dialogTitle: "Save or Share PDF",
+             });
+          } catch (err) {
+            console.error("Failed to trigger share for PDF:", err);
           }
         }
       }
@@ -179,7 +189,6 @@ export function useFileExport({
       const isNative = isCapacitorApp();
 
       if (!isNative) {
-        // Web share API if available
         if (navigator.share) {
           const file = new File([blob], fileName, { type: blob.type });
           await navigator.share({
@@ -189,15 +198,12 @@ export function useFileExport({
           });
           return true;
         } else {
-          // Fallback to download on web if share not supported
           saveAndOpenBlob(blob, fileName, blob.type);
           return true;
         }
       } else {
-        // Native Share
         const base64Data = await blobToBase64(blob);
         
-        // Write to cache directory for sharing
         const tempPath = `share-${Date.now()}-${fileName}`;
         const resultFile = await Filesystem.writeFile({
           path: tempPath,
@@ -212,9 +218,6 @@ export function useFileExport({
           dialogTitle: "Share Document",
         });
         
-        // Clean up temp file after some time or immediately?
-        // Capacitor Share usually doesn't need the file to persist after the dialog opens, 
-        // but some apps might read it later. Let's keep it in Cache.
         return true;
       }
     } catch (error) {
@@ -225,4 +228,6 @@ export function useFileExport({
 
   return { getPreviewUrls, saveToDevice, shareFile };
 }
+
+
 
