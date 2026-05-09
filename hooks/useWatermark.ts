@@ -67,11 +67,19 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     if (canvases.length === 0) return;
 
     // 1. Ensure Offscreen Cache is ready
-    if (offscreenCanvasesRef.current.length !== canvases.length) {
-      // Create new offscreen canvases matching the document
+    // We check length and also if the first offscreen canvas has actual dimensions
+    const isCacheReady = offscreenCanvasesRef.current.length === canvases.length && 
+                         offscreenCanvasesRef.current.every(c => c.width > 0);
+
+    if (!isCacheReady) {
+      // Create/Reset offscreen canvases
       offscreenCanvasesRef.current = canvases.map(c => {
         const off = document.createElement("canvas");
-        // Initial render to set dimensions
+        // We must set initial dimensions from the visible canvases if they have them
+        if (c.width > 0) {
+          off.width = c.width;
+          off.height = c.height;
+        }
         return off;
       });
       
