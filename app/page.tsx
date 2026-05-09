@@ -341,7 +341,6 @@ function HomeContent() {
                   addBlurArea(area);
                 }}
                 blurAreas={blurAreas}
-                previewLimit={activeTab === 'design' ? 1 : undefined}
               />
             </div>
           )}

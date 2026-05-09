@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight, Hash } from "lucide-react";
 
 interface BlurArea {
   x: number;
@@ -15,7 +16,6 @@ interface CanvasDisplayProps {
   isSelectionMode?: boolean;
   onAreaSelected?: (area: BlurArea) => void;
   blurAreas?: BlurArea[];
-  previewLimit?: number;
 }
 
 export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ 
@@ -23,162 +23,210 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   registerCanvas,
   isSelectionMode = false,
   onAreaSelected,
-  blurAreas = [],
-  previewLimit
+  blurAreas = []
 }) => {
+  const [currentPage, setCurrentPage] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
-  const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const displayedPages = previewLimit ? Math.min(numPages, previewLimit) : numPages;
+  const handleNext = () => {
+    if (currentPage < numPages - 1) setCurrentPage(prev => prev + 1);
+  };
 
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent, pageIndex: number) => {
+  const handlePrev = () => {
+    if (currentPage > 0) setCurrentPage(prev => prev - 1);
+  };
+
+  const handleJumpToPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCurrentPage(parseInt(e.target.value));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
-    
+
     setIsDragging(true);
-    setActivePageIndex(pageIndex);
-    
+
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
+
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    
+
     setStartPos({ x, y });
     setCurrentPos({ x, y });
   };
 
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging || activePageIndex === null) return;
-    
+    if (!isDragging) return;
+
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    // We need to get the rect of the active canvas
+
     const canvases = containerRef.current?.querySelectorAll('canvas');
-    if (!canvases || !canvases[activePageIndex]) return;
-    
-    const rect = canvases[activePageIndex].getBoundingClientRect();
+    if (!canvases || !canvases[currentPage]) return;
+
+    const rect = canvases[currentPage].getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
-    
+
     setCurrentPos({ x, y });
   };
 
   const handleMouseUp = () => {
-    if (!isDragging || activePageIndex === null || !onAreaSelected) {
+    if (!isDragging || !onAreaSelected) {
       setIsDragging(false);
-      setActivePageIndex(null);
       return;
     }
 
     const width = Math.abs(currentPos.x - startPos.x);
     const height = Math.abs(currentPos.y - startPos.y);
-    
-    // Only add if area is significant
+
     if (width > 5 && height > 5) {
       const x = Math.min(startPos.x, currentPos.x);
       const y = Math.min(startPos.y, currentPos.y);
-      
-      // We need to scale the coordinates back to the actual canvas resolution
+
       const canvases = containerRef.current?.querySelectorAll('canvas');
-      if (canvases && canvases[activePageIndex]) {
-        const canvas = canvases[activePageIndex];
+      if (canvases && canvases[currentPage]) {
+        const canvas = canvases[currentPage];
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
+
         onAreaSelected({
           x: x * scaleX,
           y: y * scaleY,
           width: width * scaleX,
           height: height * scaleY,
-          pageIndex: activePageIndex
+          pageIndex: currentPage
         });
       }
     }
-    
+
     setIsDragging(false);
-    setActivePageIndex(null);
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className={cn(
-        "flex flex-col gap-6 w-full max-h-[70vh] overflow-y-auto custom-scrollbar p-4 bg-slate-100/50 rounded-xl",
-        isSelectionMode && "cursor-crosshair"
-      )}
-      onMouseMove={handleMouseMove}
-      onTouchMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onTouchEnd={handleMouseUp}
-    >
-      {Array.from({ length: numPages }).map((_, index) => (
-        <div 
-          key={index} 
-          className={cn(
-            "relative w-full flex justify-center bg-white shadow-lg rounded-lg overflow-hidden border border-slate-200",
-            previewLimit !== undefined && index >= previewLimit && "hidden"
-          )}
-          onMouseDown={(e) => handleMouseDown(e, index)}
-          onTouchStart={(e) => handleMouseDown(e, index)}
-        >
-          <canvas
-            ref={(el) => registerCanvas(el, index)}
-            className="max-w-full h-auto"
-          />
+    <div className="w-full space-y-4">
+      {/* Navigation Controls */}
+      <div className="flex items-center justify-between bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-black/5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handlePrev}
+            disabled={currentPage === 0}
+            className="h-9 w-9 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all active:scale-90"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
 
-          
-          {/* Selection Overlay */}
-          {activePageIndex === index && isDragging && (
-            <div 
-              className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none"
-              style={{
-                left: Math.min(startPos.x, currentPos.x),
-                top: Math.min(startPos.y, currentPos.y),
-                width: Math.abs(currentPos.x - startPos.x),
-                height: Math.abs(currentPos.y - startPos.y),
-              }}
-            />
-          )}
-
-          {/* Existing Blur Areas visualization */}
-          {blurAreas.filter(a => a.pageIndex === index).map((area, i) => {
-            const canvas = containerRef.current?.querySelectorAll('canvas')[index];
-            if (!canvas) return null;
-            
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = rect.width / canvas.width;
-            const scaleY = rect.height / canvas.height;
-            
-            return (
-              <div 
-                key={i}
-                className="absolute border border-dashed border-rose-400 bg-rose-400/10 pointer-events-none"
-                style={{
-                  left: area.x * scaleX,
-                  top: area.y * scaleY,
-                  width: area.width * scaleX,
-                  height: area.height * scaleY,
-                }}
-              >
-                <div className="absolute -top-4 -left-px bg-rose-400 text-white text-[8px] px-1 font-bold rounded-t">
-                  Blur {i + 1}
-                </div>
-              </div>
-            );
-          })}
-
-          <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-md backdrop-blur-md">
-            Page {index + 1}
+          <div className="flex items-center gap-2 px-3 h-9 bg-white border border-slate-200 rounded-xl">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Page</span>
+            <span className="text-xs font-bold text-indigo-600 tabular-nums">{currentPage + 1}</span>
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">of</span>
+            <span className="text-xs font-bold text-slate-500 tabular-nums">{numPages}</span>
           </div>
+
+          <button 
+            onClick={handleNext}
+            disabled={currentPage === numPages - 1}
+            className="h-9 w-9 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all active:scale-90"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
-      ))}
+
+        <div className="flex items-center gap-2">
+           <div className="relative group">
+              <select 
+                value={currentPage}
+                onChange={handleJumpToPage}
+                className="h-9 pl-8 pr-4 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 outline-none appearance-none cursor-pointer hover:border-indigo-300 transition-colors"
+              >
+                {Array.from({ length: numPages }).map((_, i) => (
+                  <option key={i} value={i}>Go to Page {i + 1}</option>
+                ))}
+              </select>
+              <Hash className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+           </div>
+        </div>
+      </div>
+
+      <div 
+        ref={containerRef}
+        className={cn(
+          "relative flex items-center justify-center w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-hidden border border-black/5",
+          isSelectionMode && "cursor-crosshair"
+        )}
+        onMouseMove={handleMouseMove}
+        onTouchMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onTouchEnd={handleMouseUp}
+      >
+        {Array.from({ length: numPages }).map((_, index) => (
+          <div 
+            key={index} 
+            className={cn(
+              "relative w-full max-w-full flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute",
+              currentPage === index 
+                ? "opacity-100 scale-100 z-10 translate-x-0" 
+                : index < currentPage 
+                  ? "opacity-0 scale-90 -z-10 -translate-x-full" 
+                  : "opacity-0 scale-90 -z-10 translate-x-full"
+            )}
+            onMouseDown={(e) => handleMouseDown(e)}
+            onTouchStart={(e) => handleMouseDown(e)}
+          >
+            <canvas
+              ref={(el) => registerCanvas(el, index)}
+              className="max-w-full h-auto"
+            />
+
+            {/* Selection Overlay */}
+            {currentPage === index && isDragging && (
+              <div 
+                className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none"
+                style={{
+                  left: Math.min(startPos.x, currentPos.x),
+                  top: Math.min(startPos.y, currentPos.y),
+                  width: Math.abs(currentPos.x - startPos.x),
+                  height: Math.abs(currentPos.y - startPos.y),
+                }}
+              />
+            )}
+
+            {/* Existing Blur Areas visualization */}
+            {blurAreas.filter(a => a.pageIndex === index).map((area, i) => {
+              const canvas = containerRef.current?.querySelectorAll('canvas')[index];
+              if (!canvas) return null;
+
+              const rect = canvas.getBoundingClientRect();
+              const scaleX = rect.width / canvas.width;
+              const scaleY = rect.height / canvas.height;
+
+              return (
+                <div 
+                  key={i}
+                  className="absolute border border-dashed border-rose-400 bg-rose-400/10 pointer-events-none"
+                  style={{
+                    left: area.x * scaleX,
+                    top: area.y * scaleY,
+                    width: area.width * scaleX,
+                    height: area.height * scaleY,
+                  }}
+                >
+                  <div className="absolute -top-4 -left-px bg-rose-400 text-white text-[8px] px-1 font-bold rounded-t">
+                    Blur {i + 1}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
+
