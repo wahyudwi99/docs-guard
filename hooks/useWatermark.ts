@@ -185,9 +185,9 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     await Promise.all(drawPromises);
   }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
-  // Redraw watermark (only first page for real-time)
+  // Redraw watermark for all pages to support carousel navigation
   useEffect(() => {
-    drawWatermark(true);
+    drawWatermark(false);
   }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   return {
