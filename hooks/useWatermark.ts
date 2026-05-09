@@ -98,18 +98,17 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
       if (watermarkMode === "blur") return;
 
-      context.save();
-      context.globalAlpha = watermarkOpacity;
-      
-      let angle = 0;
-      if (orientation === "diagonal") angle = -Math.PI / 4;
-      else if (orientation === "vertical") angle = -Math.PI / 2;
-
-      context.translate(canvas.width / 2, canvas.height / 2);
-      context.rotate(angle);
-      context.translate(-canvas.width / 2, -canvas.height / 2);
-
       if (watermarkMode === "text") {
+        context.save();
+        context.globalAlpha = watermarkOpacity;
+        
+        let angle = 0;
+        if (orientation === "diagonal") angle = -Math.PI / 4;
+        else if (orientation === "vertical") angle = -Math.PI / 2;
+
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate(angle);
+        
         context.fillStyle = watermarkColor;
         const responsiveFontSize = (canvas.width / 800) * fontSize;
         context.font = `${responsiveFontSize}px ${fontFamily}`;
@@ -117,43 +116,55 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
         context.textBaseline = "middle";
 
         if (watermarkLayout === "single") {
-          context.fillText(watermarkText, canvas.width / 2, canvas.height / 2);
+          context.fillText(watermarkText, 0, 0);
         } else {
           const metrics = context.measureText(watermarkText);
           const spaceWidth = context.measureText("  ").width;
           const textWidth = metrics.width;
           const textHeight = responsiveFontSize;
           
-          const horizontalSpacing = textWidth + spaceWidth; 
-          const verticalSpacing = textHeight * 2.5;
+          const horizontalSpacing = textWidth + spaceWidth * 4; 
+          const verticalSpacing = textHeight * 4;
 
-          for (let i = -canvas.width * 2; i < canvas.width * 3; i += horizontalSpacing) {
-            for (let j = -canvas.height * 2; j < canvas.height * 3; j += verticalSpacing) {
+          // Drawing relative to the rotated center
+          for (let i = -canvas.width * 1.5; i < canvas.width * 1.5; i += horizontalSpacing) {
+            for (let j = -canvas.height * 1.5; j < canvas.height * 1.5; j += verticalSpacing) {
               context.fillText(watermarkText, i, j);
             }
           }
         }
+        context.restore();
       } else if (watermarkMode === "image" && watermarkImage) {
+        context.save();
+        context.globalAlpha = watermarkOpacity;
+
+        let angle = 0;
+        if (orientation === "diagonal") angle = -Math.PI / 4;
+        else if (orientation === "vertical") angle = -Math.PI / 2;
+
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate(angle);
+
         const baseWidth = (canvas.width / 4) * imageScale;
         const aspectRatio = watermarkImage.height / watermarkImage.width;
         const imgWidth = baseWidth;
         const imgHeight = baseWidth * aspectRatio;
 
         if (watermarkLayout === "single") {
-          context.drawImage(watermarkImage, (canvas.width / 2) - (imgWidth / 2), (canvas.height / 2) - (imgHeight / 2), imgWidth, imgHeight);
+          context.drawImage(watermarkImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
         } else {
-          const horizontalSpacing = imgWidth * 2;
-          const verticalSpacing = imgHeight * 2.5;
+          const horizontalSpacing = imgWidth * 2.5;
+          const verticalSpacing = imgHeight * 3;
 
-          for (let i = -canvas.width * 2; i < canvas.width * 3; i += horizontalSpacing) {
-            for (let j = -canvas.height * 2; j < canvas.height * 3; j += verticalSpacing) {
+          for (let i = -canvas.width * 1.5; i < canvas.width * 1.5; i += horizontalSpacing) {
+            for (let j = -canvas.height * 1.5; j < canvas.height * 1.5; j += verticalSpacing) {
               context.drawImage(watermarkImage, i - imgWidth / 2, j - imgHeight / 2, imgWidth, imgHeight);
             }
           }
         }
+        context.restore();
       }
 
-      context.restore();
     });
 
     await Promise.all(drawPromises);
