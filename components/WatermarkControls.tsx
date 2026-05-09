@@ -29,13 +29,6 @@ interface WatermarkControlsProps {
   removeBlurArea: (index: number) => void;
   password?: string;
   setPassword?: (password: string) => void;
-  metadataOptions: {
-    stripAuthor: boolean;
-    stripCreationDate: boolean;
-    stripGPS: boolean;
-    nuclearClean: boolean;
-  };
-  setMetadataOptions: (options: any) => void;
   isPro?: boolean;
   onUpgrade?: () => void;
   documentType?: "image" | "pdf" | null;
@@ -75,8 +68,6 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   removeBlurArea,
   password,
   setPassword,
-  metadataOptions,
-  setMetadataOptions,
   isPro,
   onUpgrade,
   documentType,
@@ -93,18 +84,8 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
     }
   };
 
-  const toggleMetadata = (key: keyof typeof metadataOptions) => {
-    if (!isPro) {
-      onUpgrade?.();
-      return;
-    }
-    setMetadataOptions((prev: any) => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
   return (
+
     <div className="w-full space-y-6 p-1">
       {/* Mode Switcher */}
       <div className="space-y-3">
@@ -410,84 +391,6 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           </div>
         </div>
       )}
-
-      {/* Metadata Stripper Section */}
-      <div className="space-y-4 pt-2 border-t border-black/5">
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
-            <Settings2 className="h-3.5 w-3.5" />
-            {t('watermark_controls.metadata_stripper.title')}
-          </label>
-          {!isPro && (
-            <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest rounded-full">
-              <Zap className="h-2.5 w-2.5 fill-amber-700" />
-              Pro Only
-            </span>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => toggleMetadata('stripAuthor')}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-2xl border transition-all text-left",
-              metadataOptions.stripAuthor 
-                ? "bg-indigo-50 border-indigo-200 text-indigo-700" 
-                : "bg-black/5 border-transparent text-slate-500 opacity-60"
-            )}
-          >
-            <UserX className="h-4 w-4 shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">
-              {t('watermark_controls.metadata_stripper.strip_author')}
-            </span>
-          </button>
-
-          <button
-            onClick={() => toggleMetadata('stripCreationDate')}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-2xl border transition-all text-left",
-              metadataOptions.stripCreationDate 
-                ? "bg-indigo-50 border-indigo-200 text-indigo-700" 
-                : "bg-black/5 border-transparent text-slate-500 opacity-60"
-            )}
-          >
-            <CalendarX className="h-4 w-4 shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">
-              {t('watermark_controls.metadata_stripper.strip_creation_date')}
-            </span>
-          </button>
-
-          <button
-            onClick={() => toggleMetadata('stripGPS')}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-2xl border transition-all text-left",
-              metadataOptions.stripGPS 
-                ? "bg-indigo-50 border-indigo-200 text-indigo-700" 
-                : "bg-black/5 border-transparent text-slate-500 opacity-60"
-            )}
-          >
-            <MapPinOff className="h-4 w-4 shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">
-              {t('watermark_controls.metadata_stripper.strip_gps')}
-            </span>
-          </button>
-
-          <button
-            onClick={() => toggleMetadata('nuclearClean')}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-2xl border transition-all text-left",
-              metadataOptions.nuclearClean 
-                ? "bg-rose-50 border-rose-200 text-rose-700" 
-                : "bg-black/5 border-transparent text-slate-500 opacity-60"
-            )}
-          >
-            <FileX2 className="h-4 w-4 shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">
-              {t('watermark_controls.metadata_stripper.nuclear_clean')}
-            </span>
-          </button>
-        </div>
-      </div>
 
       {/* Common Orientation Switcher */}
       {watermarkMode !== "blur" && (

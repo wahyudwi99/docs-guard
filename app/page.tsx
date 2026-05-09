@@ -54,12 +54,6 @@ function HomeContent() {
     }
   }, [session, showLoginModal]);
   const [password, setPassword] = useState("");
-  const [metadataOptions, setMetadataOptions] = useState({
-    stripAuthor: true,
-    stripCreationDate: true,
-    stripGPS: true,
-    nuclearClean: false,
-  });
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -168,31 +162,27 @@ function HomeContent() {
   }, [clearDocument, clearCanvases, resetWatermark]);
 
   // File Export logic - Passing canvases array
-  const { getPreviewUrls, saveToDevice, shareFile } = useFileExport({ 
+  const { saveToDevice, shareFile } = useFileExport({ 
     canvases, 
     watermarkText,
     documentType,
     password,
     isPro,
-    metadataOptions,
     file
   });
 
   const handleOpenPreview = useCallback(async () => {
     setIsSaving(true); // Show a loading state if possible
     try {
-      const urls = await getPreviewUrls(drawWatermark);
-      if (urls && urls.length > 0) {
-        setPreviewUrls(urls);
-      } else {
-        console.error("Failed to generate Preview URLs");
-      }
+      // In real-time mode, we don't need preview URLs anymore, 
+      // but we keep the handler if needed for logic transition
     } catch (err) {
       console.error("Preview error:", err);
     } finally {
       setIsSaving(false);
     }
-  }, [getPreviewUrls, drawWatermark]);
+  }, [drawWatermark]);
+
 
   const handleFinalDownload = useCallback(async () => {
     setIsSaving(true);
@@ -488,8 +478,6 @@ function HomeContent() {
                         documentType={documentType}
                         password={password}
                         setPassword={setPassword}
-                        metadataOptions={metadataOptions}
-                        setMetadataOptions={setMetadataOptions}
                      />
 
                      <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">

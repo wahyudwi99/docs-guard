@@ -71,23 +71,16 @@ export function useFileExport({
         pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
       });
 
-      // AUTOMATIC PRIVACY: Always strip library and producer info by default
+      // AUTOMATIC SILENT PRIVACY: Always strip all identifying metadata by default
       const properties: any = {
         author: " ",
         creator: " ",
         producer: " ",
         title: " ",
         subject: " ",
-        keywords: " "
+        keywords: " ",
+        creationDate: new Date(0) // Reset to 1970 to strip actual creation time
       };
-
-      // Advanced overrides if user is Pro
-      if (isPro && metadataOptions) {
-        if (metadataOptions.stripCreationDate || metadataOptions.nuclearClean) {
-          // Reset to epoch if specifically requested
-          properties.creationDate = new Date(0); 
-        }
-      }
 
       pdf.setProperties(properties);
 
