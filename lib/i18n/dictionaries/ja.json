@@ -47,6 +47,7 @@
   "watermark_controls": {
     "type": "タイプ",
     "layout": "レイアウト",
+    "watermark_mode": "透かし",
     "text_mode": "テキスト",
     "image_mode": "画像",
     "tiled": "タイル",

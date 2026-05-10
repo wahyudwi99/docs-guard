@@ -47,6 +47,7 @@
   "watermark_controls": {
     "type": "Tipo",
     "layout": "Diseño",
+    "watermark_mode": "Marca de Agua",
     "text_mode": "Texto",
     "image_mode": "Imagen",
     "blur_mode": "Desenfocar",

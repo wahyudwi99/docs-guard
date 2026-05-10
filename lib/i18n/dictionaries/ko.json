@@ -47,6 +47,7 @@
   "watermark_controls": {
     "type": "유형",
     "layout": "레이아웃",
+    "watermark_mode": "워터마크",
     "text_mode": "텍스트",
     "image_mode": "이미지",
     "tiled": "바둑판",

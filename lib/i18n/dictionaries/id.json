@@ -47,8 +47,9 @@
     "secure_note": "Aman End-to-End"
   },
   "watermark_controls": {
-    "type": "Tipe",
+    "type": "Jenis",
     "layout": "Tata Letak",
+    "watermark_mode": "Watermark",
     "text_mode": "Teks",
     "image_mode": "Gambar",
     "blur_mode": "Sensor",

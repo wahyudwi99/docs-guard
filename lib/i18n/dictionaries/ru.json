@@ -47,6 +47,7 @@
   "watermark_controls": {
     "type": "Тип",
     "layout": "Расположение",
+    "watermark_mode": "Водяной знак",
     "text_mode": "Текст",
     "image_mode": "Изображение",
     "tiled": "Плитка",

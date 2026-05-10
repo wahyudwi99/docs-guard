@@ -49,6 +49,7 @@
   "watermark_controls": {
     "type": "Type",
     "layout": "Layout",
+    "watermark_mode": "Watermark",
     "text_mode": "Text",
     "image_mode": "Image",
     "blur_mode": "Blur",

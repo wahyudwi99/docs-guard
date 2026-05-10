@@ -47,6 +47,7 @@
   "watermark_controls": {
     "type": "类型",
     "layout": "布局",
+    "watermark_mode": "水印",
     "text_mode": "文本",
     "image_mode": "图像",
     "tiled": "平铺",

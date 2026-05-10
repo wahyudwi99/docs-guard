@@ -7,7 +7,8 @@ interface UseWatermarkProps {
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
-type WatermarkMode = "text" | "image" | "blur";
+type WatermarkMode = "watermark" | "blur";
+type WatermarkType = "text" | "image";
 type WatermarkLayout = "tiled" | "single";
 
 interface BlurArea {
@@ -19,7 +20,8 @@ interface BlurArea {
 }
 
 export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
-  const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("text");
+  const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("watermark");
+  const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
   const [watermarkText, setWatermarkText] = useState("DocsGuard");
   const [watermarkColor, setWatermarkColor] = useState("#000000");
@@ -40,7 +42,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const offscreenCanvasesRef = useRef<HTMLCanvasElement[]>([]);
 
   const resetWatermark = useCallback(() => {
-    setWatermarkMode("text");
+    setWatermarkMode("watermark");
+    setWatermarkType("text");
     setWatermarkLayout("tiled");
     setWatermarkText("DocsGuard");
     setWatermarkColor("#000000");
@@ -142,7 +145,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       context.translate(canvas.width / 2, canvas.height / 2);
       context.rotate(angle);
 
-      if (watermarkMode === "text") {
+      if (watermarkType === "text") {
         context.fillStyle = watermarkColor;
         const responsiveFontSize = (canvas.width / 800) * fontSize;
         context.font = `${responsiveFontSize}px ${fontFamily}`;
@@ -166,7 +169,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
             }
           }
         }
-      } else if (watermarkMode === "image" && watermarkImage) {
+      } else if (watermarkType === "image" && watermarkImage) {
         const baseWidth = (canvas.width / 4) * imageScale;
         const aspectRatio = watermarkImage.height / watermarkImage.width;
         const imgWidth = baseWidth;
@@ -190,16 +193,18 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     });
 
     await Promise.all(drawPromises);
-  }, [canvases, watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
+  }, [canvases, watermarkMode, watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
   // Redraw watermark for all pages to support carousel navigation
   useEffect(() => {
     drawWatermark(false);
-  }, [watermarkMode, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
+  }, [watermarkMode, watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   return {
     watermarkMode,
     setWatermarkMode,
+    watermarkType,
+    setWatermarkType,
     watermarkLayout,
     setWatermarkLayout,
     watermarkText,

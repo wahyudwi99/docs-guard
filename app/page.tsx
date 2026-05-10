@@ -100,6 +100,8 @@ function HomeContent() {
   const {
     watermarkMode,
     setWatermarkMode,
+    watermarkType,
+    setWatermarkType,
     watermarkLayout,
     setWatermarkLayout,
     watermarkText,
@@ -452,6 +454,8 @@ function HomeContent() {
                      <WatermarkControls
                         watermarkMode={watermarkMode}
                         setWatermarkMode={setWatermarkMode}
+                        watermarkType={watermarkType}
+                        setWatermarkType={setWatermarkType}
                         watermarkLayout={watermarkLayout}
                         setWatermarkLayout={setWatermarkLayout}
                         watermarkText={watermarkText}

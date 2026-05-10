@@ -6,8 +6,10 @@ import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as Ima
 import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
-  watermarkMode: "text" | "image" | "blur";
-  setWatermarkMode: (mode: "text" | "image" | "blur") => void;
+  watermarkMode: "watermark" | "blur";
+  setWatermarkMode: (mode: "watermark" | "blur") => void;
+  watermarkType: "text" | "image";
+  setWatermarkType: (type: "text" | "image") => void;
   watermarkLayout: "tiled" | "single";
   setWatermarkLayout: (layout: "tiled" | "single") => void;
   watermarkText: string;
@@ -47,6 +49,8 @@ import { useI18n } from "@/hooks/useI18n";
 export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
   watermarkMode,
   setWatermarkMode,
+  watermarkType,
+  setWatermarkType,
   watermarkLayout,
   setWatermarkLayout,
   watermarkText,
@@ -95,22 +99,13 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </label>
         <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
           <button
-            onClick={() => setWatermarkMode("text")}
+            onClick={() => setWatermarkMode("watermark")}
             className={cn(
               "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "text" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              watermarkMode === "watermark" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
-            {t('watermark_controls.text_mode')}
-          </button>
-          <button
-            onClick={() => setWatermarkMode("image")}
-            className={cn(
-              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "image" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            {t('watermark_controls.image_mode')}
+            {t('watermark_controls.watermark_mode')}
           </button>
           <button
             onClick={() => setWatermarkMode("blur")}
@@ -124,6 +119,36 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Sub-mode switcher for Watermark */}
+      {watermarkMode === "watermark" && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <Settings2 className="h-3.5 w-3.5" />
+            Watermark Type
+          </label>
+          <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
+            <button
+              onClick={() => setWatermarkType("text")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkType === "text" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {t('watermark_controls.text_mode')}
+            </button>
+            <button
+              onClick={() => setWatermarkType("image")}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                watermarkType === "image" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {t('watermark_controls.image_mode')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {watermarkMode !== "blur" && (
         <div className="space-y-3">
@@ -196,7 +221,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {watermarkMode === "text" && (
+      {watermarkMode === "watermark" && watermarkType === "text" && (
         <>
           {/* Text Input Group */}
           <div className="space-y-3">
@@ -282,7 +307,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </>
       )}
 
-      {watermarkMode === "image" && (
+      {watermarkMode === "watermark" && watermarkType === "image" && (
         <>
           {/* Image Upload Group */}
           <div className="space-y-3">
