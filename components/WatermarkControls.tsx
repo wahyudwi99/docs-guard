@@ -6,8 +6,8 @@ import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as Ima
 import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
-  watermarkMode: "watermark" | "blur";
-  setWatermarkMode: (mode: "watermark" | "blur") => void;
+  watermarkMode: "watermark" | "blur" | "password";
+  setWatermarkMode: (mode: "watermark" | "blur" | "password") => void;
   watermarkType: "text" | "image";
   setWatermarkType: (type: "text" | "image") => void;
   watermarkLayout: "tiled" | "single";
@@ -117,6 +117,17 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
             {t('watermark_controls.blur_mode')}
             {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
           </button>
+          <button
+            onClick={() => documentType === "pdf" && setWatermarkMode("password")}
+            disabled={documentType !== "pdf"}
+            className={cn(
+              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:grayscale",
+              watermarkMode === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+            )}
+          >
+            {t('watermark_controls.pdf_password')}
+            {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
+          </button>
         </div>
       </div>
 
@@ -150,7 +161,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {watermarkMode !== "blur" && (
+      {watermarkMode !== "blur" && watermarkMode !== "password" && (
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -179,13 +190,13 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {/* PDF Security Section - Global for PDF regardless of watermark mode */}
-      {documentType === "pdf" && (
-        <div className="space-y-3 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50">
+      {/* PDF Password Content Section */}
+      {watermarkMode === "password" && (
+        <div className="space-y-3 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-indigo-600">
               <Lock className="h-3.5 w-3.5" />
-              {t('watermark_controls.pdf_security')}
+              {t('watermark_controls.pdf_password')}
             </label>
             {!isPro && (
               <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest rounded-full">

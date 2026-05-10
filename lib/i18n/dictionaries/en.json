@@ -74,7 +74,7 @@
     "visibility": "Visibility",
     "subtle": "Subtle",
     "visible": "Visible",
-    "pdf_security": "PDF Security",
+    "pdf_password": "PDF Password",
     "password_placeholder": "Set PDF Open Password...",
     "metadata_stripper": {
       "title": "Metadata Stripper",

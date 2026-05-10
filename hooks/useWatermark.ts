@@ -7,7 +7,7 @@ interface UseWatermarkProps {
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
-type WatermarkMode = "watermark" | "blur";
+type WatermarkMode = "watermark" | "blur" | "password";
 type WatermarkType = "text" | "image";
 type WatermarkLayout = "tiled" | "single";
 

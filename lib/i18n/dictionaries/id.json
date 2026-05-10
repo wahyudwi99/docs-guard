@@ -74,7 +74,7 @@
     "visibility": "Visibilitas",
     "subtle": "Halus",
     "visible": "Terlihat",
-    "pdf_security": "Keamanan PDF",
+    "pdf_password": "PDF Password",
     "password_placeholder": "Atur Kata Sandi Buka PDF...",
     "metadata_stripper": {
       "title": "Pembersih Metadata",
