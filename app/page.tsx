@@ -357,7 +357,7 @@ function HomeContent() {
               
               {/* Header Section */}
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black text-[#1C1C1E] tracking-tight">{t('nav.tools')}</h2>
+                <h2 className="text-2xl font-black text-purple-600 tracking-tight">{t('nav.tools')}</h2>
                 <div className="text-indigo-600">
                   <LanguageSwitcher />
                 </div>

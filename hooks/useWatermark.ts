@@ -126,45 +126,30 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
           context.save();
           
-          // Create a small temporary canvas just for this area
-          const areaCanvas = document.createElement("canvas");
-          areaCanvas.width = aw;
-          areaCanvas.height = ah;
-          const areaCtx = areaCanvas.getContext("2d");
+          // Use a more aggressive downscaling factor for visible blur
+          // If strength is 10, factor is 8x. If strength is 20, factor is 16x.
+          const scaleDownFactor = Math.max(2, (blurStrength / 10) * 8);
           
-          if (areaCtx) {
-            // 1. Copy the unblurred area from the document cache (offscreen)
-            areaCtx.drawImage(
-              offscreen,
-              ax, ay, aw, ah,
-              0, 0, aw, ah
-            );
+          const tempW = Math.max(1, Math.floor(aw / scaleDownFactor));
+          const tempH = Math.max(1, Math.floor(ah / scaleDownFactor));
+          
+          // 1. Create a small temporary canvas for the downscaled area
+          const blurCanvas = document.createElement("canvas");
+          blurCanvas.width = tempW;
+          blurCanvas.height = tempH;
+          const blurCtx = blurCanvas.getContext("2d");
+          
+          if (blurCtx) {
+            // 2. Draw from the MAIN canvas (which already has the document)
+            // This is safer than offscreen if there are any sync issues
+            blurCtx.imageSmoothingEnabled = true;
+            blurCtx.imageSmoothingQuality = "high";
+            blurCtx.drawImage(canvas, ax, ay, aw, ah, 0, 0, tempW, tempH);
             
-            // 2. Create a "blur" effect by scaling down and up (highly compatible)
-            // We use a small factor based on blurStrength
-            const blurFactor = Math.max(2, Math.floor(20 - (blurStrength / 2))); 
-            // The higher the blurStrength, the smaller the intermediate canvas
-            const tempW = Math.max(1, Math.floor(aw / (blurStrength / 2)));
-            const tempH = Math.max(1, Math.floor(ah / (blurStrength / 2)));
-            
-            const blurCanvas = document.createElement("canvas");
-            blurCanvas.width = tempW;
-            blurCanvas.height = tempH;
-            const blurCtx = blurCanvas.getContext("2d");
-            
-            if (blurCtx) {
-              // Turn off image smoothing for the "downscale" to get sharper pixelated base
-              // then let the "upscale" with smoothing create the blur
-              blurCtx.imageSmoothingEnabled = true;
-              blurCtx.drawImage(areaCanvas, 0, 0, aw, ah, 0, 0, tempW, tempH);
-              
-              // 3. Draw the blurred (upscaled) area back to the main canvas
-              context.save();
-              context.imageSmoothingEnabled = true;
-              context.imageSmoothingQuality = "high";
-              context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax, ay, aw, ah);
-              context.restore();
-            }
+            // 3. Draw it back to the main canvas, upscaled
+            context.imageSmoothingEnabled = true;
+            context.imageSmoothingQuality = "high";
+            context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax, ay, aw, ah);
           }
           
           context.restore();
