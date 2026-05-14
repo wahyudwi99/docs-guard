@@ -426,7 +426,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               <Slider
                 id="blur-strength"
                 min={1}
-                max={11}
+                max={25}
                 step={1}
                 value={blurStrength}
                 onValueChange={setBlurStrength}
