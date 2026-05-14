@@ -96,7 +96,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       const offscreen = offscreenCanvasesRef.current[index];
       if (!offscreen) return;
 
-      const context = canvas.getContext("2d", { willReadFrequently: true });
+      const context = canvas.getContext("2d");
       if (!context) return;
 
       // Match dimensions to offscreen (original document size)

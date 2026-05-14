@@ -29,14 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize Social Login if on native platform
-    if (Capacitor.isNativePlatform()) {
-      SocialLogin.initialize({
-        google: {
-          webClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-        },
-      });
-    }
+    // Restore session on mount
     restoreSession();
   }, []);
 

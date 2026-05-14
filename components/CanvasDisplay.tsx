@@ -168,11 +168,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
           <div 
             key={index} 
             className={cn(
-              "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute",
+              "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
               currentPage === index 
                 ? "opacity-100 scale-100 z-10 translate-x-0" 
-                : index < currentPage 
-                  ? "opacity-0 scale-90 -z-10 -translate-x-full" 
+          ...                  ? "opacity-0 scale-90 -z-10 -translate-x-full" 
                   : "opacity-0 scale-90 -z-10 translate-x-full"
             )}
             onMouseDown={(e) => handleMouseDown(e)}
