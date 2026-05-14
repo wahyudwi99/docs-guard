@@ -20,7 +20,7 @@ interface BlurArea {
 }
 
 export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
-  const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("watermark");
+  const [designTab, setDesignTab] = useState<WatermarkMode>("watermark");
   const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
   const [watermarkText, setWatermarkText] = useState("DocsGuard");
@@ -42,7 +42,7 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
   const offscreenCanvasesRef = useRef<HTMLCanvasElement[]>([]);
 
   const resetWatermark = useCallback(() => {
-    setWatermarkMode("watermark");
+    setDesignTab("watermark");
     setWatermarkType("text");
     setWatermarkLayout("tiled");
     setWatermarkText("DocsGuard");
@@ -133,8 +133,6 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
         }
       }
 
-      if (watermarkMode === "blur") return;
-
       context.save();
       context.globalAlpha = watermarkOpacity;
       
@@ -193,16 +191,16 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     });
 
     await Promise.all(drawPromises);
-  }, [canvases, watermarkMode, watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
+  }, [canvases, watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, redrawDocument]);
 
   // Redraw watermark for all pages to support carousel navigation
   useEffect(() => {
     drawWatermark(false);
-  }, [watermarkMode, watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
+  }, [watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   return {
-    watermarkMode,
-    setWatermarkMode,
+    designTab,
+    setDesignTab,
     watermarkType,
     setWatermarkType,
     watermarkLayout,
@@ -232,4 +230,3 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
     drawWatermark,
   };
 }
-

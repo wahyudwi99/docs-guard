@@ -6,8 +6,8 @@ import { Type, Palette, Eye, AlignLeft, TextCursor, Hash, RotateCw, Image as Ima
 import { cn } from "@/lib/utils";
 
 interface WatermarkControlsProps {
-  watermarkMode: "watermark" | "blur" | "password";
-  setWatermarkMode: (mode: "watermark" | "blur" | "password") => void;
+  designTab: "watermark" | "blur" | "password";
+  setDesignTab: (mode: "watermark" | "blur" | "password") => void;
   watermarkType: "text" | "image";
   setWatermarkType: (type: "text" | "image") => void;
   watermarkLayout: "tiled" | "single";
@@ -47,8 +47,8 @@ const FONTS = [
 import { useI18n } from "@/hooks/useI18n";
 
 export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
-  watermarkMode,
-  setWatermarkMode,
+  designTab,
+  setDesignTab,
   watermarkType,
   setWatermarkType,
   watermarkLayout,
@@ -99,40 +99,49 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </label>
         <div className="flex p-1 bg-black/5 rounded-[16px] gap-1">
           <button
-            onClick={() => setWatermarkMode("watermark")}
+            onClick={() => setDesignTab("watermark")}
             className={cn(
               "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "watermark" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              designTab === "watermark" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
             {t('watermark_controls.watermark_mode')}
+            {((watermarkType === 'text' && watermarkText) || (watermarkType === 'image')) && (
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            )}
           </button>
           <button
-            onClick={() => setWatermarkMode("blur")}
+            onClick={() => setDesignTab("blur")}
             className={cn(
               "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              watermarkMode === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
             {t('watermark_controls.blur_mode')}
+            {blurAreas.length > 0 && (
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            )}
             {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
           </button>
           <button
-            onClick={() => documentType === "pdf" && setWatermarkMode("password")}
+            onClick={() => documentType === "pdf" && setDesignTab("password")}
             disabled={documentType !== "pdf"}
             className={cn(
               "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:grayscale",
-              watermarkMode === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              designTab === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
             {t('watermark_controls.pdf_password')}
+            {password && (
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            )}
             {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
           </button>
         </div>
       </div>
 
       {/* Sub-mode switcher for Watermark */}
-      {watermarkMode === "watermark" && (
+      {designTab === "watermark" && (
         <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <Settings2 className="h-3.5 w-3.5" />
@@ -161,7 +170,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {watermarkMode !== "blur" && watermarkMode !== "password" && (
+      {designTab === "watermark" && (
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -191,7 +200,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
       )}
 
       {/* PDF Password Content Section */}
-      {watermarkMode === "password" && (
+      {designTab === "password" && (
         <div className="space-y-3 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-indigo-600">
@@ -232,7 +241,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {watermarkMode === "watermark" && watermarkType === "text" && (
+      {designTab === "watermark" && watermarkType === "text" && (
         <>
           {/* Text Input Group */}
           <div className="space-y-3">
@@ -318,7 +327,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </>
       )}
 
-      {watermarkMode === "watermark" && watermarkType === "image" && (
+      {designTab === "watermark" && watermarkType === "image" && (
         <>
           {/* Image Upload Group */}
           <div className="space-y-3">
@@ -358,7 +367,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </>
       )}
 
-      {watermarkMode === "blur" && (
+      {designTab === "blur" && (
         <div className="space-y-4">
           <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex gap-3">
             <BoxSelect className="h-5 w-5 text-indigo-600 shrink-0" />
@@ -428,8 +437,8 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {/* Common Orientation Switcher */}
-      {watermarkMode !== "blur" && (
+      {/* Common Orientation Switcher - Keep visible for Watermark editing */}
+      {designTab === "watermark" && (
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
             <RotateCw className="h-3 w-3" />
@@ -454,8 +463,8 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
         </div>
       )}
 
-      {/* Opacity Slider Group */}
-      {watermarkMode !== "blur" && (
+      {/* Opacity Slider Group - Keep visible for Watermark editing */}
+      {designTab === "watermark" && (
         <div className="space-y-4 bg-black/5 p-5 rounded-[24px] border border-black/[0.02]">
           <div className="flex items-center justify-between">
             <label htmlFor="watermark-opacity" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">

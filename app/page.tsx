@@ -98,8 +98,8 @@ function HomeContent() {
 
   // Watermark management
   const {
-    watermarkMode,
-    setWatermarkMode,
+    designTab,
+    setDesignTab,
     watermarkType,
     setWatermarkType,
     watermarkLayout,
@@ -152,8 +152,11 @@ function HomeContent() {
 
   // Switch to design tab when file is uploaded
   useEffect(() => {
-    if (file) setActiveTab('design');
-  }, [file]);
+    if (file) {
+      setActiveTab('design');
+      setDesignTab('watermark');
+    }
+  }, [file, setActiveTab, setDesignTab]);
 
   const handleNewFile = useCallback(() => {
     clearDocument();
@@ -329,7 +332,7 @@ function HomeContent() {
                   <Layout className="h-4 w-4" />
                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_section.pdf')} / {t('upload_section.image')} Real-time Preview</span>
                 </div>
-                {watermarkMode === 'blur' && (
+                {designTab === 'blur' && (
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
                     {t('watermark_controls.blur_instruction')}
                   </p>
@@ -338,7 +341,7 @@ function HomeContent() {
               <CanvasDisplay 
                 numPages={numPages} 
                 registerCanvas={registerCanvas} 
-                isSelectionMode={watermarkMode === 'blur'}
+                isSelectionMode={designTab === 'blur'}
                 onAreaSelected={(area) => {
                   addBlurArea(area);
                 }}
@@ -452,8 +455,8 @@ function HomeContent() {
                      </div>
                      
                      <WatermarkControls
-                        watermarkMode={watermarkMode}
-                        setWatermarkMode={setWatermarkMode}
+                        designTab={designTab}
+                        setDesignTab={setDesignTab}
                         watermarkType={watermarkType}
                         setWatermarkType={setWatermarkType}
                         watermarkLayout={watermarkLayout}
