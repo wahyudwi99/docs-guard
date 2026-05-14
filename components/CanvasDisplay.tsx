@@ -47,6 +47,11 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
+    // Prevent default on touchstart to stop scroll initiation on iOS
+    if ('touches' in e && e.cancelable) {
+      e.preventDefault();
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     setIsDragging(true);
 
@@ -63,6 +68,11 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
 
+    // Prevent scrolling on touch devices while dragging
+    if ('touches' in e && e.cancelable) {
+      e.preventDefault();
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -72,6 +82,23 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
 
     setCurrentPos({ x, y });
   };
+
+  // Effect to add non-passive touchmove listener to the container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => {
+      container.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isDragging]);
 
   const handleMouseUp = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !onAreaSelected) {

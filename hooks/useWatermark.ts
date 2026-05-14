@@ -112,32 +112,46 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       // Draw blur areas if any
       const pageBlurAreas = blurAreas.filter(a => a.pageIndex === index);
       if (pageBlurAreas.length > 0) {
-        // Create a temporary canvas for this page's blur operation
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext("2d");
-        if (tempCtx) {
-          tempCtx.drawImage(canvas, 0, 0);
+        // Make blur strength resolution-aware
+        const responsiveBlurStrength = (canvas.width / 800) * blurStrength;
+        
+        pageBlurAreas.forEach(area => {
+          // Ensure dimensions are valid and rounded for canvas stability
+          const ax = Math.floor(area.x);
+          const ay = Math.floor(area.y);
+          const aw = Math.ceil(area.width);
+          const ah = Math.ceil(area.height);
+
+          if (aw <= 0 || ah <= 0) return;
+
+          context.save();
           
-          // Make blur strength resolution-aware
-          const responsiveBlurStrength = (canvas.width / 800) * blurStrength;
+          // Create a small temporary canvas just for this area
+          const areaCanvas = document.createElement("canvas");
+          areaCanvas.width = aw;
+          areaCanvas.height = ah;
+          const areaCtx = areaCanvas.getContext("2d");
           
-          pageBlurAreas.forEach(area => {
-            context.save();
-            // Create clipping path for the blur area
-            context.beginPath();
-            context.rect(area.x, area.y, area.width, area.height);
-            context.clip();
+          if (areaCtx) {
+            // 1. Copy the unblurred area from the document cache (offscreen)
+            areaCtx.drawImage(
+              offscreen,
+              ax, ay, aw, ah,
+              0, 0, aw, ah
+            );
             
-            // Draw the FULL original image blurred
-            // Clipping ensures it only appears in the intended box
-            // This prevents "fading" at the edges of the box
+            // 2. Apply blur filter to the main context before drawing the area back
             context.filter = `blur(${responsiveBlurStrength}px)`;
-            context.drawImage(tempCanvas, 0, 0);
-            context.restore();
-          });
-        }
+            
+            // 3. Draw the area back to the main canvas
+            context.drawImage(areaCanvas, ax, ay, aw, ah);
+            
+            // 4. Reset filter
+            context.filter = "none";
+          }
+          
+          context.restore();
+        });
       }
 
       context.save();
