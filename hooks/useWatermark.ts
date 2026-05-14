@@ -121,13 +121,14 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
           if (aw <= 0 || ah <= 0) return;
 
-          // iOS Fallback: Downscale and Stack technique
-          // Instead of context.filter (which is unreliable on WebKit/Capacitor),
-          // we downscale the image to create an organic blur and draw it back upscaled
-          // To increase intensity, we use a smaller scale as blurStrength increases
-          const blurScale = Math.max(0.01, 0.15 - (blurStrength * 0.012)); 
-          const tempW = Math.max(1, Math.floor(aw * blurScale));
-          const tempH = Math.max(1, Math.floor(ah * blurScale));
+          // iOS & Privacy-First: Ultra-Obscure Downscale and Stack technique
+          // To ensure total privacy (zero legibility), we use an aggressive downscale 
+          // combined with a multi-directional smear.
+          
+          // The higher the blurStrength, the lower the resolution (more pixelated/smeared)
+          const privacyFactor = Math.max(0.005, 0.1 - (blurStrength * 0.004)); 
+          const tempW = Math.max(1, Math.floor(aw * privacyFactor));
+          const tempH = Math.max(1, Math.floor(ah * privacyFactor));
           
           const blurCanvas = document.createElement("canvas");
           blurCanvas.width = tempW;
@@ -135,27 +136,42 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
           const blurCtx = blurCanvas.getContext("2d");
           
           if (blurCtx) {
-            // 1. Draw area downscaled
+            // 1. Capture and Obscure via extreme downscaling
             blurCtx.imageSmoothingEnabled = true;
             blurCtx.drawImage(canvas, ax, ay, aw, ah, 0, 0, tempW, tempH);
             
             context.save();
-            // Create clipping path for the blur area
             context.beginPath();
             context.rect(ax, ay, aw, ah);
             context.clip();
             
-            // 2. Draw back upscaled multiple times with offsets for extra smoothness (StackBlur effect)
-            // Increased iterations and spread for a stronger effect
-            const iterations = Math.min(6, Math.max(2, Math.floor(blurStrength / 2)));
-            context.globalAlpha = 1 / iterations;
+            // 2. Reconstruction with Multi-Directional Smear (Stacking)
+            // We draw the tiny pixels back at large scale with significant offsets
+            // to smear any remaining shapes or letterforms.
+            const iterations = 8; // Constant high-quality smear
+            context.globalAlpha = 1.0; // Reset for initial fill
+            
+            // Fill with a base layer first to remove any transparency gaps
+            context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax, ay, aw, ah);
+            
+            // Apply semi-transparent smear layers
+            context.globalAlpha = 0.4;
             context.imageSmoothingEnabled = true;
-            context.imageSmoothingQuality = "medium";
+            context.imageSmoothingQuality = "low"; // Lower quality actually helps obscuring
             
             for (let i = 0; i < iterations; i++) {
-              const offset = (i - iterations / 2) * (blurStrength);
-              context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax + offset, ay + offset, aw, ah);
+              // Create a circular smear pattern
+              const angle = (i / iterations) * Math.PI * 2;
+              const radius = blurStrength * 0.8;
+              const offsetX = Math.cos(angle) * radius;
+              const offsetY = Math.sin(angle) * radius;
+              
+              context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax + offsetX, ay + offsetY, aw, ah);
             }
+            
+            // 3. Optional: Add a final slight frost layer to further break up patterns
+            context.fillStyle = "rgba(255, 255, 255, 0.1)";
+            context.fillRect(ax, ay, aw, ah);
             
             context.restore();
           }
