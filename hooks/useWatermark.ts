@@ -140,14 +140,31 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
               0, 0, aw, ah
             );
             
-            // 2. Apply blur filter to the main context before drawing the area back
-            context.filter = `blur(${responsiveBlurStrength}px)`;
+            // 2. Create a "blur" effect by scaling down and up (highly compatible)
+            // We use a small factor based on blurStrength
+            const blurFactor = Math.max(2, Math.floor(20 - (blurStrength / 2))); 
+            // The higher the blurStrength, the smaller the intermediate canvas
+            const tempW = Math.max(1, Math.floor(aw / (blurStrength / 2)));
+            const tempH = Math.max(1, Math.floor(ah / (blurStrength / 2)));
             
-            // 3. Draw the area back to the main canvas
-            context.drawImage(areaCanvas, ax, ay, aw, ah);
+            const blurCanvas = document.createElement("canvas");
+            blurCanvas.width = tempW;
+            blurCanvas.height = tempH;
+            const blurCtx = blurCanvas.getContext("2d");
             
-            // 4. Reset filter
-            context.filter = "none";
+            if (blurCtx) {
+              // Turn off image smoothing for the "downscale" to get sharper pixelated base
+              // then let the "upscale" with smoothing create the blur
+              blurCtx.imageSmoothingEnabled = true;
+              blurCtx.drawImage(areaCanvas, 0, 0, aw, ah, 0, 0, tempW, tempH);
+              
+              // 3. Draw the blurred (upscaled) area back to the main canvas
+              context.save();
+              context.imageSmoothingEnabled = true;
+              context.imageSmoothingQuality = "high";
+              context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax, ay, aw, ah);
+              context.restore();
+            }
           }
           
           context.restore();

@@ -47,9 +47,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
-    // Prevent default on touchstart to stop scroll initiation on iOS
-    if ('touches' in e && e.cancelable) {
-      e.preventDefault();
+    // Aggressively prevent default and propagation on touchstart
+    if ('touches' in e) {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
@@ -68,9 +69,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
 
-    // Prevent scrolling on touch devices while dragging
-    if ('touches' in e && e.cancelable) {
-      e.preventDefault();
+    // Prevent scrolling and other gestures on touch devices while dragging
+    if ('touches' in e) {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
