@@ -47,14 +47,18 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
+    const canvases = containerRef.current?.querySelectorAll('canvas');
+    if (!canvases || !canvases[currentPage]) return;
+    const canvas = canvases[currentPage];
+    const rect = canvas.getBoundingClientRect();
+
     setIsDragging(true);
 
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
 
     setStartPos({ x, y });
     setCurrentPos({ x, y });
@@ -68,8 +72,9 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
 
     const canvases = containerRef.current?.querySelectorAll('canvas');
     if (!canvases || !canvases[currentPage]) return;
+    const canvas = canvases[currentPage];
+    const rect = canvas.getBoundingClientRect();
 
-    const rect = canvases[currentPage].getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
 

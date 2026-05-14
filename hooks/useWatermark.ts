@@ -120,14 +120,21 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
         if (tempCtx) {
           tempCtx.drawImage(canvas, 0, 0);
           
+          // Make blur strength resolution-aware
+          const responsiveBlurStrength = (canvas.width / 800) * blurStrength;
+          
           pageBlurAreas.forEach(area => {
             context.save();
-            context.filter = `blur(${blurStrength}px)`;
-            context.drawImage(
-              tempCanvas, 
-              area.x, area.y, area.width, area.height, 
-              area.x, area.y, area.width, area.height
-            );
+            // Create clipping path for the blur area
+            context.beginPath();
+            context.rect(area.x, area.y, area.width, area.height);
+            context.clip();
+            
+            // Draw the FULL original image blurred
+            // Clipping ensures it only appears in the intended box
+            // This prevents "fading" at the edges of the box
+            context.filter = `blur(${responsiveBlurStrength}px)`;
+            context.drawImage(tempCanvas, 0, 0);
             context.restore();
           });
         }
