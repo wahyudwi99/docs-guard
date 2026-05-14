@@ -47,11 +47,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
-    const canvases = containerRef.current?.querySelectorAll('canvas');
-    if (!canvases || !canvases[currentPage]) return;
-    const canvas = canvases[currentPage];
-    const rect = canvas.getBoundingClientRect();
-
+    const rect = e.currentTarget.getBoundingClientRect();
     setIsDragging(true);
 
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -67,13 +63,9 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
 
+    const rect = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-    const canvases = containerRef.current?.querySelectorAll('canvas');
-    if (!canvases || !canvases[currentPage]) return;
-    const canvas = canvases[currentPage];
-    const rect = canvas.getBoundingClientRect();
 
     const x = clientX - rect.left;
     const y = clientY - rect.top;
@@ -81,16 +73,16 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     setCurrentPos({ x, y });
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !onAreaSelected) {
       setIsDragging(false);
       return;
     }
 
+    const rect = e.currentTarget.getBoundingClientRect();
     const canvases = containerRef.current?.querySelectorAll('canvas');
     if (canvases && canvases[currentPage]) {
       const canvas = canvases[currentPage];
-      const rect = canvas.getBoundingClientRect();
       
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
@@ -171,16 +163,12 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
           "relative flex items-center justify-center w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-hidden border border-black/5",
           isSelectionMode && "cursor-crosshair"
         )}
-        onMouseMove={handleMouseMove}
-        onTouchMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchEnd={handleMouseUp}
       >
         {Array.from({ length: numPages }).map((_, index) => (
           <div 
             key={index} 
             className={cn(
-              "relative w-full max-w-full flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute",
+              "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute",
               currentPage === index 
                 ? "opacity-100 scale-100 z-10 translate-x-0" 
                 : index < currentPage 
@@ -189,10 +177,14 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
             )}
             onMouseDown={(e) => handleMouseDown(e)}
             onTouchStart={(e) => handleMouseDown(e)}
+            onMouseMove={handleMouseMove}
+            onTouchMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onTouchEnd={handleMouseUp}
           >
             <canvas
               ref={(el) => registerCanvas(el, index)}
-              className="max-w-full h-auto"
+              className="max-w-full h-auto block"
             />
 
             {/* Selection Overlay */}
