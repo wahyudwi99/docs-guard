@@ -57,8 +57,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     setStartPos({ x, y });
     setCurrentPos({ x, y });
@@ -75,8 +75,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const canvas = canvases[currentPage];
     const rect = canvas.getBoundingClientRect();
 
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     setCurrentPos({ x, y });
   };
@@ -87,25 +87,31 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       return;
     }
 
-    const width = Math.abs(currentPos.x - startPos.x);
-    const height = Math.abs(currentPos.y - startPos.y);
+    const canvases = containerRef.current?.querySelectorAll('canvas');
+    if (canvases && canvases[currentPage]) {
+      const canvas = canvases[currentPage];
+      const rect = canvas.getBoundingClientRect();
+      
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
 
-    if (width > 5 && height > 5) {
       const x = Math.min(startPos.x, currentPos.x);
       const y = Math.min(startPos.y, currentPos.y);
+      const width = Math.abs(currentPos.x - startPos.x);
+      const height = Math.abs(currentPos.y - startPos.y);
 
-      const canvases = containerRef.current?.querySelectorAll('canvas');
-      if (canvases && canvases[currentPage]) {
-        const canvas = canvases[currentPage];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+      // Constrain and scale
+      const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
+      const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
+      const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
+      const finalHeight = Math.min(height, rect.height - Math.max(0, y)) * scaleY;
 
+      if (finalWidth > 5 && finalHeight > 5) {
         onAreaSelected({
-          x: x * scaleX,
-          y: y * scaleY,
-          width: width * scaleX,
-          height: height * scaleY,
+          x: finalX,
+          y: finalY,
+          width: finalWidth,
+          height: finalHeight,
           pageIndex: currentPage
         });
       }
