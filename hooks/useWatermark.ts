@@ -112,9 +112,6 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
       // Draw blur areas if any
       const pageBlurAreas = blurAreas.filter(a => a.pageIndex === index);
       if (pageBlurAreas.length > 0) {
-        // Make blur strength resolution-aware
-        const responsiveBlurStrength = (canvas.width / 800) * blurStrength;
-        
         pageBlurAreas.forEach(area => {
           // Ensure dimensions are valid and rounded for canvas stability
           const ax = Math.floor(area.x);
@@ -124,35 +121,42 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
 
           if (aw <= 0 || ah <= 0) return;
 
-          context.save();
+          // iOS Fallback: Downscale and Stack technique
+          // Instead of context.filter (which is unreliable on WebKit/Capacitor),
+          // we downscale the image to create an organic blur and draw it back upscaled
+          const blurScale = 0.1; // 10% size
+          const tempW = Math.max(1, Math.floor(aw * blurScale));
+          const tempH = Math.max(1, Math.floor(ah * blurScale));
           
-          // Use a more aggressive downscaling factor for visible blur
-          // If strength is 10, factor is 8x. If strength is 20, factor is 16x.
-          const scaleDownFactor = Math.max(2, (blurStrength / 10) * 8);
-          
-          const tempW = Math.max(1, Math.floor(aw / scaleDownFactor));
-          const tempH = Math.max(1, Math.floor(ah / scaleDownFactor));
-          
-          // 1. Create a small temporary canvas for the downscaled area
           const blurCanvas = document.createElement("canvas");
           blurCanvas.width = tempW;
           blurCanvas.height = tempH;
           const blurCtx = blurCanvas.getContext("2d");
           
           if (blurCtx) {
-            // 2. Draw from the MAIN canvas (which already has the document)
-            // This is safer than offscreen if there are any sync issues
+            // 1. Draw area downscaled
             blurCtx.imageSmoothingEnabled = true;
-            blurCtx.imageSmoothingQuality = "high";
             blurCtx.drawImage(canvas, ax, ay, aw, ah, 0, 0, tempW, tempH);
             
-            // 3. Draw it back to the main canvas, upscaled
+            context.save();
+            // Create clipping path for the blur area
+            context.beginPath();
+            context.rect(ax, ay, aw, ah);
+            context.clip();
+            
+            // 2. Draw back upscaled multiple times with offsets for extra smoothness (StackBlur effect)
+            const iterations = Math.min(3, Math.max(1, Math.floor(blurStrength / 4)));
+            context.globalAlpha = 1 / iterations;
             context.imageSmoothingEnabled = true;
             context.imageSmoothingQuality = "high";
-            context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax, ay, aw, ah);
+            
+            for (let i = 0; i < iterations; i++) {
+              const offset = (i - iterations / 2) * (blurStrength / 2);
+              context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax + offset, ay + offset, aw, ah);
+            }
+            
+            context.restore();
           }
-          
-          context.restore();
         });
       }
 

@@ -67,7 +67,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
                 Continue with Google
               </button>
               
-              <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
+              <div className="flex items-center justify-center gap-2 text-[10px] text-indigo-600 dark:text-indigo-400 uppercase tracking-widest font-bold">
                 <Lock className="w-3 h-3" />
                 <span>Secure AES-256 Authentication</span>
               </div>
