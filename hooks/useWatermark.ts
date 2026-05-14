@@ -124,7 +124,8 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
           // iOS Fallback: Downscale and Stack technique
           // Instead of context.filter (which is unreliable on WebKit/Capacitor),
           // we downscale the image to create an organic blur and draw it back upscaled
-          const blurScale = 0.1; // 10% size
+          // To increase intensity, we use a smaller scale as blurStrength increases
+          const blurScale = Math.max(0.01, 0.15 - (blurStrength * 0.012)); 
           const tempW = Math.max(1, Math.floor(aw * blurScale));
           const tempH = Math.max(1, Math.floor(ah * blurScale));
           
@@ -145,13 +146,14 @@ export function useWatermark({ canvases, redrawDocument }: UseWatermarkProps) {
             context.clip();
             
             // 2. Draw back upscaled multiple times with offsets for extra smoothness (StackBlur effect)
-            const iterations = Math.min(3, Math.max(1, Math.floor(blurStrength / 4)));
+            // Increased iterations and spread for a stronger effect
+            const iterations = Math.min(6, Math.max(2, Math.floor(blurStrength / 2)));
             context.globalAlpha = 1 / iterations;
             context.imageSmoothingEnabled = true;
-            context.imageSmoothingQuality = "high";
+            context.imageSmoothingQuality = "medium";
             
             for (let i = 0; i < iterations; i++) {
-              const offset = (i - iterations / 2) * (blurStrength / 2);
+              const offset = (i - iterations / 2) * (blurStrength);
               context.drawImage(blurCanvas, 0, 0, tempW, tempH, ax + offset, ay + offset, aw, ah);
             }
             
