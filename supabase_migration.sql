@@ -4,14 +4,9 @@ CREATE TABLE public.users (
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE,
   full_name text,
-  avatar_url text,
-  
-  -- Status Langganan
   is_pro boolean DEFAULT false,
-  subscription_status text DEFAULT 'none', -- active, expired, canceled, none
   subscription_end_date timestamptz,
   revenuecat_id text UNIQUE,
-  
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -65,8 +60,7 @@ BEGIN
   VALUES (
     new.id, 
     new.email, 
-    new.raw_user_meta_data->>'full_name', 
-    new.raw_user_meta_data->>'avatar_url'
+    new.raw_user_meta_data->>'full_name'
   );
   RETURN new;
 END;
