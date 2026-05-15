@@ -70,20 +70,48 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
               <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : authenticated ? (
-            <div className="space-y-3">
-              {packages.map((pkg) => (
-                <button
-                  key={pkg.identifier}
-                  disabled={loading}
-                  onClick={() => subscribe(pkg)}
-                  className="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all active:scale-95 disabled:opacity-50"
-                >
-                  <div className="flex justify-between items-center">
-                    <span>{pkg.product.title}</span>
-                    <span>{pkg.product.priceString}</span>
-                  </div>
-                </button>
-              ))}
+            <div className="grid grid-cols-1 gap-4 mb-8">
+              {packages.map((pkg) => {
+                const isYearly = pkg.identifier.toLowerCase().includes('yearly');
+                const isMonthly = pkg.identifier.toLowerCase().includes('monthly');
+                
+                return (
+                  <button
+                    key={pkg.identifier}
+                    disabled={loading}
+                    onClick={() => subscribe(pkg)}
+                    className={cn(
+                      "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                      isYearly 
+                        ? "bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-200" 
+                        : "bg-white border-slate-100 hover:border-indigo-200 text-slate-900"
+                    )}
+                  >
+                    {isYearly && (
+                      <div className="absolute -top-3 right-6 px-3 py-1 bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-md">
+                        Best Value
+                      </div>
+                    )}
+                    {isMonthly && (
+                      <div className="absolute -top-3 right-6 px-3 py-1 bg-indigo-100 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-full border border-indigo-200">
+                        Most Popular
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center mb-1">
+                      <span className={cn("font-bold text-lg", isYearly ? "text-white" : "text-slate-900")}>
+                        {pkg.product.title}
+                      </span>
+                      <span className={cn("font-black text-xl", isYearly ? "text-amber-300" : "text-indigo-600")}>
+                        {pkg.product.priceString}
+                      </span>
+                    </div>
+                    <p className={cn("text-xs font-medium", isYearly ? "text-indigo-100" : "text-slate-400")}>
+                      {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <div className="space-y-4">

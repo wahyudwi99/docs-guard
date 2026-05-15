@@ -52,11 +52,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         await fetchPackages();
         await checkSubscriptionStatus();
       } else {
-        // Mock packages for web development
+        // Mock packages for web development with sensible tiered pricing
         setPackages([
-          { identifier: 'weekly', product: { title: 'Weekly Pro', priceString: '$1.99' } },
-          { identifier: 'monthly', product: { title: 'Monthly Pro', priceString: '$4.99' } },
-          { identifier: 'yearly', product: { title: 'Yearly Pro', priceString: '$29.99' } }
+          { 
+            identifier: 'weekly', 
+            product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
+          },
+          { 
+            identifier: 'monthly', 
+            product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
+          },
+          { 
+            identifier: 'yearly', 
+            product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
+          }
         ]);
         setLoading(false);
       }
