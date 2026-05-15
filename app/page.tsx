@@ -12,6 +12,7 @@ import { CanvasDisplay } from "@/components/CanvasDisplay";
 import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
+import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
@@ -28,12 +29,13 @@ function HomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
-  const [activeTab, setActiveTab] = useState<'upload' | 'design'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
   const { isPro } = useSubscription();
@@ -62,7 +64,7 @@ function HomeContent() {
     const tab = searchParams.get('tab');
     
     if (tab === 'subscription') {
-      setActiveTab('design'); // Redirect to design if subscription was requested
+      setActiveTab('subscription'); 
     }
   }, [searchParams]);
 
@@ -269,6 +271,15 @@ function HomeContent() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {!isPro && session && (
+               <button 
+                onClick={() => setShowPaywall(true)}
+                className="hidden sm:flex h-9 px-4 rounded-full bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest hover:bg-amber-200 transition-all active:scale-95 items-center gap-2 border border-amber-200"
+              >
+                <Zap className="h-3.5 w-3.5 fill-amber-700" />
+                Go Pro
+              </button>
+            )}
             {isLoadingAuth ? (
               <div className="h-9 w-20 bg-slate-100 animate-pulse rounded-full" />
             ) : session ? (
@@ -393,6 +404,16 @@ function HomeContent() {
                 >
                   <Settings className="h-3.5 w-3.5" />
                   {t('tabs.design')}
+                </button>
+                <button 
+                  onClick={() => setActiveTab('subscription')}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-[12px] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2",
+                    activeTab === 'subscription' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}
+                >
+                  <CreditCard className="h-3.5 w-3.5" />
+                  {t('tabs.subscription')}
                 </button>
               </div>
 
@@ -529,6 +550,52 @@ function HomeContent() {
 
                   </div>
                 )}
+
+                {activeTab === 'subscription' && (
+                  <div className="space-y-6">
+                    <div className="p-8 rounded-[32px] bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-center space-y-4 shadow-xl shadow-indigo-200">
+                      <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md">
+                        <Zap className="h-8 w-8 text-amber-300 fill-amber-300" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-black">{isPro ? t('tabs.pro_active') : t('tabs.go_pro')}</h3>
+                        <p className="text-xs text-indigo-100/80 font-medium">
+                          {isPro ? "Enjoy unlimited access to all features" : "Unlock privacy-first professional tools"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {!isPro && (
+                      <button 
+                        onClick={() => setShowPaywall(true)}
+                        className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-100 uppercase tracking-widest text-[10px]"
+                      >
+                        {t('tabs.go_pro')}
+                      </button>
+                    )}
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-indigo-600 shadow-sm">
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">Verified Security</p>
+                          <p className="text-[10px] text-slate-400 font-medium">Encryption on every export</p>
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-emerald-600 shadow-sm">
+                          <Shield className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">Total Privacy</p>
+                          <p className="text-[10px] text-slate-400 font-medium">No data ever leaves your device</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -613,6 +680,10 @@ function HomeContent() {
           </div>
         </div>
       </footer>
+
+      {showPaywall && (
+        <Paywall onClose={() => setShowPaywall(false)} />
+      )}
     </div>
   );
 }
