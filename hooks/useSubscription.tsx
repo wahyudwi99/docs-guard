@@ -81,7 +81,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       if (!Capacitor.isNativePlatform() || !user?.id) return;
       
-      const customerInfo = await Purchases.getCustomerInfo();
+      const { customerInfo } = await Purchases.getCustomerInfo();
       const isActive = typeof customerInfo.entitlements.active['pro'] !== "undefined";
       
       // If RevenueCat says they are active but our DB doesn't, sync it
@@ -156,7 +156,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setLoading(true);
       if (!Capacitor.isNativePlatform()) return false;
       
-      const customerInfo = await Purchases.restorePurchases();
+      const { customerInfo } = await Purchases.restorePurchases();
       if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
         await syncPurchaseToSupabase(null, true);
         return true;
