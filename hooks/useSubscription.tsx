@@ -1,6 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
+import { Capacitor } from '@capacitor/core';
+import { useAuth } from './useAuth';
+import { supabase } from '@/lib/supabase';
 
 interface SubscriptionContextType {
   isPro: boolean;
@@ -15,15 +19,156 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Always true for testing Pro features
-  const [isPro] = useState(true);
-  const [loading] = useState(false);
-  const [subscriptionDaysLeft] = useState<number | null>(null);
-  const [packages] = useState<any[]>([]);
+  const { user, refreshProfile } = useAuth();
+  
+  // Base isPro on the user's Supabase profile
+  const isPro = user?.is_pro || false;
+  
+  const [loading, setLoading] = useState(true);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
+  const [packages, setPackages] = useState<any[]>([]);
 
-  const checkSubscriptionStatus = async () => {};
-  const subscribe = async () => true;
-  const restorePurchases = async () => true;
+  useEffect(() => {
+    initRevenueCat();
+  }, [user]);
+
+  const initRevenueCat = async () => {
+    try {
+      setLoading(true);
+      if (Capacitor.isNativePlatform()) {
+        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+        
+        // Use placeholders or env vars for the keys
+        if (Capacitor.getPlatform() === 'ios') {
+          await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
+        } else if (Capacitor.getPlatform() === 'android') {
+          await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY || 'YOUR_REVENUECAT_ANDROID_KEY' });
+        }
+
+        if (user?.id) {
+          await Purchases.logIn({ appUserID: user.id });
+        }
+
+        await fetchPackages();
+        await checkSubscriptionStatus();
+      } else {
+        // Mock packages for web development
+        setPackages([
+          { identifier: 'weekly', product: { title: 'Weekly Pro', priceString: '$1.99' } },
+          { identifier: 'monthly', product: { title: 'Monthly Pro', priceString: '$4.99' } },
+          { identifier: 'yearly', product: { title: 'Yearly Pro', priceString: '$29.99' } }
+        ]);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("RevenueCat Init Error:", error);
+      setLoading(false);
+    }
+  };
+
+  const fetchPackages = async () => {
+    try {
+      const offerings = await Purchases.getOfferings();
+      if (offerings.current !== null && offerings.current.availablePackages.length !== 0) {
+        setPackages(offerings.current.availablePackages);
+      }
+    } catch (error) {
+      console.error("Error fetching packages", error);
+    }
+  };
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      if (!Capacitor.isNativePlatform() || !user?.id) return;
+      
+      const customerInfo = await Purchases.getCustomerInfo();
+      const isActive = typeof customerInfo.entitlements.active['pro'] !== "undefined";
+      
+      // If RevenueCat says they are active but our DB doesn't, sync it
+      if (isActive && !isPro) {
+        await syncPurchaseToSupabase(null, true);
+      } else if (!isActive && isPro) {
+        await syncPurchaseToSupabase(null, false);
+      }
+    } catch (error) {
+      console.error("Error checking status", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
+    if (!user?.id) return;
+
+    try {
+      // Update user pro status
+      await supabase
+        .from('users')
+        .update({ is_pro: active, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+        
+      if (transactionId && active) {
+        // Log payment
+        await supabase
+          .from('payments')
+          .insert({
+            user_id: user.id,
+            transaction_id: transactionId,
+            status: 'completed',
+          });
+      }
+      
+      // Refresh local auth context
+      await refreshProfile();
+    } catch (error) {
+      console.error("Error syncing to Supabase", error);
+    }
+  };
+
+  const subscribe = async (pkg: any) => {
+    try {
+      setLoading(true);
+      if (!Capacitor.isNativePlatform()) {
+        // Mock purchase for web
+        await syncPurchaseToSupabase('mock_tx_123', true);
+        return true;
+      }
+      
+      const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
+      
+      if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
+        await syncPurchaseToSupabase(productIdentifier, true);
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      if (!error.userCancelled) {
+        console.error("Purchase error", error);
+      }
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const restorePurchases = async () => {
+    try {
+      setLoading(true);
+      if (!Capacitor.isNativePlatform()) return false;
+      
+      const customerInfo = await Purchases.restorePurchases();
+      if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
+        await syncPurchaseToSupabase(null, true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Restore error", error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const contextValue = {
     isPro,

@@ -274,7 +274,14 @@ function HomeContent() {
             ) : session ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end leading-none">
-                  <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
+                    {session.is_pro && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] font-black text-white uppercase tracking-widest shadow-sm">
+                        PRO
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <button 
                   onClick={handleLogout}
