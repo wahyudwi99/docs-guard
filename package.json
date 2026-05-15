@@ -19,6 +19,7 @@
     "@capacitor/share": "^8.0.1",
     "@capgo/capacitor-social-login": "^8.3.20",
     "@revenuecat/purchases-capacitor": "^13.0.1",
+    "@supabase/supabase-js": "^2.105.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "jspdf": "^4.2.1",
