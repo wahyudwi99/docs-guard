@@ -141,35 +141,38 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
     try {
       if (user?.id) {
-        // Update user pro status in Supabase
-        await supabase
+        console.log("Syncing purchase to Supabase for user:", user.id, "Active:", active);
+        
+        // 1. Update user pro status in Supabase
+        const { error: userError } = await supabase
           .from('users')
-          .update({ is_pro: active, updated_at: new Date().toISOString() })
+          .update({ 
+            is_pro: active, 
+            updated_at: new Date().toISOString() 
+          })
           .eq('id', user.id);
           
+        if (userError) throw userError;
+          
+        // 2. Log payment in Supabase if it's a new successful transaction
         if (transactionId && active) {
-          // Log payment in Supabase
-          await supabase
+          const { error: payError } = await supabase
             .from('payments')
-            .insert({
+            .upsert({
               user_id: user.id,
               transaction_id: transactionId,
               status: 'completed',
-            });
+              created_at: new Date().toISOString()
+            }, { onConflict: 'transaction_id' });
+            
+          if (payError) console.error("Error logging payment:", payError);
         }
-      } else if (user) {
-        // Standalone test mode: update local preferences directly
-        const updatedUser = { ...user, is_pro: active };
-        await Preferences.set({
-          key: 'docs_guard_auth_user',
-          value: JSON.stringify(updatedUser),
-        });
+
+        // 3. Refresh local auth context to show badge
+        await refreshProfile();
       }
-      
-      // Refresh local auth context
-      await refreshProfile();
     } catch (error) {
-      console.error("Error syncing purchase status", error);
+      console.error("CRITICAL: Failed to sync with Supabase database:", error);
     }
   };
 
