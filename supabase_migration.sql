@@ -29,14 +29,28 @@ ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
 -- 4. KEBIJAKAN AKSES (Policies)
 -- User hanya bisa melihat datanya sendiri di tabel users
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.users;
 CREATE POLICY "Users can view their own profile" 
 ON public.users FOR SELECT 
 USING (auth.uid() = id);
 
+-- User bisa mengupdate profilnya sendiri (penting untuk is_pro)
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
+CREATE POLICY "Users can update their own profile" 
+ON public.users FOR UPDATE 
+USING (auth.uid() = id);
+
 -- User hanya bisa melihat riwayat pembayarannya sendiri
+DROP POLICY IF EXISTS "Users can view their own payments" ON public.payments;
 CREATE POLICY "Users can view their own payments" 
 ON public.payments FOR SELECT 
 USING (auth.uid() = user_id);
+
+-- User bisa mencatat pembayarannya sendiri
+DROP POLICY IF EXISTS "Users can insert their own payments" ON public.payments;
+CREATE POLICY "Users can insert their own payments" 
+ON public.payments FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
 
 -- 5. TRIGGER OTOMATIS UNTUK UPDATED_AT
 CREATE OR REPLACE FUNCTION update_updated_at_column()
