@@ -152,31 +152,22 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
-    if (!user?.id) {
-      console.warn("[SUPABASE SYNC] Aborted: No User ID found");
-      return;
-    }
+    if (!user?.id) return;
 
     try {
-      console.log(`[SUPABASE SYNC] Starting sync. Active: ${active}, TxID: ${transactionId}`);
-      
-      // 1. Update user pro status
-      const { data: userUpdate, error: userError } = await supabase
+      // 1. Update ONLY the user's PRO status (always do this on sync)
+      const { error: userError } = await supabase
         .from('users')
         .update({ is_pro: active, updated_at: new Date().toISOString() })
-        .eq('id', user.id)
-        .select();
+        .eq('id', user.id);
         
-      if (userError) {
-        console.error("[SUPABASE SYNC] User Table Error:", userError.message);
-        throw userError;
-      }
-      console.log("[SUPABASE SYNC] User table updated successfully");
-        
-      // 2. Log payment if active and transactionId exists
+      if (userError) throw userError;
+
+      // 2. Log payment ONLY if we have a transactionId (means it's a NEW manual purchase)
+      // and only if the status is active.
       if (transactionId && active) {
-        console.log("[SUPABASE SYNC] Logging transaction...");
-        const { error: payError } = await supabase
+        console.log("[SUPABASE] Logging NEW transaction:", transactionId);
+        await supabase
           .from('payments')
           .upsert({
             user_id: user.id,
@@ -184,19 +175,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
             status: 'completed',
             created_at: new Date().toISOString()
           }, { onConflict: 'transaction_id' });
-            
-        if (payError) {
-          console.error("[SUPABASE SYNC] Payment Table Error:", payError.message);
-        } else {
-          console.log("[SUPABASE SYNC] Transaction logged successfully");
-        }
       }
       
-      // 3. Refresh profile ONLY ONCE
       await refreshProfile();
-      console.log("[SUPABASE SYNC] Sync COMPLETED");
     } catch (error) {
-      console.error("[SUPABASE SYNC] CRITICAL ERROR:", error);
+      console.error("[SUPABASE] Sync failed:", error);
     }
   };
 
