@@ -136,12 +136,13 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       const { customerInfo } = await Purchases.getCustomerInfo();
       const isActive = typeof customerInfo.entitlements.active['pro'] !== "undefined";
       
-      // If RevenueCat says they are active but our DB doesn't, sync it
+      // Sync status with Supabase based on RevenueCat truth
       if (isActive && !isPro) {
+        console.log("[SUBSCRIPTION] Syncing: Becoming PRO");
         await syncPurchaseToSupabase(null, true);
       } else if (!isActive && isPro) {
-        // Optional: keep DB synced if expired
-        // await syncPurchaseToSupabase(null, false);
+        console.log("[SUBSCRIPTION] Syncing: Subscription EXPIRED. Removing PRO status.");
+        await syncPurchaseToSupabase(null, false);
       }
     } catch (error) {
       console.error("Error checking status", error);
