@@ -140,15 +140,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (authError) throw authError;
 
           if (authData.user) {
-            // Wait briefly for the DB trigger to create the profile record
-            await new Promise(resolve => setTimeout(resolve, 800));
+            console.log("Supabase Auth SUCCESS. User ID:", authData.user.id);
+            // Wait longer for the DB trigger to create the profile record
+            console.log("Waiting for DB trigger (2s)...");
+            await new Promise(resolve => setTimeout(resolve, 2000));
             
             const dbProfile = await fetchUserProfile(authData.user.id);
+            console.log("Fetched DB Profile:", dbProfile);
             
             const newUser: AuthUser = {
               id: authData.user.id,
               email: authData.user.email,
-              name: dbProfile.name || authData.user.user_metadata.full_name,
+              name: dbProfile.name || authData.user.user_metadata.full_name || "User",
               image: dbProfile.image || authData.user.user_metadata.avatar_url,
               is_pro: dbProfile.is_pro || false,
               loggedIn: true,
