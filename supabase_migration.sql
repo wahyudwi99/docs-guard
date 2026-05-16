@@ -46,11 +46,16 @@ CREATE POLICY "Users can view their own payments"
 ON public.payments FOR SELECT 
 USING (auth.uid() = user_id);
 
--- User bisa mencatat pembayarannya sendiri
+-- User bisa mencatat pembayarannya sendiri (INSERT) dan memperbaruinya (UPDATE untuk upsert)
 DROP POLICY IF EXISTS "Users can insert their own payments" ON public.payments;
 CREATE POLICY "Users can insert their own payments" 
 ON public.payments FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own payments" ON public.payments;
+CREATE POLICY "Users can update their own payments" 
+ON public.payments FOR UPDATE 
+USING (auth.uid() = user_id);
 
 -- 5. TRIGGER OTOMATIS UNTUK UPDATED_AT
 CREATE OR REPLACE FUNCTION update_updated_at_column()
