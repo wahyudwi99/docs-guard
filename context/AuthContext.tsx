@@ -70,7 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       
-      // Check Supabase session first
+      // DISABLED SUPABASE FOR TESTING
+      /*
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
@@ -86,12 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(currentUser);
         await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(currentUser) });
       } else {
+      */
         // Fallback to local preferences
         const { value } = await Preferences.get({ key: AUTH_STORAGE_KEY });
         if (value) {
           setUser(JSON.parse(value));
         }
-      }
+      // }
     } catch (error) {
       console.error('Failed to restore session:', error);
     } finally {
@@ -121,42 +123,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (result.result && result.result.responseType === 'online') {
-        const idToken = result.result.idToken;
-        console.log("Supabase URL being used:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log("ID Token received:", idToken ? "YES (Length: " + idToken.length + ")" : "NO");
+        const profile = result.result.profile;
         
+        // DISABLED SUPABASE FOR TESTING
+        /*
+        const idToken = result.result.idToken;
         if (idToken) {
-          // Sign in to Supabase using the Google ID token
           const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
             provider: 'google',
             token: idToken,
           });
-
-          if (authError) throw authError;
-
-          if (authData.user) {
-            // Wait briefly for the trigger to create the public.users record
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            const profile = await fetchUserProfile(authData.user.id);
-            
-            const newUser: AuthUser = {
-              id: authData.user.id,
-              email: authData.user.email,
-              name: profile.name || authData.user.user_metadata.full_name,
-              image: profile.image || authData.user.user_metadata.avatar_url,
-              is_pro: profile.is_pro || false,
-              loggedIn: true,
-            };
-            
-            await Preferences.set({
-              key: AUTH_STORAGE_KEY,
-              value: JSON.stringify(newUser),
-            });
-            
-            setUser(newUser);
-          }
+          // ... rest of supabase logic
         }
+        */
+
+        const newUser: AuthUser = {
+          name: profile.name || undefined,
+          email: profile.email || undefined,
+          image: profile.imageUrl || undefined,
+          is_pro: false, // Default for testing
+          loggedIn: true,
+        };
+        
+        await Preferences.set({
+          key: AUTH_STORAGE_KEY,
+          value: JSON.stringify(newUser),
+        });
+        
+        setUser(newUser);
       }
     } catch (error) {
       console.error('Google login failed:', error);
@@ -171,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (Capacitor.isNativePlatform()) {
         await SocialLogin.logout({ provider: 'google' });
       }
-      await supabase.auth.signOut();
+      // await supabase.auth.signOut(); // DISABLED SUPABASE
       await Preferences.remove({ key: AUTH_STORAGE_KEY });
       setUser(null);
     } catch (error) {
