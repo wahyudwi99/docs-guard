@@ -143,40 +143,51 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
-    try {
-      if (user?.id) {
-        console.log("Syncing purchase to Supabase for user:", user.id, "Active:", active);
-        
-        // 1. Update user pro status in Supabase
-        const { error: userError } = await supabase
-          .from('users')
-          .update({ 
-            is_pro: active, 
-            updated_at: new Date().toISOString() 
-          })
-          .eq('id', user.id);
-          
-        if (userError) throw userError;
-          
-        // 2. Log payment in Supabase if it's a new successful transaction
-        if (transactionId && active) {
-          const { error: payError } = await supabase
-            .from('payments')
-            .upsert({
-              user_id: user.id,
-              transaction_id: transactionId,
-              status: 'completed',
-              created_at: new Date().toISOString()
-            }, { onConflict: 'transaction_id' });
-            
-          if (payError) console.error("Error logging payment:", payError);
-        }
+    if (!user?.id) {
+      console.warn("[SUPABASE SYNC] Aborted: No User ID found");
+      return;
+    }
 
-        // 3. Refresh local auth context to show badge
-        await refreshProfile();
+    try {
+      console.log(`[SUPABASE SYNC] Starting sync. Active: ${active}, TxID: ${transactionId}`);
+      
+      // 1. Update user pro status
+      const { data: userUpdate, error: userError } = await supabase
+        .from('users')
+        .update({ is_pro: active, updated_at: new Date().toISOString() })
+        .eq('id', user.id)
+        .select();
+        
+      if (userError) {
+        console.error("[SUPABASE SYNC] User Table Error:", userError.message);
+        throw userError;
       }
+      console.log("[SUPABASE SYNC] User table updated successfully");
+        
+      // 2. Log payment if active and transactionId exists
+      if (transactionId && active) {
+        console.log("[SUPABASE SYNC] Logging transaction...");
+        const { error: payError } = await supabase
+          .from('payments')
+          .upsert({
+            user_id: user.id,
+            transaction_id: transactionId,
+            status: 'completed',
+            created_at: new Date().toISOString()
+          }, { onConflict: 'transaction_id' });
+            
+        if (payError) {
+          console.error("[SUPABASE SYNC] Payment Table Error:", payError.message);
+        } else {
+          console.log("[SUPABASE SYNC] Transaction logged successfully");
+        }
+      }
+      
+      // 3. Refresh profile ONLY ONCE
+      await refreshProfile();
+      console.log("[SUPABASE SYNC] Sync COMPLETED");
     } catch (error) {
-      console.error("CRITICAL: Failed to sync with Supabase database:", error);
+      console.error("[SUPABASE SYNC] CRITICAL ERROR:", error);
     }
   };
 
