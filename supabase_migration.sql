@@ -40,6 +40,12 @@ CREATE POLICY "Users can update their own profile"
 ON public.users FOR UPDATE 
 USING (auth.uid() = id);
 
+-- User bisa membuat profilnya sendiri (Auto-Repair)
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
+CREATE POLICY "Users can insert their own profile" 
+ON public.users FOR INSERT 
+WITH CHECK (auth.uid() = id);
+
 -- User hanya bisa melihat riwayat pembayarannya sendiri
 DROP POLICY IF EXISTS "Users can view their own payments" ON public.payments;
 CREATE POLICY "Users can view their own payments" 
