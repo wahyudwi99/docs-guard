@@ -38,7 +38,7 @@ function HomeContent() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
-  const { isPro } = useSubscription();
+  const { isPro, packages, subscribe } = useSubscription();
 
   useEffect(() => {
     console.log("Auth Status:", isLoadingAuth ? 'loading' : (session ? 'authenticated' : 'unauthenticated'));
@@ -568,15 +568,15 @@ function HomeContent() {
                         </p>
                       </div>
                     </div>
-                    
                     <div className="grid grid-cols-1 gap-4">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Available Plans</p>
-                       {(useSubscription().packages).map((pkg: any) => {
+                       {/* Plan Cards directly in the tab */}
+                       {packages.map((pkg: any) => {
                           const isYearly = pkg.identifier.toLowerCase().includes('yearly');
                           return (
                             <button
                               key={pkg.identifier}
-                              onClick={() => useSubscription().subscribe(pkg)}
+                              onClick={() => subscribe(pkg)}
                               className={cn(
                                 "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
                                 isYearly 
