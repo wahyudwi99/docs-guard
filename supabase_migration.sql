@@ -54,6 +54,9 @@ EXECUTE PROCEDURE update_updated_at_column();
 
 -- 6. TRIGGER UNTUK OTOMATIS COPY DATA DARI AUTH KE PUBLIC.USERS
 -- Setiap kali user baru daftar lewat Google, baris di public.users akan otomatis dibuat.
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
@@ -61,8 +64,8 @@ BEGIN
   VALUES (
     new.id, 
     new.email, 
-    new.raw_user_meta_data->>'full_name',
-    new.raw_user_meta_data->>'avatar_url' -- Pastikan ini ada dan pas
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User'),
+    COALESCE(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', '')
   );
   RETURN new;
 END;
