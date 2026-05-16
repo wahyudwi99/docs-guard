@@ -122,6 +122,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (result.result && result.result.responseType === 'online') {
         const idToken = result.result.idToken;
+        console.log("Supabase URL being used:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+        console.log("ID Token received:", idToken ? "YES (Length: " + idToken.length + ")" : "NO");
         
         if (idToken) {
           // Sign in to Supabase using the Google ID token
