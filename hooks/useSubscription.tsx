@@ -93,14 +93,17 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     const mockPackages = [
       { 
         identifier: 'weekly', 
+        isMock: true,
         product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
       },
       { 
         identifier: 'monthly', 
+        isMock: true,
         product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
       },
       { 
         identifier: 'yearly', 
+        isMock: true,
         product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
       }
     ];
@@ -129,7 +132,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (isActive && !isPro) {
         await syncPurchaseToSupabase(null, true);
       } else if (!isActive && isPro) {
-        await syncPurchaseToSupabase(null, false);
+        // Optional: keep DB synced if expired
+        // await syncPurchaseToSupabase(null, false);
       }
     } catch (error) {
       console.error("Error checking status", error);
@@ -179,12 +183,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const subscribe = async (pkg: any) => {
     try {
       setLoading(true);
-      if (!Capacitor.isNativePlatform()) {
-        // Mock purchase for web
-        await syncPurchaseToSupabase('mock_tx_123', true);
+      
+      // If it's a mock package (for testing) or not on native
+      if (pkg.isMock || !Capacitor.isNativePlatform()) {
+        console.log("Simulating purchase for mock package:", pkg.identifier);
+        await syncPurchaseToSupabase(`sim_tx_${Date.now()}`, true);
         return true;
       }
       
+      // REAL native purchase using RevenueCat
       const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
       
       if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
