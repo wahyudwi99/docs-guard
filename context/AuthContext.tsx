@@ -36,8 +36,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     restoreSession();
   }, []);
 
-  const fetchUserProfile = async (userId: string, metadata?: any): Promise<Partial<AuthUser>> => {
+  const fetchUserProfile = async (userId: string, metadata?: any, email?: string): Promise<Partial<AuthUser>> => {
     try {
+      console.log(`[AUTH] Fetching profile for: ${userId}`);
       // 1. Try to fetch existing profile
       const { data, error } = await supabase
         .from('users')
@@ -46,26 +47,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
         
       if (error) {
+        console.log(`[AUTH] Profile fetch status: ${error.code} (${error.message})`);
+        
         // 2. If profile is missing (Error PGRST116), create it (Auto-Repair)
-        if (error.code === 'PGRST116' && metadata) {
-          console.log("Profile missing, auto-repairing...");
+        if (error.code === 'PGRST116') {
+          console.log("[AUTH] Profile MISSING. Attempting AUTO-REPAIR...");
+          
+          const profileData = {
+            id: userId,
+            email: email || '',
+            full_name: metadata?.full_name || metadata?.name || 'User',
+            avatar_url: metadata?.avatar_url || metadata?.picture || '',
+            updated_at: new Date().toISOString()
+          };
+
           const { data: newData, error: insertError } = await supabase
             .from('users')
-            .upsert({
-              id: userId,
-              full_name: metadata.full_name || metadata.name || 'User',
-              avatar_url: metadata.avatar_url || metadata.picture || '',
-              updated_at: new Date().toISOString()
-            })
+            .upsert(profileData)
             .select()
             .single();
             
-          if (insertError) throw insertError;
+          if (insertError) {
+            console.error("[AUTH] AUTO-REPAIR FAILED:", insertError.code, insertError.message);
+            throw insertError;
+          }
+          
+          console.log("[AUTH] AUTO-REPAIR SUCCESSFUL");
           return { name: newData.full_name, image: newData.avatar_url, is_pro: newData.is_pro };
         }
         
         // Handle missing column error (previous fix)
         if (error.code === '42703') {
+          console.warn("[AUTH] Avatar column missing, retrying...");
           const { data: retryData, error: retryError } = await supabase
             .from('users')
             .select('is_pro, full_name')
@@ -77,13 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
+      console.log("[AUTH] Profile found in DB.");
       return {
         name: data.full_name,
         image: data.avatar_url,
         is_pro: data.is_pro
       };
     } catch (err) {
-      console.error('Error fetching user profile:', err);
+      console.error('[AUTH] fetchUserProfile exception:', err);
       return {};
     }
   };
@@ -91,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = async () => {
     if (user?.id) {
       const { data: { session } } = await supabase.auth.getSession();
-      const profileUpdates = await fetchUserProfile(user.id, session?.user?.user_metadata);
+      const profileUpdates = await fetchUserProfile(user.id, session?.user?.user_metadata, session?.user?.email);
       const updatedUser = { ...user, ...profileUpdates };
       setUser(updatedUser);
       await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
@@ -110,7 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id, session.user.user_metadata);
+        console.log("[AUTH] Session active:", session.user.email);
+        const profile = await fetchUserProfile(session.user.id, session.user.user_metadata, session.user.email);
         const currentUser: AuthUser = {
           id: session.user.id,
           email: session.user.email,
@@ -128,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Failed to restore session:', error);
+      console.error('[AUTH] restoreSession error:', error);
     } finally {
       setLoading(false);
     }
@@ -155,11 +170,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (result.result && result.result.responseType === 'online') {
-        const profile = result.result.profile;
         const idToken = result.result.idToken;
 
         if (idToken) {
-          // RE-ENABLED SUPABASE AUTH
+          console.log("[AUTH] Signing in with Supabase...");
           const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
             provider: 'google',
             token: idToken,
@@ -173,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.log("Waiting for DB trigger (2s)...");
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            const dbProfile = await fetchUserProfile(authData.user.id);
+            const dbProfile = await fetchUserProfile(authData.user.id, authData.user.user_metadata, authData.user.email);
             console.log("Fetched DB Profile:", dbProfile);
             
             const newUser: AuthUser = {
@@ -191,6 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
             
             setUser(newUser);
+            console.log("[AUTH] Login sequence finished.");
           }
         }
       }
