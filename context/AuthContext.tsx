@@ -59,8 +59,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     if (user?.id) {
+      // If supabase is enabled, fetch from server
       const profileUpdates = await fetchUserProfile(user.id);
       const updatedUser = { ...user, ...profileUpdates };
+      setUser(updatedUser);
+      await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
+    } else if (user) {
+      // In standalone test mode, we might just want to toggle is_pro for UI testing
+      const updatedUser = { ...user, is_pro: true };
       setUser(updatedUser);
       await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
     }

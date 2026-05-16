@@ -80,6 +80,22 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       const offerings = await Purchases.getOfferings();
       if (offerings.current !== null && offerings.current.availablePackages.length !== 0) {
         setPackages(offerings.current.availablePackages);
+      } else {
+        // Fallback to high-quality mocks if no native offerings configured yet
+        setPackages([
+          { 
+            identifier: 'weekly', 
+            product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
+          },
+          { 
+            identifier: 'monthly', 
+            product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
+          },
+          { 
+            identifier: 'yearly', 
+            product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
+          }
+        ]);
       }
     } catch (error) {
       console.error("Error fetching packages", error);

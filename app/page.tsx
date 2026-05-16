@@ -288,7 +288,8 @@ function HomeContent() {
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
                     {session.is_pro && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] font-black text-white uppercase tracking-widest shadow-sm">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20 animate-in fade-in zoom-in duration-500">
+                        <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
                         PRO
                       </span>
                     )}
