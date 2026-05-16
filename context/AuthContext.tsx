@@ -36,9 +36,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     restoreSession();
   }, []);
 
-  const fetchUserProfile = async (userId: string): Promise<Partial<AuthUser>> => {
+  const fetchUserProfile = async (userId: string, metadata?: any): Promise<Partial<AuthUser>> => {
     try {
-      // Try to fetch with all columns
+      // 1. Try to fetch existing profile
       const { data, error } = await supabase
         .from('users')
         .select('is_pro, full_name, avatar_url')
@@ -46,9 +46,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
         
       if (error) {
-        // If avatar_url is missing (Error 42703), try fetching without it
+        // 2. If profile is missing (Error PGRST116), create it (Auto-Repair)
+        if (error.code === 'PGRST116' && metadata) {
+          console.log("Profile missing, auto-repairing...");
+          const { data: newData, error: insertError } = await supabase
+            .from('users')
+            .upsert({
+              id: userId,
+              full_name: metadata.full_name || metadata.name || 'User',
+              avatar_url: metadata.avatar_url || metadata.picture || '',
+              updated_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+            
+          if (insertError) throw insertError;
+          return { name: newData.full_name, image: newData.avatar_url, is_pro: newData.is_pro };
+        }
+        
+        // Handle missing column error (previous fix)
         if (error.code === '42703') {
-          console.warn("Avatar column missing, retrying without it...");
           const { data: retryData, error: retryError } = await supabase
             .from('users')
             .select('is_pro, full_name')
@@ -73,13 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     if (user?.id) {
-      // If supabase is enabled, fetch from server
-      const profileUpdates = await fetchUserProfile(user.id);
+      const { data: { session } } = await supabase.auth.getSession();
+      const profileUpdates = await fetchUserProfile(user.id, session?.user?.user_metadata);
       const updatedUser = { ...user, ...profileUpdates };
       setUser(updatedUser);
       await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
     } else if (user) {
-      // In standalone test mode, we refresh from local storage or just keep current
       const { value } = await Preferences.get({ key: AUTH_STORAGE_KEY });
       if (value) {
         setUser(JSON.parse(value));
@@ -91,23 +107,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       
-      // RE-ENABLED SUPABASE INTEGRATION
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id);
+        const profile = await fetchUserProfile(session.user.id, session.user.user_metadata);
         const currentUser: AuthUser = {
           id: session.user.id,
           email: session.user.email,
           name: profile.name || session.user.user_metadata.full_name,
           image: profile.image || session.user.user_metadata.avatar_url,
-          is_pro: profile.is_pro,
+          is_pro: profile.is_pro || false,
           loggedIn: true
         };
         setUser(currentUser);
         await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(currentUser) });
       } else {
-        // Fallback to local preferences if offline
         const { value } = await Preferences.get({ key: AUTH_STORAGE_KEY });
         if (value) {
           setUser(JSON.parse(value));
