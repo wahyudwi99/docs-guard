@@ -202,6 +202,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const subscribe = async (pkg: any) => {
     try {
+      if (isPro && !pkg.isMock) {
+        console.log("[SUBSCRIPTION] User is already PRO. Checking if this package is already active...");
+        // Optional: Show a message to user "You already have an active plan"
+      }
+
       setLoading(true);
       
       // REAL native purchase using RevenueCat
@@ -211,6 +216,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         
         if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
           console.log("Purchase SUCCESSFUL for:", productIdentifier);
+          // Only sync if there is a NEW transaction date or ID
           await syncPurchaseToSupabase(productIdentifier, true);
           return true;
         }
