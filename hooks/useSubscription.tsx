@@ -30,21 +30,29 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [packages, setPackages] = useState<any[]>([
     { 
       identifier: 'weekly', 
+      isMock: true,
       product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
     },
     { 
       identifier: 'monthly', 
+      isMock: true,
       product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
     },
     { 
       identifier: 'yearly', 
+      isMock: true,
       product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
     }
   ]);
 
+  const isInitialized = React.useRef(false);
+
   useEffect(() => {
-    initRevenueCat();
-  }, [user]);
+    if (user?.id && !isInitialized.current) {
+      initRevenueCat();
+      isInitialized.current = true;
+    }
+  }, [user?.id]);
 
   const initRevenueCat = async () => {
     try {
