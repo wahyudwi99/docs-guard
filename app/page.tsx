@@ -556,24 +556,22 @@ function HomeContent() {
                   <div className="space-y-6">
                     <div className="p-8 rounded-[32px] bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-center space-y-4 shadow-xl shadow-indigo-200">
                       <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md">
-                        <Zap className="h-8 w-8 text-amber-300 fill-amber-300" />
+                        <Zap className={cn("h-8 w-8 text-amber-300 fill-amber-300", isPro && "animate-pulse")} />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="text-xl font-black">{isPro ? t('tabs.pro_active') : t('tabs.go_pro')}</h3>
+                        <h3 className="text-xl font-black">{isPro ? "You are a PRO Member!" : t('tabs.go_pro')}</h3>
                         <p className="text-xs text-indigo-100/80 font-medium">
-                          {isPro ? "Enjoy unlimited access to all features" : "Unlock privacy-first professional tools"}
+                          {isPro ? "You have unlimited access to all privacy features." : "Unlock privacy-first professional tools"}
                         </p>
                       </div>
                     </div>
                     
-                    {!isPro && (
-                      <button 
-                        onClick={() => setShowPaywall(true)}
-                        className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-100 uppercase tracking-widest text-[10px]"
-                      >
-                        {t('tabs.go_pro')}
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => setShowPaywall(true)}
+                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-100 uppercase tracking-widest text-[10px]"
+                    >
+                      {isPro ? "Manage / View Plans" : t('tabs.go_pro')}
+                    </button>
                     
                     <div className="grid grid-cols-1 gap-3">
                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">

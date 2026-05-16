@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import { useAuth } from './useAuth';
 import { supabase } from '@/lib/supabase';
 
@@ -26,7 +27,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const [loading, setLoading] = useState(true);
   const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
-  const [packages, setPackages] = useState<any[]>([]);
+  const [packages, setPackages] = useState<any[]>([
+    { 
+      identifier: 'weekly', 
+      product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
+    },
+    { 
+      identifier: 'monthly', 
+      product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
+    },
+    { 
+      identifier: 'yearly', 
+      product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
+    }
+  ]);
 
   useEffect(() => {
     initRevenueCat();
@@ -123,30 +137,37 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
-    if (!user?.id) return;
-
     try {
-      // Update user pro status
-      await supabase
-        .from('users')
-        .update({ is_pro: active, updated_at: new Date().toISOString() })
-        .eq('id', user.id);
-        
-      if (transactionId && active) {
-        // Log payment
+      if (user?.id) {
+        // Update user pro status in Supabase
         await supabase
-          .from('payments')
-          .insert({
-            user_id: user.id,
-            transaction_id: transactionId,
-            status: 'completed',
-          });
+          .from('users')
+          .update({ is_pro: active, updated_at: new Date().toISOString() })
+          .eq('id', user.id);
+          
+        if (transactionId && active) {
+          // Log payment in Supabase
+          await supabase
+            .from('payments')
+            .insert({
+              user_id: user.id,
+              transaction_id: transactionId,
+              status: 'completed',
+            });
+        }
+      } else if (user) {
+        // Standalone test mode: update local preferences directly
+        const updatedUser = { ...user, is_pro: active };
+        await Preferences.set({
+          key: 'docs_guard_auth_user',
+          value: JSON.stringify(updatedUser),
+        });
       }
       
       // Refresh local auth context
       await refreshProfile();
     } catch (error) {
-      console.error("Error syncing to Supabase", error);
+      console.error("Error syncing purchase status", error);
     }
   };
 

@@ -65,10 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(updatedUser);
       await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
     } else if (user) {
-      // In standalone test mode, we might just want to toggle is_pro for UI testing
-      const updatedUser = { ...user, is_pro: true };
-      setUser(updatedUser);
-      await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(updatedUser) });
+      // In standalone test mode, we refresh from local storage or just keep current
+      const { value } = await Preferences.get({ key: AUTH_STORAGE_KEY });
+      if (value) {
+        setUser(JSON.parse(value));
+      }
     }
   };
 
