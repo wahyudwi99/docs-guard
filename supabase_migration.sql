@@ -4,6 +4,7 @@ CREATE TABLE public.users (
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE,
   full_name text,
+  avatar_url text, -- Tambahkan kolom ini
   is_pro boolean DEFAULT false,
   subscription_end_date timestamptz,
   revenuecat_id text UNIQUE,
@@ -60,7 +61,8 @@ BEGIN
   VALUES (
     new.id, 
     new.email, 
-    new.raw_user_meta_data->>'full_name'
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url' -- Pastikan ini ada dan pas
   );
   RETURN new;
 END;
