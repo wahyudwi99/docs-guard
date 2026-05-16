@@ -184,24 +184,27 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       setLoading(true);
       
-      // If it's a mock package (for testing) or not on native
-      if (pkg.isMock || !Capacitor.isNativePlatform()) {
-        console.log("Simulating purchase for mock package:", pkg.identifier);
+      // REAL native purchase using RevenueCat
+      if (!pkg.isMock && Capacitor.isNativePlatform()) {
+        console.log("Triggering REAL native purchase for:", pkg.identifier);
+        const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
+        
+        if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
+          console.log("Purchase SUCCESSFUL for:", productIdentifier);
+          await syncPurchaseToSupabase(productIdentifier, true);
+          return true;
+        }
+      } else {
+        // Fallback for mock package (for testing UI/DB only)
+        console.log("Simulating purchase for mock/web package:", pkg.identifier);
         await syncPurchaseToSupabase(`sim_tx_${Date.now()}`, true);
         return true;
       }
       
-      // REAL native purchase using RevenueCat
-      const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
-      
-      if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
-        await syncPurchaseToSupabase(productIdentifier, true);
-        return true;
-      }
       return false;
     } catch (error: any) {
       if (!error.userCancelled) {
-        console.error("Purchase error", error);
+        console.error("Native Purchase Error:", error);
       }
       return false;
     } finally {
