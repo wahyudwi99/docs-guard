@@ -38,13 +38,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUserProfile = async (userId: string): Promise<Partial<AuthUser>> => {
     try {
+      // Try to fetch with all columns
       const { data, error } = await supabase
         .from('users')
         .select('is_pro, full_name, avatar_url')
         .eq('id', userId)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        // If avatar_url is missing (Error 42703), try fetching without it
+        if (error.code === '42703') {
+          console.warn("Avatar column missing, retrying without it...");
+          const { data: retryData, error: retryError } = await supabase
+            .from('users')
+            .select('is_pro, full_name')
+            .eq('id', userId)
+            .single();
+          if (retryError) throw retryError;
+          return { name: retryData.full_name, is_pro: retryData.is_pro };
+        }
+        throw error;
+      }
       
       return {
         name: data.full_name,
