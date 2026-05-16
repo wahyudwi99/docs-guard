@@ -110,6 +110,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
 
+      // FORCE LOGOUT FIRST for clean state (prevents nonce mismatch)
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await SocialLogin.logout({ provider: 'google' });
+        } catch (e) {
+          // Ignore logout errors
+        }
+      }
+
       const result = await SocialLogin.login({
         provider: 'google',
         options: {
