@@ -554,23 +554,65 @@ function HomeContent() {
 
                 {activeTab === 'subscription' && (
                   <div className="space-y-6">
-                    <div className="p-8 rounded-[32px] bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-center space-y-4 shadow-xl shadow-indigo-200">
-                      <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md">
+                    <div className="p-8 rounded-[32px] bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-center space-y-4 shadow-xl shadow-indigo-200 overflow-hidden relative">
+                      <div className="absolute top-0 right-0 p-4 opacity-10">
+                         <Zap className="h-24 w-24 fill-white" />
+                      </div>
+                      <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md relative z-10">
                         <Zap className={cn("h-8 w-8 text-amber-300 fill-amber-300", isPro && "animate-pulse")} />
                       </div>
-                      <div className="space-y-1">
-                        <h3 className="text-xl font-black">{isPro ? "You are a PRO Member!" : t('tabs.go_pro')}</h3>
+                      <div className="space-y-1 relative z-10">
+                        <h3 className="text-xl font-black">{isPro ? "You are a PRO Member!" : "Go Pro Today"}</h3>
                         <p className="text-xs text-indigo-100/80 font-medium">
-                          {isPro ? "You have unlimited access to all privacy features." : "Unlock privacy-first professional tools"}
+                          {isPro ? "You have unlimited access to all privacy features." : "Choose a plan to unlock all premium tools"}
                         </p>
                       </div>
                     </div>
                     
+                    <div className="grid grid-cols-1 gap-4">
+                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Available Plans</p>
+                       {(useSubscription().packages).map((pkg: any) => {
+                          const isYearly = pkg.identifier.toLowerCase().includes('yearly');
+                          return (
+                            <button
+                              key={pkg.identifier}
+                              onClick={() => useSubscription().subscribe(pkg)}
+                              className={cn(
+                                "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                                isYearly 
+                                  ? "bg-indigo-50 border-indigo-200 shadow-sm" 
+                                  : "bg-white border-slate-100 hover:border-indigo-200"
+                              )}
+                            >
+                              {isYearly && (
+                                <div className="absolute top-4 right-5 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm">
+                                  Best Value
+                                </div>
+                              )}
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="font-bold text-sm text-slate-900">{pkg.product.title}</span>
+                                <span className="font-black text-lg text-indigo-600">{pkg.product.priceString}</span>
+                              </div>
+                              <p className="text-[10px] font-medium text-slate-400">
+                                {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                              </p>
+                            </button>
+                          );
+                       })}
+                    </div>
+
                     <button 
-                      onClick={() => setShowPaywall(true)}
-                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-100 uppercase tracking-widest text-[10px]"
+                      onClick={async () => {
+                        const { Preferences } = await import('@capacitor/preferences');
+                        if (session) {
+                          const updated = { ...session, is_pro: false };
+                          await Preferences.set({ key: 'docs_guard_auth_user', value: JSON.stringify(updated) });
+                          window.location.reload();
+                        }
+                      }}
+                      className="w-full py-3 bg-rose-50 text-rose-500 font-bold rounded-2xl text-[8px] uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
                     >
-                      {isPro ? "Manage / View Plans" : t('tabs.go_pro')}
+                      Reset Pro Status (Dev Only)
                     </button>
                     
                     <div className="grid grid-cols-1 gap-3">
