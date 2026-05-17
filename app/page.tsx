@@ -336,8 +336,8 @@ function HomeContent() {
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
                     {session ? (
-                      <span className="flex items-center gap-1.5 whitespace-nowrap">
-                        Hi, {session.name} <span className="animate-bounce ml-1">👋</span>
+                      <span className="flex items-center gap-1.5 whitespace-nowrap capitalize">
+                        Hi, {session.name?.toLowerCase()} <span className="ml-1">👋</span>
                       </span>
                     ) : t('nav.privacy_banner_title')}
                   </span>
@@ -582,8 +582,13 @@ function HomeContent() {
                     </div>
                     <div className="grid grid-cols-1 gap-4">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Available Plans</p>
-                       {/* Plan Cards directly in the tab */}
-                       {packages.map((pkg: any) => {
+                       {/* Plan Cards directly in the tab - Sorted by duration */}
+                       {[...packages].sort((a: any, b: any) => {
+                          const order = ['weekly', 'monthly', 'yearly'];
+                          const aType = a.identifier.toLowerCase().includes('weekly') ? 'weekly' : a.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
+                          const bType = b.identifier.toLowerCase().includes('weekly') ? 'weekly' : b.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
+                          return order.indexOf(aType) - order.indexOf(bType);
+                       }).map((pkg: any) => {
                           const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
                           const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
                           const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
@@ -615,13 +620,13 @@ function HomeContent() {
                               )}
                             >
                               {isYearly && (
-                                <div className="absolute top-4 right-5 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm">
+                                <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
                                   Best Value
                                 </div>
                               )}
                               <div className="flex justify-between items-center mb-1">
-                                <span className="font-bold text-sm text-slate-900">{displayName}</span>
-                                <span className="font-black text-lg text-indigo-600">{pkg.product.priceString}</span>
+                                <span className="font-bold text-sm text-slate-900 pr-16">{displayName}</span>
+                                <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
                               </div>
                               <p className="text-[10px] font-medium text-slate-400">
                                 {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
