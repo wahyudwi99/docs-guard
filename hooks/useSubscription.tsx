@@ -24,6 +24,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<any[]>([]);
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
+  const [purchaseHistory, setPurchaseHistory] = useState<any[]>([]);
   
   // Single source of truth for PRO status is the user profile from Supabase
   const isPro = user?.is_pro || false;
@@ -39,6 +40,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const initRevenueCat = async () => {
     try {
       setLoading(true);
+      if (user?.id) {
+        await fetchPurchaseHistory(user.id);
+      }
+      
       if (Capacitor.isNativePlatform()) {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         if (Capacitor.getPlatform() === 'ios') {
@@ -61,6 +66,22 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } catch (error) {
       console.error("RevenueCat Init Error:", error);
       setLoading(false);
+    }
+  };
+
+  const fetchPurchaseHistory = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+        
+      if (data) {
+        setPurchaseHistory(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch history:", error);
     }
   };
 
@@ -107,8 +128,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         if (isPro) {
           const expiredEntitlement = customerInfo.entitlements.all['pro'];
           if (expiredEntitlement && expiredEntitlement.expirationDate) {
-            console.log("[SUBSCRIPTION] Subscription explicitly EXPIRED. Removing PRO status.");
-            await syncPurchaseToSupabase(null, false, null, null);
+            // Check if expiration date is actually in the past
+            if (new Date(expiredEntitlement.expirationDate).getTime() < new Date().getTime()) {
+              console.log("[SUBSCRIPTION] Subscription explicitly EXPIRED. Removing PRO status.");
+              await syncPurchaseToSupabase(null, false, null, null);
+            }
           } else {
             console.log("[SUBSCRIPTION] Trusting database PRO status. No explicit expiration found in RevenueCat.");
           }
@@ -144,6 +168,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
             status: 'completed',
             created_at: new Date().toISOString()
           });
+          
+        await fetchPurchaseHistory(user.id);
       }
       
       await refreshProfile();
