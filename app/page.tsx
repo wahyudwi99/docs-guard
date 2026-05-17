@@ -291,11 +291,11 @@ function HomeContent() {
                       <div className="flex items-center gap-1 animate-in fade-in zoom-in duration-500">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20">
                           <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
-                          PRO
+                          PRO {session.subscription_type ? session.subscription_type : ''}
                         </span>
                         {session.subscription_end_date && (
                           <span className="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200 uppercase tracking-tighter">
-                            {session.subscription_type} • {(() => {
+                            {(() => {
                               const end = new Date(session.subscription_end_date);
                               const diff = end.getTime() - new Date().getTime();
                               const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
