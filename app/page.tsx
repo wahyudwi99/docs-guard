@@ -611,7 +611,7 @@ function HomeContent() {
                          {isPro ? "Your Active Plans" : "Available Plans"}
                        </p>
                        
-                       {/* IF PRO: Show only active entitlements with a cancel button for each */}
+                       {/* IF PRO: Show only active entitlements and smart upgrade options */}
                        {isPro ? (
                          <div className="space-y-4">
                            {activeEntitlements.length > 0 ? (
@@ -626,16 +626,10 @@ function HomeContent() {
                                    </span>
                                    <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
                                  </div>
-                                 <p className="text-[10px] font-medium text-slate-500 mb-4">
+                                 <p className="text-[10px] font-medium text-slate-500">
                                    Valid until {new Date(ent.expirationDate).toLocaleDateString()}
                                  </p>
-                                 <button 
-                                   onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
-                                   className="w-full py-3 bg-white text-rose-500 border border-rose-100 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
-                                 >
-                                   <X className="h-3.5 w-3.5" />
-                                   Manage Subscription
-                                 </button>                               </div>
+                               </div>
                              ))
                            ) : (
                               /* Fallback to database session if entitlements are loading but DB says Pro */
@@ -644,18 +638,50 @@ function HomeContent() {
                                   <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{session?.subscription_type?.toUpperCase() || 'Premium'} Plan</span>
                                   <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
                                 </div>
-                                <p className="text-[10px] font-medium text-slate-500 mb-4">
+                                <p className="text-[10px] font-medium text-slate-500">
                                   Valid until {session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Active'}
                                 </p>
-                                <button 
-                                  onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
-                                  className="w-full py-3 bg-white text-rose-500 border border-rose-100 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
-                                >
-                                  <X className="h-3.5 w-3.5" />
-                                  Manage via Apple Store
-                                </button>
                               </div>
                            )}
+
+                           {/* Smart Upgrade Options */}
+                           {(() => {
+                              const planType = currentPlan?.type?.toLowerCase();
+                              if (planType === 'yearly') return null;
+
+                              const availableUpgrades = packages.filter((pkg: any) => {
+                                if (planType === 'weekly') {
+                                  return pkg.identifier.toLowerCase().includes('monthly') || pkg.identifier.toLowerCase().includes('yearly');
+                                }
+                                if (planType === 'monthly') {
+                                  return pkg.identifier.toLowerCase().includes('yearly');
+                                }
+                                return false;
+                              });
+
+                              if (availableUpgrades.length === 0) return null;
+
+                              return (
+                                <div className="pt-2 space-y-3">
+                                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Upgrade Your Experience</p>
+                                  {availableUpgrades.map((pkg: any) => (
+                                    <button
+                                      key={pkg.identifier}
+                                      onClick={() => subscribe(pkg)}
+                                      className="relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2 bg-white border-indigo-100 hover:border-indigo-300 shadow-sm"
+                                    >
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className="font-bold text-sm text-slate-900">Upgrade to {pkg.product.title}</span>
+                                        <span className="font-black text-lg text-indigo-600">{pkg.product.priceString}</span>
+                                      </div>
+                                      <p className="text-[10px] font-medium text-slate-400">
+                                        Unlock long-term premium benefits and save more.
+                                      </p>
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                           })()}
                          </div>
                        ) : (
                          /* IF NOT PRO: Show Plan Cards directly in the tab - Sorted by duration */
