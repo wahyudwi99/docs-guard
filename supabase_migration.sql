@@ -11,6 +11,7 @@ CREATE TABLE public.users (
   email text UNIQUE,
   full_name text,
   is_pro boolean DEFAULT false,
+  subscription_type text, -- 'weekly', 'monthly', 'yearly'
   subscription_end_date timestamptz,
   revenuecat_id text UNIQUE,
   created_at timestamptz DEFAULT now(),

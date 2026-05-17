@@ -60,11 +60,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (Capacitor.isNativePlatform()) {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         
-        // Use placeholders or env vars for the keys
         if (Capacitor.getPlatform() === 'ios') {
           await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
-        } else if (Capacitor.getPlatform() === 'android') {
-          await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY || 'YOUR_REVENUECAT_ANDROID_KEY' });
         }
 
         if (user?.id) {
@@ -74,21 +71,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         await fetchPackages();
         await checkSubscriptionStatus();
       } else {
-        // Mock packages for web development with sensible tiered pricing
-        setPackages([
-          { 
-            identifier: 'weekly', 
-            product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
-          },
-          { 
-            identifier: 'monthly', 
-            product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
-          },
-          { 
-            identifier: 'yearly', 
-            product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
-          }
-        ]);
         setLoading(false);
       }
     } catch (error) {
@@ -134,15 +116,24 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (!Capacitor.isNativePlatform() || !user?.id) return;
       
       const { customerInfo } = await Purchases.getCustomerInfo();
-      const isActive = typeof customerInfo.entitlements.active['pro'] !== "undefined";
+      const entitlement = customerInfo.entitlements.active['pro'];
+      const isActive = typeof entitlement !== "undefined";
       
-      // Sync status with Supabase based on RevenueCat truth
-      if (isActive && !isPro) {
-        console.log("[SUBSCRIPTION] Syncing: Becoming PRO");
-        await syncPurchaseToSupabase(null, true);
-      } else if (!isActive && isPro) {
-        console.log("[SUBSCRIPTION] Syncing: Subscription EXPIRED. Removing PRO status.");
-        await syncPurchaseToSupabase(null, false);
+      const expirationDate = entitlement?.expirationDate || null;
+      const productIdentifier = entitlement?.productIdentifier || null;
+      
+      let subType = null;
+      if (productIdentifier) {
+        if (productIdentifier.toLowerCase().includes('weekly')) subType = 'weekly';
+        else if (productIdentifier.toLowerCase().includes('monthly')) subType = 'monthly';
+        else if (productIdentifier.toLowerCase().includes('yearly')) subType = 'yearly';
+      }
+      
+      if (isActive) {
+        await syncPurchaseToSupabase(null, true, subType, expirationDate);
+      } else if (isPro) {
+        // Entitlement gone, sync with DB
+        await syncPurchaseToSupabase(null, false, null, null);
       }
     } catch (error) {
       console.error("Error checking status", error);
@@ -151,22 +142,23 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
 
-  const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean) => {
+  const syncPurchaseToSupabase = async (transactionId: string | null, active: boolean, type?: string | null, endDate?: string | null) => {
     if (!user?.id) return;
 
     try {
-      // 1. Update ONLY the user's PRO status (always do this on sync)
       const { error: userError } = await supabase
         .from('users')
-        .update({ is_pro: active, updated_at: new Date().toISOString() })
+        .update({ 
+          is_pro: active, 
+          subscription_type: type,
+          subscription_end_date: endDate,
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', user.id);
         
       if (userError) throw userError;
 
-      // 2. Log payment ONLY if we have a transactionId (means it's a NEW manual purchase)
-      // and only if the status is active.
       if (transactionId && active) {
-        console.log("[SUPABASE] Logging NEW transaction:", transactionId);
         await supabase
           .from('payments')
           .upsert({
@@ -185,28 +177,37 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const subscribe = async (pkg: any) => {
     try {
-      if (isPro && !pkg.isMock) {
-        console.log("[SUBSCRIPTION] User is already PRO. Checking if this package is already active...");
-        // Optional: Show a message to user "You already have an active plan"
-      }
-
       setLoading(true);
       
-      // REAL native purchase using RevenueCat
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
-        console.log("Triggering REAL native purchase for:", pkg.identifier);
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
         
-        if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
-          console.log("Purchase SUCCESSFUL for:", productIdentifier);
-          // Only sync if there is a NEW transaction date or ID
-          await syncPurchaseToSupabase(productIdentifier, true);
+        const entitlement = customerInfo.entitlements.active['pro'];
+        if (typeof entitlement !== "undefined") {
+          const expirationDate = entitlement.expirationDate || null;
+          let subType = 'monthly';
+          if (pkg.identifier.toLowerCase().includes('weekly')) subType = 'weekly';
+          else if (pkg.identifier.toLowerCase().includes('yearly')) subType = 'yearly';
+          
+          await syncPurchaseToSupabase(productIdentifier, true, subType, expirationDate);
           return true;
         }
       } else {
-        // Fallback for mock package (for testing UI/DB only)
-        console.log("Simulating purchase for mock/web package:", pkg.identifier);
-        await syncPurchaseToSupabase(`sim_tx_${Date.now()}`, true);
+        // Simulated purchase
+        const fakeExpiry = new Date();
+        let subType = 'monthly';
+        if (pkg.identifier.includes('weekly')) {
+          fakeExpiry.setDate(fakeExpiry.getDate() + 7);
+          subType = 'weekly';
+        } else if (pkg.identifier.includes('monthly')) {
+          fakeExpiry.setMonth(fakeExpiry.getMonth() + 1);
+          subType = 'monthly';
+        } else {
+          fakeExpiry.setFullYear(fakeExpiry.getFullYear() + 1);
+          subType = 'yearly';
+        }
+
+        await syncPurchaseToSupabase(`sim_tx_${Date.now()}`, true, subType, fakeExpiry.toISOString());
         return true;
       }
       
@@ -227,8 +228,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (!Capacitor.isNativePlatform()) return false;
       
       const { customerInfo } = await Purchases.restorePurchases();
-      if (typeof customerInfo.entitlements.active['pro'] !== "undefined") {
-        await syncPurchaseToSupabase(null, true);
+      const entitlement = customerInfo.entitlements.active['pro'];
+      if (typeof entitlement !== "undefined") {
+        const expirationDate = entitlement.expirationDate || null;
+        const productIdentifier = entitlement.productIdentifier || null;
+        let subType = 'monthly';
+        if (productIdentifier?.toLowerCase().includes('weekly')) subType = 'weekly';
+        else if (productIdentifier?.toLowerCase().includes('yearly')) subType = 'yearly';
+
+        await syncPurchaseToSupabase(null, true, subType, expirationDate);
         return true;
       }
       return false;
@@ -260,7 +268,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 export const useSubscription = () => {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
-    throw new Error('useSubscription must be used within a SubscriptionProvider');
+    throw new Error('useSubscription must be used within an AuthProvider');
   }
   return context;
 };

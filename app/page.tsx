@@ -288,10 +288,22 @@ function HomeContent() {
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
                     {session.is_pro && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20 animate-in fade-in zoom-in duration-500">
-                        <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
-                        PRO
-                      </span>
+                      <div className="flex items-center gap-1 animate-in fade-in zoom-in duration-500">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20">
+                          <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
+                          PRO
+                        </span>
+                        {session.subscription_end_date && (
+                          <span className="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200 uppercase tracking-tighter">
+                            {session.subscription_type} • {(() => {
+                              const end = new Date(session.subscription_end_date);
+                              const diff = end.getTime() - new Date().getTime();
+                              const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                              return days > 0 ? `${days}d left` : 'Expired';
+                            })()}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -583,10 +595,12 @@ function HomeContent() {
                       </div>
                       <div className="space-y-1 relative z-10">
                         <h3 className="text-xl font-black">
-                          {isPro ? "Pro Status Active" : "Go Pro Today"}
+                          {isPro ? `${session?.subscription_type || 'Pro'} Member` : "Go Pro Today"}
                         </h3>
                         <p className={cn("text-xs font-medium", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
-                          {isPro ? "We've detected your premium membership. Enjoy!" : "Choose a plan to unlock all premium tools"}
+                          {isPro 
+                            ? `Active until ${session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'forever'}` 
+                            : "Choose a plan to unlock all premium tools"}
                         </p>
                       </div>
                     </div>

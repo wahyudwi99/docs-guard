@@ -12,6 +12,8 @@ export type AuthUser = {
   email?: string;
   image?: string;
   is_pro?: boolean;
+  subscription_type?: string | null;
+  subscription_end_date?: string | null;
   loggedIn: boolean;
 };
 
@@ -40,10 +42,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log(`[AUTH] Fetching profile for: ${userId}`);
       
-      // 1. Try to fetch existing profile (Stopped selecting avatar_url)
+      // 1. Try to fetch existing profile
       const { data, error } = await supabase
         .from('users')
-        .select('is_pro, full_name')
+        .select('is_pro, full_name, subscription_type, subscription_end_date')
         .eq('id', userId)
         .single();
         
@@ -73,7 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           
           console.log("[AUTH] AUTO-REPAIR SUCCESSFUL");
-          return { name: newData.full_name, is_pro: newData.is_pro };
+          return { 
+            name: newData.full_name, 
+            is_pro: newData.is_pro,
+            subscription_type: newData.subscription_type,
+            subscription_end_date: newData.subscription_end_date
+          };
         }
         throw error;
       }
@@ -81,7 +88,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("[AUTH] Profile found in DB.");
       return {
         name: data.full_name,
-        is_pro: data.is_pro
+        is_pro: data.is_pro,
+        subscription_type: data.subscription_type,
+        subscription_end_date: data.subscription_end_date
       };
     } catch (err) {
       console.error('[AUTH] fetchUserProfile exception:', err);
@@ -119,6 +128,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: profile.name || session.user.user_metadata.full_name,
           image: session.user.user_metadata.avatar_url, // Metadata only
           is_pro: profile.is_pro || false,
+          subscription_type: profile.subscription_type,
+          subscription_end_date: profile.subscription_end_date,
           loggedIn: true
         };
         setUser(currentUser);
