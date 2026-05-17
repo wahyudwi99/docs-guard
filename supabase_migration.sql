@@ -1,10 +1,15 @@
--- 1. TABEL USERS (Profil dan Status Langganan)
+-- 1. HAPUS SEMUANYA AGAR BERSIH
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP TABLE IF EXISTS public.payments;
+DROP TABLE IF EXISTS public.users;
+
+-- 2. TABEL USERS (Profil dan Status Langganan)
 CREATE TABLE public.users (
   -- ID ini harus sama dengan ID di auth.users (Supabase Auth)
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE,
   full_name text,
-  avatar_url text, -- Tambahkan kolom ini
   is_pro boolean DEFAULT false,
   subscription_end_date timestamptz,
   revenuecat_id text UNIQUE,
@@ -12,7 +17,7 @@ CREATE TABLE public.users (
   updated_at timestamptz DEFAULT now()
 );
 
--- 2. TABEL PAYMENTS (Riwayat Transaksi)
+-- 3. TABEL PAYMENTS (Riwayat Transaksi)
 CREATE TABLE public.payments (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
@@ -23,47 +28,24 @@ CREATE TABLE public.payments (
   created_at timestamptz DEFAULT now()
 );
 
--- 3. AKTIFKAN KEAMANAN (Row Level Security)
+-- 4. AKTIFKAN KEAMANAN (Row Level Security)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
--- 4. KEBIJAKAN AKSES (Policies)
--- User hanya bisa melihat datanya sendiri di tabel users
-DROP POLICY IF EXISTS "Users can view their own profile" ON public.users;
-CREATE POLICY "Users can view their own profile" 
-ON public.users FOR SELECT 
-USING (auth.uid() = id);
-
--- User bisa mengupdate profilnya sendiri (penting untuk is_pro)
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
-CREATE POLICY "Users can update their own profile" 
-ON public.users FOR UPDATE 
-USING (auth.uid() = id);
-
--- User bisa membuat profilnya sendiri (Auto-Repair)
-DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
-CREATE POLICY "Users can insert their own profile" 
-ON public.users FOR INSERT 
+-- 5. KEBIJAKAN AKSES (Policies) - Memberikan izin penuh (SELECT, INSERT, UPDATE) untuk data milik sendiri
+DROP POLICY IF EXISTS "Users can manage their own profile" ON public.users;
+CREATE POLICY "Users can manage their own profile" 
+ON public.users FOR ALL
+USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- User hanya bisa melihat riwayat pembayarannya sendiri
-DROP POLICY IF EXISTS "Users can view their own payments" ON public.payments;
-CREATE POLICY "Users can view their own payments" 
-ON public.payments FOR SELECT 
-USING (auth.uid() = user_id);
-
--- User bisa mencatat pembayarannya sendiri (INSERT) dan memperbaruinya (UPDATE untuk upsert)
-DROP POLICY IF EXISTS "Users can insert their own payments" ON public.payments;
-CREATE POLICY "Users can insert their own payments" 
-ON public.payments FOR INSERT 
+DROP POLICY IF EXISTS "Users can manage their own payments" ON public.payments;
+CREATE POLICY "Users can manage their own payments" 
+ON public.payments FOR ALL
+USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can update their own payments" ON public.payments;
-CREATE POLICY "Users can update their own payments" 
-ON public.payments FOR UPDATE 
-USING (auth.uid() = user_id);
-
--- 5. TRIGGER OTOMATIS UNTUK UPDATED_AT
+-- 6. TRIGGER OTOMATIS UNTUK UPDATED_AT
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -77,21 +59,18 @@ BEFORE UPDATE ON public.users
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
--- 6. TRIGGER UNTUK OTOMATIS COPY DATA DARI AUTH KE PUBLIC.USERS
+-- 7. TRIGGER UNTUK OTOMATIS COPY DATA DARI AUTH KE PUBLIC.USERS
 -- Setiap kali user baru daftar lewat Google, baris di public.users akan otomatis dibuat.
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
-
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.users (id, email, full_name, avatar_url)
+  INSERT INTO public.users (id, email, full_name)
   VALUES (
     new.id, 
     new.email, 
-    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User'),
-    COALESCE(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', '')
-  );
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User')
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
