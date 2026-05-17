@@ -1,17 +1,24 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { useAuth } from './useAuth';
 import { supabase } from '@/lib/supabase';
 
+interface ActivePlan {
+  type: string;
+  endDate: string | null;
+  productIdentifier: string;
+}
+
 interface SubscriptionContextType {
   isPro: boolean;
   loading: boolean;
   packages: any[];
   activeEntitlements: any[];
+  currentPlan: ActivePlan | null;
   subscribe: (pkg: any) => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
   checkSubscriptionStatus: () => Promise<void>;
@@ -26,9 +33,43 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
   const [purchaseHistory, setPurchaseHistory] = useState<any[]>([]);
   
-  // Single source of truth for PRO status is the user profile from Supabase
-  const isPro = user?.is_pro || false;
   const isInitialized = useRef(false);
+
+  // Derive isPro from both DB and active entitlements for maximum responsiveness
+  const isPro = useMemo(() => {
+    return (user?.is_pro === true) || activeEntitlements.length > 0;
+  }, [user?.is_pro, activeEntitlements]);
+
+  // Determine the primary active plan (prioritize latest purchase)
+  const currentPlan = useMemo(() => {
+    if (activeEntitlements.length === 0) {
+      if (user?.is_pro && user.subscription_type) {
+        return {
+          type: user.subscription_type,
+          endDate: user.subscription_end_date || null,
+          productIdentifier: ''
+        };
+      }
+      return null;
+    }
+
+    // Sort by latest purchase date
+    const sorted = [...activeEntitlements].sort((a, b) => 
+      new Date(b.latestPurchaseDate).getTime() - new Date(a.latestPurchaseDate).getTime()
+    );
+    
+    const primary = sorted[0];
+    let subType = 'premium';
+    if (primary.productIdentifier.toLowerCase().includes('weekly')) subType = 'weekly';
+    else if (primary.productIdentifier.toLowerCase().includes('monthly')) subType = 'monthly';
+    else if (primary.productIdentifier.toLowerCase().includes('yearly')) subType = 'yearly';
+
+    return {
+      type: subType,
+      endDate: primary.expirationDate,
+      productIdentifier: primary.productIdentifier
+    };
+  }, [activeEntitlements, user]);
 
   useEffect(() => {
     if (user?.id && !isInitialized.current) {
@@ -107,34 +148,28 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       const isActive = active.length > 0;
       
       if (isActive) {
-        // Sort by latest purchase date to get the "current" primary plan
         const sorted = [...active].sort((a, b) => 
           new Date(b.latestPurchaseDate).getTime() - new Date(a.latestPurchaseDate).getTime()
         );
         
         const primary = sorted[0];
-        let subType = 'pro';
+        let subType = 'premium';
         if (primary.productIdentifier.toLowerCase().includes('weekly')) subType = 'weekly';
         else if (primary.productIdentifier.toLowerCase().includes('monthly')) subType = 'monthly';
         else if (primary.productIdentifier.toLowerCase().includes('yearly')) subType = 'yearly';
 
-        // Only sync if data has actually changed or we are becoming PRO
-        if (!isPro || user?.subscription_type !== subType) {
-          console.log("[SUBSCRIPTION] Status update needed: Syncing to PRO");
+        if (user?.is_pro !== true || user?.subscription_type !== subType) {
           await syncPurchaseToSupabase(null, true, subType, primary.expirationDate);
         }
       } else {
         // If DB says Pro but RevenueCat says No Active Plans
-        if (isPro) {
+        if (user?.is_pro === true) {
           const expiredEntitlement = customerInfo.entitlements.all['pro'];
           if (expiredEntitlement && expiredEntitlement.expirationDate) {
-            // Check if expiration date is actually in the past
             if (new Date(expiredEntitlement.expirationDate).getTime() < new Date().getTime()) {
-              console.log("[SUBSCRIPTION] Subscription explicitly EXPIRED. Removing PRO status.");
+              console.log("[SUBSCRIPTION] Subscription EXPIRED. Removing PRO status.");
               await syncPurchaseToSupabase(null, false, null, null);
             }
-          } else {
-            console.log("[SUBSCRIPTION] Trusting database PRO status. No explicit expiration found in RevenueCat.");
           }
         }
       }
@@ -232,7 +267,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   return (
-    <SubscriptionContext.Provider value={{ isPro, loading, packages, activeEntitlements, subscribe, restorePurchases, checkSubscriptionStatus }}>
+    <SubscriptionContext.Provider value={{ isPro, loading, packages, activeEntitlements, currentPlan, subscribe, restorePurchases, checkSubscriptionStatus }}>
       {children}
     </SubscriptionContext.Provider>
   );

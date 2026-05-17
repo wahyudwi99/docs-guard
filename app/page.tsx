@@ -38,12 +38,14 @@ function HomeContent() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
-  const { isPro, packages, subscribe } = useSubscription();
+  const { isPro, packages, subscribe, currentPlan, activeEntitlements } = useSubscription();
 
   useEffect(() => {
     console.log("Auth Status:", isLoadingAuth ? 'loading' : (session ? 'authenticated' : 'unauthenticated'));
     console.log("Session Data:", session);
-  }, [isLoadingAuth, session]);
+    console.log("Subscription Status:", isPro ? 'PRO' : 'FREE');
+    console.log("Current Plan:", currentPlan);
+  }, [isLoadingAuth, session, isPro, currentPlan]);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -287,19 +289,19 @@ function HomeContent() {
                 <div className="hidden sm:flex flex-col items-end leading-none">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
-                    {session.is_pro && (
+                    {isPro && (
                       <div className="flex items-center gap-1 animate-in fade-in zoom-in duration-500">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20">
                           <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
-                          PRO {session.subscription_type ? session.subscription_type : ''}
+                          PRO {currentPlan?.type?.toUpperCase() || ''}
                         </span>
-                        {session.subscription_end_date && (
+                        {currentPlan?.endDate && (
                           <span className="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200 uppercase tracking-tighter">
                             {(() => {
-                              const end = new Date(session.subscription_end_date);
+                              const end = new Date(currentPlan.endDate);
                               const diff = end.getTime() - new Date().getTime();
                               const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                              return days > 0 ? `${days}d left` : 'Expired';
+                              return days > 0 ? `${days}d left` : 'Active';
                             })()}
                           </span>
                         )}
@@ -599,7 +601,7 @@ function HomeContent() {
                         </h3>
                         <p className={cn("text-xs font-medium", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
                           {isPro 
-                            ? `Package: ${session?.subscription_type?.toUpperCase() || 'PREMIUM'} | Expires: ${session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Forever'}` 
+                            ? `Package: ${currentPlan?.type?.toUpperCase() || 'PREMIUM'} | Expires: ${currentPlan?.endDate ? new Date(currentPlan.endDate).toLocaleDateString() : 'Active'}` 
                             : "Choose a plan to unlock all premium tools"}
                         </p>
                       </div>
@@ -612,39 +614,39 @@ function HomeContent() {
                        {/* IF PRO: Show only active entitlements with a cancel button for each */}
                        {isPro ? (
                          <div className="space-y-4">
-                           {useSubscription().activeEntitlements.map((ent: any) => (
-                             <div key={ent.productIdentifier} className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm relative overflow-hidden">
-                               <div className="absolute top-0 right-0 p-3 opacity-10">
-                                 <CheckCircle2 className="h-12 w-12 text-amber-600" />
+                           {activeEntitlements.length > 0 ? (
+                             activeEntitlements.map((ent: any) => (
+                               <div key={ent.productIdentifier} className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm relative overflow-hidden">
+                                 <div className="absolute top-0 right-0 p-3 opacity-10">
+                                   <CheckCircle2 className="h-12 w-12 text-amber-600" />
+                                 </div>
+                                 <div className="flex justify-between items-center mb-1">
+                                   <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">
+                                     {ent.productIdentifier.split('.').pop()?.replace('_', ' ') || 'Premium'} Plan
+                                   </span>
+                                   <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
+                                 </div>
+                                 <p className="text-[10px] font-medium text-slate-500 mb-4">
+                                   Valid until {new Date(ent.expirationDate).toLocaleDateString()}
+                                 </p>
+                                 <button 
+                                   onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
+                                   className="w-full py-3 bg-white text-rose-500 border border-rose-100 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
+                                 >
+                                   <X className="h-3.5 w-3.5" />
+                                   Cancel This Plan
+                                 </button>
                                </div>
-                               <div className="flex justify-between items-center mb-1">
-                                 <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">
-                                   {ent.productIdentifier.split('.').pop()?.replace('_', ' ') || 'Premium'} Plan
-                                 </span>
-                                 <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
-                               </div>
-                               <p className="text-[10px] font-medium text-slate-500 mb-4">
-                                 Valid until {new Date(ent.expirationDate).toLocaleDateString()}
-                               </p>
-                               <button 
-                                 onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
-                                 className="w-full py-3 bg-white text-rose-500 border border-rose-100 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
-                               >
-                                 <X className="h-3.5 w-3.5" />
-                                 Cancel This Plan
-                               </button>
-                             </div>
-                           ))}
-                           
-                           {/* If only mock PRO, show a generic card */}
-                           {useSubscription().activeEntitlements.length === 0 && (
+                             ))
+                           ) : (
+                              /* Fallback to database session if entitlements are loading but DB says Pro */
                               <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm">
                                 <div className="flex justify-between items-center mb-1">
-                                  <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{session?.subscription_type || 'Premium'} Plan</span>
+                                  <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{session?.subscription_type?.toUpperCase() || 'Premium'} Plan</span>
                                   <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
                                 </div>
                                 <p className="text-[10px] font-medium text-slate-500 mb-4">
-                                  Valid until {session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Forever'}
+                                  Valid until {session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Active'}
                                 </p>
                                 <button 
                                   onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
