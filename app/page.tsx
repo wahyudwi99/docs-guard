@@ -566,17 +566,27 @@ function HomeContent() {
 
                 {activeTab === 'subscription' && (
                   <div className="space-y-6">
-                    <div className="p-8 rounded-[32px] bg-gradient-to-br from-indigo-600 to-violet-700 text-white text-center space-y-4 shadow-xl shadow-indigo-200 overflow-hidden relative">
+                    <div className={cn(
+                      "p-8 rounded-[32px] text-white text-center space-y-4 shadow-xl overflow-hidden relative transition-all duration-700",
+                      isPro 
+                        ? "bg-gradient-to-br from-amber-400/90 to-amber-500 shadow-amber-200/50" 
+                        : "bg-gradient-to-br from-indigo-600 to-violet-700 shadow-xl shadow-indigo-200"
+                    )}>
                       <div className="absolute top-0 right-0 p-4 opacity-10">
                          <Zap className="h-24 w-24 fill-white" />
                       </div>
-                      <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md relative z-10">
+                      <div className={cn(
+                        "h-16 w-16 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md relative z-10",
+                        isPro ? "bg-white/30" : "bg-white/20"
+                      )}>
                         <Zap className={cn("h-8 w-8 text-amber-300 fill-amber-300", isPro && "animate-pulse")} />
                       </div>
                       <div className="space-y-1 relative z-10">
-                        <h3 className="text-xl font-black">{isPro ? "You are a PRO Member!" : "Go Pro Today"}</h3>
-                        <p className="text-xs text-indigo-100/80 font-medium">
-                          {isPro ? "You have unlimited access to all privacy features." : "Choose a plan to unlock all premium tools"}
+                        <h3 className="text-xl font-black">
+                          {isPro ? "Pro Status Active" : "Go Pro Today"}
+                        </h3>
+                        <p className={cn("text-xs font-medium", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
+                          {isPro ? "We've detected your premium membership. Enjoy!" : "Choose a plan to unlock all premium tools"}
                         </p>
                       </div>
                     </div>
