@@ -325,20 +325,44 @@ function HomeContent() {
         <div className="w-full space-y-6">
           {/* Top Verified Privacy Banner */}
           <div className="w-full bg-emerald-50/50 backdrop-blur-md border border-emerald-100/50 rounded-3xl p-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-1000 delay-500">
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 mt-0.5">
+            <div className="flex gap-4 items-center">
+              <div className="flex-shrink-0">
                 <div className="relative">
                   <div className="absolute inset-0 bg-emerald-400 blur-md opacity-20 animate-pulse"></div>
-                  <CheckCircle2 className="h-6 w-6 text-emerald-500 relative z-10" />
+                  {session ? (
+                    <div className="relative z-10 h-10 w-10 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+                      <img src={session.image} alt={session.name} className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <CheckCircle2 className="h-6 w-6 text-emerald-500 relative z-10" />
+                  )}
                 </div>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">{t('nav.privacy_banner_title')}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
+                    {session ? (
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="h-3 w-3 animate-bounce" />
+                        Hi, Welcome back!
+                      </span>
+                    ) : t('nav.privacy_banner_title')}
+                  </span>
                 </div>
-                <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
-                  {t('nav.privacy_banner')}
-                </p>
+                <h3 className="text-sm font-black text-slate-900 leading-tight">
+                  {session ? (
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600">
+                      {session.name}
+                    </span>
+                  ) : (
+                    t('nav.privacy_banner')
+                  )}
+                </h3>
+                {session && (
+                  <p className="text-[10px] font-medium text-slate-500 italic">
+                    {t('nav.privacy_banner')}
+                  </p>
+                )}
               </div>
             </div>
           </div>
