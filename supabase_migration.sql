@@ -29,7 +29,8 @@ CREATE TABLE public.payments (
   created_at timestamptz DEFAULT now()
 );
 
--- 4. AKTIFKAN KEAMANAN (Row Level Security)
+CREATE INDEX idx_payments_user_id ON public.payments(user_id);
+CREATE INDEX idx_payments_created_at ON public.payments(created_at DESC);
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
