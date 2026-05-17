@@ -572,7 +572,19 @@ function HomeContent() {
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Available Plans</p>
                        {/* Plan Cards directly in the tab */}
                        {packages.map((pkg: any) => {
-                          const isYearly = pkg.identifier.toLowerCase().includes('yearly');
+                          const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
+                          const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
+                          const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
+
+                          // Robust naming logic
+                          let displayName = pkg.product.title;
+                          if (!displayName || displayName.trim() === "") {
+                            if (isYearly) displayName = "Yearly Pro";
+                            else if (isMonthly) displayName = "Monthly Pro";
+                            else if (isWeekly) displayName = "Weekly Pro";
+                            else displayName = "Premium Plan";
+                          }
+
                           return (
                             <button
                               key={pkg.identifier}
@@ -590,7 +602,7 @@ function HomeContent() {
                                 </div>
                               )}
                               <div className="flex justify-between items-center mb-1">
-                                <span className="font-bold text-sm text-slate-900">{pkg.product.title}</span>
+                                <span className="font-bold text-sm text-slate-900">{displayName}</span>
                                 <span className="font-black text-lg text-indigo-600">{pkg.product.priceString}</span>
                               </div>
                               <p className="text-[10px] font-medium text-slate-400">
