@@ -329,36 +329,24 @@ function HomeContent() {
               <div className="flex-shrink-0">
                 <div className="relative">
                   <div className="absolute inset-0 bg-emerald-400 blur-md opacity-20 animate-pulse"></div>
-                  {session ? (
-                    <div className="relative z-10 h-10 w-10 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
-                      <img src={session.image} alt={session.name} className="h-full w-full object-cover" />
-                    </div>
-                  ) : (
-                    <CheckCircle2 className="h-6 w-6 text-emerald-500 relative z-10" />
-                  )}
+                  <CheckCircle2 className="h-6 w-6 text-emerald-500 relative z-10" />
                 </div>
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
                     {session ? (
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles className="h-3 w-3 animate-bounce" />
-                        Hi, Welcome back!
+                      <span className="flex items-center gap-1.5 whitespace-nowrap">
+                        Hi, {session.name} <span className="animate-bounce ml-1">👋</span>
                       </span>
                     ) : t('nav.privacy_banner_title')}
                   </span>
                 </div>
-                <h3 className="text-sm font-black text-slate-900 leading-tight">
-                  {session ? (
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600">
-                      {session.name}
-                    </span>
-                  ) : (
-                    t('nav.privacy_banner')
-                  )}
-                </h3>
-                {session && (
+                {!session ? (
+                   <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
+                     {t('nav.privacy_banner')}
+                   </p>
+                ) : (
                   <p className="text-[10px] font-medium text-slate-500 italic">
                     {t('nav.privacy_banner')}
                   </p>
@@ -612,7 +600,13 @@ function HomeContent() {
                           return (
                             <button
                               key={pkg.identifier}
-                              onClick={() => subscribe(pkg)}
+                              onClick={() => {
+                                if (!session) {
+                                  setShowLoginModal(true);
+                                } else {
+                                  subscribe(pkg);
+                                }
+                              }}
                               className={cn(
                                 "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
                                 isYearly 
