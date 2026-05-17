@@ -122,12 +122,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         console.log("[AUTH] Session active:", session.user.email);
         const profile = await fetchUserProfile(session.user.id, session.user.user_metadata, session.user.email);
+        console.log("[AUTH] Restored profile Pro status:", profile.is_pro);
+
         const currentUser: AuthUser = {
           id: session.user.id,
           email: session.user.email,
           name: profile.name || session.user.user_metadata.full_name,
-          image: session.user.user_metadata.avatar_url, // Metadata only
-          is_pro: profile.is_pro || false,
+          image: session.user.user_metadata.avatar_url,
+          is_pro: profile.is_pro, // Use exact value from DB
           subscription_type: profile.subscription_type,
           subscription_end_date: profile.subscription_end_date,
           loggedIn: true
@@ -181,14 +183,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             const dbProfile = await fetchUserProfile(authData.user.id, authData.user.user_metadata, authData.user.email);
-            console.log("Fetched DB Profile:", dbProfile);
-            
+            console.log("[AUTH] Login DB Profile Pro status:", dbProfile.is_pro);
+
             const newUser: AuthUser = {
               id: authData.user.id,
               email: authData.user.email,
               name: dbProfile.name || authData.user.user_metadata.full_name || "User",
-              image: authData.user.user_metadata.avatar_url,
-              is_pro: dbProfile.is_pro || false,
+              image: dbProfile.image || authData.user.user_metadata.avatar_url,
+              is_pro: dbProfile.is_pro, // Use exact value from DB
+              subscription_type: dbProfile.subscription_type,
+              subscription_end_date: dbProfile.subscription_end_date,
               loggedIn: true,
             };
             

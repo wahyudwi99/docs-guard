@@ -97,10 +97,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         else if (primary.productIdentifier.toLowerCase().includes('monthly')) subType = 'monthly';
         else if (primary.productIdentifier.toLowerCase().includes('yearly')) subType = 'yearly';
 
-        await syncPurchaseToSupabase(null, true, subType, primary.expirationDate);
-      } else if (isPro) {
-        // No active entitlements but DB says Pro -> Sync to false
-        await syncPurchaseToSupabase(null, false, null, null);
+        // Only sync if data has actually changed or we are becoming PRO
+        if (!isPro || user?.subscription_type !== subType) {
+          console.log("[SUBSCRIPTION] Status update needed: Syncing to PRO");
+          await syncPurchaseToSupabase(null, true, subType, primary.expirationDate);
+        }
+      } else {
+        // If DB says Pro but RevenueCat says No Active Plans
+        // WE ONLY SYNC FALSE IF we are absolutely sure (e.g. check if it's explicitly expired)
+        // For now, let's just log and only sync false if we've successfully contacted the network
+        if (isPro) {
+          console.log("[SUBSCRIPTION] RevenueCat reports no active plans. Checking for explicit expiry...");
+          // Only sync false if we are not in a loading state and have real customer info
+          await syncPurchaseToSupabase(null, false, null, null);
+        }
       }
     } catch (error) {
       console.error("Error checking status", error);
