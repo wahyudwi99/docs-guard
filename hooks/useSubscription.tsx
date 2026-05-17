@@ -138,12 +138,12 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (transactionId && active) {
         await supabase
           .from('payments')
-          .upsert({
+          .insert({
             user_id: user.id,
             transaction_id: transactionId,
             status: 'completed',
             created_at: new Date().toISOString()
-          }, { onConflict: 'transaction_id' });
+          });
       }
       
       await refreshProfile();

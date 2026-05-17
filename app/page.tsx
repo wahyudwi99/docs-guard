@@ -595,11 +595,11 @@ function HomeContent() {
                       </div>
                       <div className="space-y-1 relative z-10">
                         <h3 className="text-xl font-black">
-                          {isPro ? `${session?.subscription_type || 'Pro'} Member` : "Go Pro Today"}
+                          {isPro ? "You are a PRO Member!" : "Go Pro Today"}
                         </h3>
                         <p className={cn("text-xs font-medium", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
                           {isPro 
-                            ? `Active until ${session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'forever'}` 
+                            ? `Package: ${session?.subscription_type?.toUpperCase() || 'PREMIUM'} | Expires: ${session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Forever'}` 
                             : "Choose a plan to unlock all premium tools"}
                         </p>
                       </div>
