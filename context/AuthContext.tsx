@@ -39,10 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserProfile = async (userId: string, metadata?: any, email?: string): Promise<Partial<AuthUser>> => {
     try {
       console.log(`[AUTH] Fetching profile for: ${userId}`);
-      // 1. Try to fetch existing profile
+      
+      // 1. Try to fetch existing profile (Stopped selecting avatar_url)
       const { data, error } = await supabase
         .from('users')
-        .select('is_pro, full_name, avatar_url')
+        .select('is_pro, full_name')
         .eq('id', userId)
         .single();
         
@@ -51,13 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // 2. If profile is missing (Error PGRST116), create it (Auto-Repair)
         if (error.code === 'PGRST116') {
-          console.log("[AUTH] Profile MISSING. Attempting AUTO-REPAIR...");
+          console.log("[AUTH] Profile MISSING in public.users. Attempting AUTO-REPAIR...");
           
           const profileData = {
             id: userId,
             email: email || '',
             full_name: metadata?.full_name || metadata?.name || 'User',
-            avatar_url: metadata?.avatar_url || metadata?.picture || '',
             updated_at: new Date().toISOString()
           };
 
@@ -73,19 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           
           console.log("[AUTH] AUTO-REPAIR SUCCESSFUL");
-          return { name: newData.full_name, image: newData.avatar_url, is_pro: newData.is_pro };
-        }
-        
-        // Handle missing column error (previous fix)
-        if (error.code === '42703') {
-          console.warn("[AUTH] Avatar column missing, retrying...");
-          const { data: retryData, error: retryError } = await supabase
-            .from('users')
-            .select('is_pro, full_name')
-            .eq('id', userId)
-            .single();
-          if (retryError) throw retryError;
-          return { name: retryData.full_name, is_pro: retryData.is_pro };
+          return { name: newData.full_name, is_pro: newData.is_pro };
         }
         throw error;
       }
@@ -93,7 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("[AUTH] Profile found in DB.");
       return {
         name: data.full_name,
-        image: data.avatar_url,
         is_pro: data.is_pro
       };
     } catch (err) {
@@ -130,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: session.user.id,
           email: session.user.email,
           name: profile.name || session.user.user_metadata.full_name,
-          image: profile.image || session.user.user_metadata.avatar_url,
+          image: session.user.user_metadata.avatar_url, // Metadata only
           is_pro: profile.is_pro || false,
           loggedIn: true
         };
@@ -153,13 +140,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
 
-      // FORCE LOGOUT FIRST for clean state (prevents nonce mismatch)
       if (Capacitor.isNativePlatform()) {
-        try {
-          await SocialLogin.logout({ provider: 'google' });
-        } catch (e) {
-          // Ignore logout errors
-        }
+        try { await SocialLogin.logout({ provider: 'google' }); } catch (e) {}
       }
 
       const result = await SocialLogin.login({
@@ -194,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               id: authData.user.id,
               email: authData.user.email,
               name: dbProfile.name || authData.user.user_metadata.full_name || "User",
-              image: dbProfile.image || authData.user.user_metadata.avatar_url,
+              image: authData.user.user_metadata.avatar_url,
               is_pro: dbProfile.is_pro || false,
               loggedIn: true,
             };
