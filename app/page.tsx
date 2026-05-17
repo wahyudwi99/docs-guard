@@ -634,9 +634,8 @@ function HomeContent() {
                                    className="w-full py-3 bg-white text-rose-500 border border-rose-100 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2"
                                  >
                                    <X className="h-3.5 w-3.5" />
-                                   Cancel This Plan
-                                 </button>
-                               </div>
+                                   Manage Subscription
+                                 </button>                               </div>
                              ))
                            ) : (
                               /* Fallback to database session if entitlements are loading but DB says Pro */
