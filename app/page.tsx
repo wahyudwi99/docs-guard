@@ -49,6 +49,8 @@ function HomeContent() {
 
   const handleLogout = useCallback(async () => {
     await logout();
+    // Hard refresh to clear all states and re-trigger splash screen
+    window.location.reload();
   }, [logout]);
 
   // Close login modal when session is established
