@@ -72,35 +72,63 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [activeEntitlements, user]);
 
   useEffect(() => {
-    if (user?.id && !isInitialized.current) {
+    // Always initialize to fetch packages
+    if (!isInitialized.current) {
       initRevenueCat();
       isInitialized.current = true;
+    } else if (user?.id) {
+      // If already initialized but user just logged in, sync them
+      syncUserWithRevenueCat();
     }
   }, [user?.id]);
+
+  const syncUserWithRevenueCat = async () => {
+    if (!Capacitor.isNativePlatform() || !user?.id) return;
+    try {
+      await Purchases.logIn({ appUserID: user.id });
+      await fetchPurchaseHistory(user.id);
+      await checkSubscriptionStatus();
+    } catch (e) {
+      console.error("Error syncing user with RevenueCat:", e);
+    }
+  };
 
   const initRevenueCat = async () => {
     try {
       setLoading(true);
-      if (user?.id) {
-        await fetchPurchaseHistory(user.id);
-      }
       
       if (Capacitor.isNativePlatform()) {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         if (Capacitor.getPlatform() === 'ios') {
           await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
         }
-        if (user?.id) {
-          await Purchases.logIn({ appUserID: user.id });
-        }
+
+        // Fetch packages for guest users
         await fetchPackages();
-        await checkSubscriptionStatus();
+
+        if (user?.id) {
+          await syncUserWithRevenueCat();
+        } else {
+          setLoading(false);
+        }
       } else {
-        // Mock data for web
+        // Mock data for web development
         setPackages([
-          { identifier: 'weekly', isMock: true, product: { title: 'Weekly Pro', priceString: '$1.99' } },
-          { identifier: 'monthly', isMock: true, product: { title: 'Monthly Pro', priceString: '$4.99' } },
-          { identifier: 'yearly', isMock: true, product: { title: 'Yearly Pro', priceString: '$24.99' } }
+          { 
+            identifier: 'weekly', 
+            isMock: true, 
+            product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } 
+          },
+          { 
+            identifier: 'monthly', 
+            isMock: true, 
+            product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } 
+          },
+          { 
+            identifier: 'yearly', 
+            isMock: true, 
+            product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } 
+          }
         ]);
         setLoading(false);
       }
