@@ -599,11 +599,21 @@ function HomeContent() {
                         <h3 className="text-xl font-black">
                           {isPro ? "You are a PRO Member!" : "Go Pro Today"}
                         </h3>
-                        <p className={cn("text-xs font-medium", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
+                        <p className={cn("text-xs font-medium mb-4", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
                           {isPro 
                             ? `Package: ${currentPlan?.type?.toUpperCase() || 'PREMIUM'} | Expires: ${currentPlan?.endDate ? new Date(currentPlan.endDate).toLocaleDateString() : 'Active'}` 
                             : "Choose a plan to unlock all premium tools"}
                         </p>
+                        
+                        {isPro && (
+                          <button 
+                            onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
+                            className="mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-[9px] font-black uppercase tracking-widest rounded-xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                          >
+                            <Settings className="h-3 w-3" />
+                            Cancel Subscription
+                          </button>
+                        )}
                       </div>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
