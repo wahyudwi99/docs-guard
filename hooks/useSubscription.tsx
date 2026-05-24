@@ -132,8 +132,17 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const checkSubscriptionStatus = async () => {
     try {
       if (!Capacitor.isNativePlatform()) return;
+      console.log("[SUBSCRIPTION] Checking latest status from RevenueCat...");
       const { customerInfo } = await Purchases.getCustomerInfo();
-      setActiveEntitlements(Object.values(customerInfo.entitlements.active));
+      const active = Object.values(customerInfo.entitlements.active);
+      
+      console.log(`[SUBSCRIPTION] Found ${active.length} active entitlements`);
+      setActiveEntitlements(active);
+
+      // If active list is empty, we must ensure local state reflects this
+      if (active.length === 0) {
+        console.log("[SUBSCRIPTION] No active plans detected. Status: FREE");
+      }
     } catch (error) {
       console.error("Error checking status", error);
     } finally {
