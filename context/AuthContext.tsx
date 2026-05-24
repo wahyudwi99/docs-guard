@@ -11,9 +11,6 @@ export type AuthUser = {
   name?: string;
   email?: string;
   image?: string;
-  is_pro?: boolean;
-  subscription_type?: string | null;
-  subscription_end_date?: string | null;
   loggedIn: boolean;
 };
 
@@ -42,55 +39,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log(`[AUTH] Fetching profile for: ${userId}`);
       
-      // 1. Try to fetch existing profile
+      // 1. Try to fetch existing profile (Simple Profile only)
       const { data, error } = await supabase
         .from('users')
-        .select('is_pro, full_name, subscription_type, subscription_end_date')
+        .select('full_name')
         .eq('id', userId)
         .single();
         
       if (error) {
-        console.log(`[AUTH] Profile fetch status: ${error.code} (${error.message})`);
+        console.log(`[AUTH] Profile missing or error: ${error.code}. Triggering Self-Healing Sync...`);
         
-        // 2. If profile is missing (Error PGRST116), create it (Auto-Repair)
-        if (error.code === 'PGRST116') {
-          console.log("[AUTH] Profile MISSING in public.users. Attempting AUTO-REPAIR...");
-          
-          const profileData = {
-            id: userId,
-            email: email || '',
-            full_name: metadata?.full_name || metadata?.name || 'User',
-            updated_at: new Date().toISOString()
-          };
+        // 2. SELF-HEALING: Call RPC to sync profile from Auth metadata
+        // This ensures the public.users table is re-populated if deleted
+        const { error: syncError } = await supabase.rpc('sync_user_profile', {
+          user_id: userId,
+          user_email: email || '',
+          user_metadata: metadata || {}
+        });
 
-          const { data: newData, error: insertError } = await supabase
-            .from('users')
-            .upsert(profileData)
-            .select()
-            .single();
-            
-          if (insertError) {
-            console.error("[AUTH] AUTO-REPAIR FAILED:", insertError.code, insertError.message);
-            throw insertError;
-          }
-          
-          console.log("[AUTH] AUTO-REPAIR SUCCESSFUL");
-          return { 
-            name: newData.full_name, 
-            is_pro: newData.is_pro,
-            subscription_type: newData.subscription_type,
-            subscription_end_date: newData.subscription_end_date
-          };
+        if (syncError) {
+          console.error("[AUTH] Self-Healing Sync FAILED:", syncError.message);
+          throw syncError;
         }
-        throw error;
+
+        // 3. Final retry after sync
+        const { data: newData, error: retryError } = await supabase
+          .from('users')
+          .select('full_name')
+          .eq('id', userId)
+          .single();
+          
+        if (retryError) throw retryError;
+        return { name: newData.full_name };
       }
       
       console.log("[AUTH] Profile found in DB.");
       return {
-        name: data.full_name,
-        is_pro: data.is_pro,
-        subscription_type: data.subscription_type,
-        subscription_end_date: data.subscription_end_date
+        name: data.full_name
       };
     } catch (err) {
       console.error('[AUTH] fetchUserProfile exception:', err);
@@ -122,16 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         console.log("[AUTH] Session active:", session.user.email);
         const profile = await fetchUserProfile(session.user.id, session.user.user_metadata, session.user.email);
-        console.log("[AUTH] Restored profile Pro status:", profile.is_pro);
-
+        
         const currentUser: AuthUser = {
           id: session.user.id,
           email: session.user.email,
           name: profile.name || session.user.user_metadata.full_name,
-          image: session.user.user_metadata.avatar_url,
-          is_pro: profile.is_pro, // Use exact value from DB
-          subscription_type: profile.subscription_type,
-          subscription_end_date: profile.subscription_end_date,
+          image: session.user.user_metadata.avatar_url, // UI only
           loggedIn: true
         };
         setUser(currentUser);
@@ -177,37 +158,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (authError) throw authError;
 
           if (authData.user) {
-            console.log("Supabase Auth SUCCESS. User ID:", authData.user.id);
-            // Wait longer for the DB trigger to create the profile record
-            console.log("Waiting for DB trigger (2s)...");
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
+            console.log("[AUTH] Supabase Auth SUCCESS. ID:", authData.user.id);
+            // Re-sync profile to ensure public table is populated
             const dbProfile = await fetchUserProfile(authData.user.id, authData.user.user_metadata, authData.user.email);
-            console.log("[AUTH] Login DB Profile Pro status:", dbProfile.is_pro);
-
+            
             const newUser: AuthUser = {
               id: authData.user.id,
               email: authData.user.email,
               name: dbProfile.name || authData.user.user_metadata.full_name || "User",
-              image: dbProfile.image || authData.user.user_metadata.avatar_url,
-              is_pro: dbProfile.is_pro, // Use exact value from DB
-              subscription_type: dbProfile.subscription_type,
-              subscription_end_date: dbProfile.subscription_end_date,
+              image: authData.user.user_metadata.avatar_url,
               loggedIn: true,
             };
             
-            await Preferences.set({
-              key: AUTH_STORAGE_KEY,
-              value: JSON.stringify(newUser),
-            });
-            
+            await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(newUser) });
             setUser(newUser);
             console.log("[AUTH] Login sequence finished.");
           }
         }
       }
     } catch (error) {
-      console.error('Google login failed:', error);
+      console.error('[AUTH] Google login failed:', error);
     } finally {
       setLoading(false);
     }
