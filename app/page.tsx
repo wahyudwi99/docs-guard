@@ -618,189 +618,64 @@ function HomeContent() {
                         )}
                       </div>
                     </div>
+                    
                     <div className="grid grid-cols-1 gap-4">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
-                         {isPro ? "Your Active Plans" : "Available Plans"}
+                         {isPro ? "Switch or Renew Plan" : "Available Plans"}
                        </p>
                        
-                       {/* IF PRO: Show only active entitlements and smart upgrade options */}
-                       {isPro ? (
-                         <div className="space-y-4">
-                           {activeEntitlements.length > 0 ? (
-                             activeEntitlements.map((ent: any) => (
-                               <div key={ent.productIdentifier} className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm relative overflow-hidden">
-                                 <div className="absolute top-0 right-0 p-3 opacity-10">
-                                   <CheckCircle2 className="h-12 w-12 text-amber-600" />
-                                 </div>
-                                 <div className="flex justify-between items-center mb-1">
-                                   <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">
-                                     {ent.productIdentifier.split('.').pop()?.replace('_', ' ') || 'Premium'} Plan
-                                   </span>
-                                   <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
-                                 </div>
-                                 <p className="text-[10px] font-medium text-slate-500">
-                                   Valid until {new Date(ent.expirationDate).toLocaleDateString()}
-                                 </p>
-                               </div>
-                             ))
-                           ) : (
-                              /* Fallback to prioritized plan from SubscriptionContext if entitlements are loading but DB/SDK says Pro */
-                              <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm">
-                                <div className="flex justify-between items-center mb-1">
-                                  <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{currentPlan?.type?.toUpperCase() || 'Premium'} Plan</span>
-                                  <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
-                                </div>
-                                <p className="text-[10px] font-medium text-slate-500">
-                                  Valid until {currentPlan?.endDate ? new Date(currentPlan.endDate).toLocaleDateString() : 'Active'}
-                                </p>
-                              </div>
-                           )}
+                       {/* Always show Plan Cards - Sorted by duration */}
+                       {[...packages].sort((a: any, b: any) => {
+                          const order = ['weekly', 'monthly', 'yearly'];
+                          const aType = a.identifier.toLowerCase().includes('weekly') ? 'weekly' : a.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
+                          const bType = b.identifier.toLowerCase().includes('weekly') ? 'weekly' : b.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
+                          return order.indexOf(aType) - order.indexOf(bType);
+                       }).map((pkg: any) => {
+                          const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
+                          const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
+                          const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
 
-                           {/* Smart Upgrade Options */}
-                           {(() => {
-                              const planType = currentPlan?.type?.toLowerCase();
-                              if (planType === 'yearly') return null;
-
-                              const availableUpgrades = packages.filter((pkg: any) => {
-                                if (planType === 'weekly') {
-                                  return pkg.identifier.toLowerCase().includes('monthly') || pkg.identifier.toLowerCase().includes('yearly');
-                                }
-                                if (planType === 'monthly') {
-                                  return pkg.identifier.toLowerCase().includes('yearly');
-                                }
-                                return false;
-                              });
-
-                              if (availableUpgrades.length === 0) return null;
-
-                              return (
-                                <div className="pt-2 space-y-3">
-                                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Upgrade Your Experience</p>
-                                  {availableUpgrades.map((pkg: any) => (
-                                    <button
-                                      key={pkg.identifier}
-                                      onClick={() => subscribe(pkg)}
-                                      className="relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2 bg-white border-indigo-100 hover:border-indigo-300 shadow-sm"
-                                    >
-                                      <div className="flex justify-between items-center mb-1">
-                                        <span className="font-bold text-sm text-slate-900">Upgrade to {pkg.product.title}</span>
-                                        <span className="font-black text-lg text-indigo-600">{pkg.product.priceString}</span>
-                                      </div>
-                                      <p className="text-[10px] font-medium text-slate-400">
-                                        Unlock long-term premium benefits and save more.
-                                      </p>
-                                    </button>
-                                  ))}
-                                </div>
-                              );
-                           })()}
-                         </div>
-                       ) : (
-                         /* IF NOT PRO: Show Plan Cards directly in the tab - Sorted by duration */
-                         [...packages].sort((a: any, b: any) => {
-                            const order = ['weekly', 'monthly', 'yearly'];
-                            const aType = a.identifier.toLowerCase().includes('weekly') ? 'weekly' : a.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
-                            const bType = b.identifier.toLowerCase().includes('weekly') ? 'weekly' : b.identifier.toLowerCase().includes('monthly') ? 'monthly' : 'yearly';
-                            return order.indexOf(aType) - order.indexOf(bType);
-                         }).map((pkg: any) => {
-                            const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
-                            const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
-                            const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
-
-                            // Robust naming logic
-                            let displayName = pkg.product.title;
-                            if (!displayName || displayName.trim() === "") {
-                              if (isYearly) displayName = "Yearly Pro";
-                              else if (isMonthly) displayName = "Monthly Pro";
-                              else if (isWeekly) displayName = "Weekly Pro";
-                              else displayName = "Premium Plan";
-                            }
-
-                            return (
-                              <button
-                                key={pkg.identifier}
-                                onClick={() => {
-                                  if (!session) {
-                                    setShowLoginModal(true);
-                                  } else {
-                                    subscribe(pkg);
-                                  }
-                                }}
-                                className={cn(
-                                  "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
-                                  isYearly 
-                                    ? "bg-indigo-50 border-indigo-200 shadow-sm" 
-                                    : "bg-white border-slate-100 hover:border-indigo-200"
-                                )}
-                              >
-                                {isYearly && (
-                                  <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
-                                    Best Value
-                                  </div>
-                                )}
-                                <div className="flex justify-between items-center mb-1">
-                                  <span className="font-bold text-sm text-slate-900 pr-16">{displayName}</span>
-                                  <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
-                                </div>
-                                <p className="text-[10px] font-medium text-slate-400">
-                                  {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
-                                </p>
-                              </button>
-                            );
-                         })
-                       )}
-                    </div>
-
-                    {/* Reset & Restore Buttons */}
-                    <div className="space-y-2">
-                      <button 
-                        onClick={async () => {
-                          const success = await useSubscription().restorePurchases();
-                          if (success) {
-                            alert("Purchases restored successfully!");
-                          } else {
-                            alert("No active subscriptions found to restore.");
+                          // Robust naming logic
+                          let displayName = pkg.product.title;
+                          if (!displayName || displayName.trim() === "") {
+                            if (isYearly) displayName = "Yearly Pro";
+                            else if (isMonthly) displayName = "Monthly Pro";
+                            else if (isWeekly) displayName = "Weekly Pro";
+                            else displayName = "Premium Plan";
                           }
-                        }}
-                        className="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        Restore Purchases
-                      </button>
 
-                      <button 
-                        onClick={async () => {
-                          const { Preferences } = await import('@capacitor/preferences');
-                          console.log("[DEV] Wiping all local state...");
-                          await Preferences.clear();
-                          setTimeout(() => {
-                            window.location.reload();
-                          }, 500);
-                        }}
-                        className="w-full py-3 bg-rose-50 text-rose-500 font-bold rounded-2xl text-[8px] uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
-                      >
-                        Wipe All Data & Status (Dev Only)
-                      </button>
-                    </div>                    
-                    <div className="grid grid-cols-1 gap-3">
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-indigo-600 shadow-sm">
-                          <CheckCircle2 className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-800">Verified Security</p>
-                          <p className="text-[10px] text-slate-400 font-medium">Encryption on every export</p>
-                        </div>
-                      </div>
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-emerald-600 shadow-sm">
-                          <Shield className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-800">Total Privacy</p>
-                          <p className="text-[10px] text-slate-400 font-medium">No data ever leaves your device</p>
-                        </div>
-                      </div>
+                          return (
+                            <button
+                              key={pkg.identifier}
+                              onClick={() => {
+                                if (!session) {
+                                  setShowLoginModal(true);
+                                } else {
+                                  subscribe(pkg);
+                                }
+                              }}
+                              className={cn(
+                                "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                                isYearly 
+                                  ? "bg-indigo-50 border-indigo-200 shadow-sm" 
+                                  : "bg-white border-slate-100 hover:border-indigo-200"
+                              )}
+                            >
+                              {isYearly && (
+                                <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
+                                  Best Value
+                                </div>
+                              )}
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="font-bold text-sm text-slate-900 pr-16">{displayName}</span>
+                                <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
+                              </div>
+                              <p className="text-[10px] font-medium text-slate-400">
+                                {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                              </p>
+                            </button>
+                          );
+                       })}
                     </div>
                   </div>
                 )}
