@@ -751,19 +751,37 @@ function HomeContent() {
                        )}
                     </div>
 
-                    <button 
-                      onClick={async () => {
-                        const { Preferences } = await import('@capacitor/preferences');
-                        console.log("[DEV] Wiping all local state...");
-                        await Preferences.clear();
-                        setTimeout(() => {
-                          window.location.reload();
-                        }, 500);
-                      }}
-                      className="w-full py-3 bg-rose-50 text-rose-500 font-bold rounded-2xl text-[8px] uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
-                    >
-                      Wipe All Data & Status (Dev Only)
-                    </button>                    
+                    {/* Reset & Restore Buttons */}
+                    <div className="space-y-2">
+                      <button 
+                        onClick={async () => {
+                          const success = await useSubscription().restorePurchases();
+                          if (success) {
+                            alert("Purchases restored successfully!");
+                          } else {
+                            alert("No active subscriptions found to restore.");
+                          }
+                        }}
+                        className="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Restore Purchases
+                      </button>
+
+                      <button 
+                        onClick={async () => {
+                          const { Preferences } = await import('@capacitor/preferences');
+                          console.log("[DEV] Wiping all local state...");
+                          await Preferences.clear();
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 500);
+                        }}
+                        className="w-full py-3 bg-rose-50 text-rose-500 font-bold rounded-2xl text-[8px] uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
+                      >
+                        Wipe All Data & Status (Dev Only)
+                      </button>
+                    </div>                    
                     <div className="grid grid-cols-1 gap-3">
                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
                         <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-indigo-600 shadow-sm">
