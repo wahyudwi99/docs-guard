@@ -80,9 +80,13 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                   <button
                     key={pkg.identifier}
                     disabled={loading}
-                    onClick={() => subscribe(pkg)}
-                    className={cn(
-                      "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                    onClick={async () => {
+                      const success = await subscribe(pkg);
+                      if (success) {
+                        window.location.reload();
+                      }
+                    }}
+                    className={cn(                      "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
                       isYearly 
                         ? "bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-200" 
                         : "bg-white border-slate-100 hover:border-indigo-200 text-slate-900"

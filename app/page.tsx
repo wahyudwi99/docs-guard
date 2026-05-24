@@ -647,11 +647,15 @@ function HomeContent() {
                           return (
                             <button
                               key={pkg.identifier}
-                              onClick={() => {
+                              onClick={async () => {
                                 if (!session) {
                                   setShowLoginModal(true);
                                 } else {
-                                  subscribe(pkg);
+                                  const success = await subscribe(pkg);
+                                  if (success) {
+                                    // Hard refresh to show splash and sync state
+                                    window.location.reload();
+                                  }
                                 }
                               }}
                               className={cn(
