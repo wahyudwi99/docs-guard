@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS public.users;
 
 -- 2. TABEL USERS (Hanya Profil Dasar)
 CREATE TABLE public.users (
-  -- ID ini harus sama dengan ID di auth.users (Supabase Auth)
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE,
   full_name text,
@@ -18,11 +17,11 @@ CREATE TABLE public.users (
 CREATE TABLE public.payments (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
-  transaction_id text NOT NULL, -- Tidak lagi UNIQUE agar bisa mencatat semua attempt
-  product_id text, -- ID Produk (weekly, monthly, dll)
+  transaction_id text NOT NULL, 
+  product_id text,
   amount numeric,
   currency text DEFAULT 'IDR',
-  status text, -- succeeded, failed, refunded
+  status text,
   created_at timestamptz DEFAULT now()
 );
 
@@ -55,19 +54,29 @@ BEFORE UPDATE ON public.users
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
--- 7. TRIGGER UNTUK OTOMATIS COPY DATA DARI AUTH KE PUBLIC.USERS
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
+-- 7. FUNGSI SINKRONISASI (Self-Healing)
+-- Fungsi ini akan dijalankan lewat trigger atau dipanggil manual jika data hilang
+CREATE OR REPLACE FUNCTION public.sync_user_profile(user_id uuid, user_email text, user_metadata jsonb)
+RETURNS void AS $$
 BEGIN
   INSERT INTO public.users (id, email, full_name)
   VALUES (
-    new.id, 
-    new.email, 
-    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User')
+    user_id, 
+    user_email, 
+    COALESCE(user_metadata->>'full_name', user_metadata->>'name', 'User')
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
-    full_name = EXCLUDED.full_name;
+    full_name = EXCLUDED.full_name,
+    updated_at = now();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 8. TRIGGER UNTUK SINKRONISASI OTOMATIS SAAT AUTH INSERT
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  PERFORM public.sync_user_profile(new.id, new.email, new.raw_user_meta_data);
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
