@@ -40,16 +40,19 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const currentPlan = useMemo(() => {
     if (activeEntitlements.length === 0) return null;
 
+    console.log("[SUBSCRIPTION] Active Entitlements Raw:", JSON.stringify(activeEntitlements));
+
     // Sort by latest purchase date DESCENDING (newest first)
-    // We use getTime() to ensure accurate numerical comparison
     const sorted = [...activeEntitlements].sort((a, b) => {
-      const dateA = new Date(a.latestPurchaseDate || 0).getTime();
-      const dateB = new Date(b.latestPurchaseDate || 0).getTime();
+      const dateA = new Date(a.latestPurchaseDate || a.originalPurchaseDate || 0).getTime();
+      const dateB = new Date(b.latestPurchaseDate || b.originalPurchaseDate || 0).getTime();
+      
+      console.log(`[SUBSCRIPTION] Comparing A: ${a.productIdentifier} (${dateA}) with B: ${b.productIdentifier} (${dateB})`);
       return dateB - dateA;
     });
     
     const primary = sorted[0];
-    console.log("[SUBSCRIPTION] Prioritizing latest plan:", primary.productIdentifier);
+    console.log("[SUBSCRIPTION] WINNER (Latest):", primary.productIdentifier);
     
     let subType = 'premium';
     const id = primary.productIdentifier.toLowerCase();
