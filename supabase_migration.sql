@@ -1,10 +1,12 @@
 -- 1. HAPUS SEMUANYA AGAR BERSIH
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_login ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP FUNCTION IF EXISTS public.sync_user_profile(uuid, text, jsonb);
 DROP TABLE IF EXISTS public.payments;
 DROP TABLE IF EXISTS public.users;
 
--- 2. TABEL USERS (Hanya Profil Dasar)
+-- 2. TABEL USERS (Profil Dasar)
 CREATE TABLE public.users (
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE,
@@ -13,7 +15,7 @@ CREATE TABLE public.users (
   updated_at timestamptz DEFAULT now()
 );
 
--- 3. TABEL PAYMENTS (Append-only Log Riwayat Transaksi)
+-- 3. TABEL PAYMENTS (Append-only Log)
 CREATE TABLE public.payments (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
@@ -25,7 +27,7 @@ CREATE TABLE public.payments (
   created_at timestamptz DEFAULT now()
 );
 
--- 4. AKTIFKAN KEAMANAN (Row Level Security)
+-- 4. AKTIFKAN KEAMANAN (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
@@ -54,33 +56,34 @@ BEFORE UPDATE ON public.users
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
--- 7. FUNGSI SINKRONISASI (Self-Healing)
--- Fungsi ini akan dijalankan lewat trigger atau dipanggil manual jika data hilang
-CREATE OR REPLACE FUNCTION public.sync_user_profile(user_id uuid, user_email text, user_metadata jsonb)
-RETURNS void AS $$
+-- 7. FUNGSI SINKRONISASI TOTAL (Database Level Only)
+-- Fungsi ini menangani pembuatan dan pemulihan data profil secara otomatis
+CREATE OR REPLACE FUNCTION public.handle_auth_user_sync()
+RETURNS trigger AS $$
 BEGIN
   INSERT INTO public.users (id, email, full_name)
   VALUES (
-    user_id, 
-    user_email, 
-    COALESCE(user_metadata->>'full_name', user_metadata->>'name', 'User')
+    new.id, 
+    new.email, 
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User')
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
     full_name = EXCLUDED.full_name,
     updated_at = now();
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 8. TRIGGER UNTUK SINKRONISASI OTOMATIS SAAT AUTH INSERT
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  PERFORM public.sync_user_profile(new.id, new.email, new.raw_user_meta_data);
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- 8. TRIGGER UNTUK SINKRONISASI SAAT SIGNUP (INSERT)
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_auth_user_sync();
+
+-- 9. TRIGGER UNTUK SINKRONISASI SAAT LOGIN (UPDATE last_sign_in_at)
+-- Ini yang membuat sistem "Self-Healing": setiap login, data profil dipastikan ada.
+CREATE TRIGGER on_auth_user_login
+  AFTER UPDATE ON auth.users
+  FOR EACH ROW 
+  WHEN (old.last_sign_in_at IS DISTINCT FROM new.last_sign_in_at)
+  EXECUTE PROCEDURE public.handle_auth_user_sync();
