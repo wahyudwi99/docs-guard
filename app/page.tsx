@@ -644,14 +644,14 @@ function HomeContent() {
                                </div>
                              ))
                            ) : (
-                              /* Fallback to database session if entitlements are loading but DB says Pro */
+                              /* Fallback to prioritized plan from SubscriptionContext if entitlements are loading but DB/SDK says Pro */
                               <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-200 shadow-sm">
                                 <div className="flex justify-between items-center mb-1">
-                                  <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{session?.subscription_type?.toUpperCase() || 'Premium'} Plan</span>
+                                  <span className="font-bold text-sm text-slate-900 uppercase tracking-tight">{currentPlan?.type?.toUpperCase() || 'Premium'} Plan</span>
                                   <span className="text-[10px] font-black text-amber-600 bg-white px-2 py-0.5 rounded-full border border-amber-100 shadow-sm uppercase">Active</span>
                                 </div>
                                 <p className="text-[10px] font-medium text-slate-500">
-                                  Valid until {session?.subscription_end_date ? new Date(session.subscription_end_date).toLocaleDateString() : 'Active'}
+                                  Valid until {currentPlan?.endDate ? new Date(currentPlan.endDate).toLocaleDateString() : 'Active'}
                                 </p>
                               </div>
                            )}
