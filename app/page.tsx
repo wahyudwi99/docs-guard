@@ -296,7 +296,7 @@ function HomeContent() {
                         <div className="relative group">
                           <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
                           <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
-                            <Zap className="w-3 h-3 fill-amber-900 text-amber-900 mr-1 animate-pulse" />
+                            <Zap className="w-3 h-3 fill-orange-600 text-orange-600 mr-1" />
                             PRO {currentPlan?.type?.toUpperCase() || ''}
                           </span>
                         </div>
@@ -305,9 +305,8 @@ function HomeContent() {
                             <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
                               {(() => {
                                 const end = new Date(currentPlan.endDate);
-                                const diff = end.getTime() - new Date().getTime();
-                                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                                return days > 0 ? `${days} days left` : 'Active';
+                                const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                return end.toLocaleDateString('en-GB', options);
                               })()}
                             </span>
                           </div>
@@ -607,13 +606,13 @@ function HomeContent() {
                         )}>
                           <Zap className={cn(
                             "h-10 w-10 drop-shadow-md transition-all duration-500", 
-                            isPro ? "text-amber-900 fill-amber-900 animate-pulse" : "text-amber-300 fill-amber-300"
+                            isPro ? "text-orange-600 fill-orange-600" : "text-amber-300 fill-amber-300"
                           )} />
                         </div>
                         
                         <div className="space-y-2">
                           <h3 className="text-2xl font-black tracking-tight leading-none uppercase">
-                            {isPro ? "Premium Experience" : "Go Pro Today"}
+                            {isPro ? "PRO" : "Go Pro Today"}
                           </h3>
                           <div className="h-px w-12 bg-white/30 mx-auto my-4"></div>
                           
@@ -624,19 +623,15 @@ function HomeContent() {
                                   {currentPlan?.type || 'PRO'} Membership
                                 </span>
                                 {currentPlan?.endDate && (
-                                  <span className="px-3 py-1 bg-amber-900/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-900/20 text-amber-900">
+                                  <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/30 text-white">
                                     {(() => {
                                       const end = new Date(currentPlan.endDate);
-                                      const diff = end.getTime() - new Date().getTime();
-                                      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                                      return days > 0 ? `${days} Days Left` : 'Life-time Access';
+                                      const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                      return end.toLocaleDateString('en-GB', options);
                                     })()}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm font-bold text-amber-50/90 leading-relaxed max-w-[200px] mx-auto italic">
-                                Thank you for your trust. All premium features are now at your fingertips.
-                              </p>
                             </div>
                           ) : (
                             <p className="text-xs font-medium text-indigo-100/80 leading-relaxed max-w-[240px] mx-auto">
