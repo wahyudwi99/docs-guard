@@ -35,43 +35,18 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // SOURCE OF TRUTH: PRO if there is an active entitlement AND it is set to renew
-  // (User specifically asked for badge to disappear on cancel)
+  // SOURCE OF TRUTH: PRO if there is an active entitlement AND it is NOT canceled (willRenew !== false)
+  // This satisfies the "badge disappears on cancel" requirement.
   const isPro = useMemo(() => {
     return activeEntitlements.length > 0 && activeEntitlements.some((ent: any) => ent.willRenew !== false);
   }, [activeEntitlements]);
 
-  // Determine the primary active plan from RevenueCat state
+  // Use state-tracked info from processCustomerInfo which scans ALL active subs
   const currentPlan = useMemo(() => {
-    if (activeEntitlements.length === 0) return null;
-
-    // Filter only those that will renew (active according to user's "immediate disappear on cancel" rule)
-    const validEntitlements = activeEntitlements.filter((ent: any) => ent.willRenew !== false);
-    if (validEntitlements.length === 0) return null;
-
-    // Sort by latest purchase date DESCENDING (newest first)
-    const sorted = [...validEntitlements].sort((a, b) => {
-      const dateA = new Date(a.latestPurchaseDate || a.originalPurchaseDate || 0).getTime();
-      const dateB = new Date(b.latestPurchaseDate || b.originalPurchaseDate || 0).getTime();
-      return dateB - dateA;
-    });
-    
-    const primary = sorted[0];
-    let subType = 'premium';
-    const idLower = primary.productIdentifier.toLowerCase();
-    if (idLower.includes('weekly')) subType = 'weekly';
-    else if (idLower.includes('monthly')) subType = 'monthly';
-    else if (idLower.includes('yearly')) subType = 'yearly';
-
-    return {
-      type: subType,
-      endDate: primary.expirationDate,
-      productIdentifier: primary.productIdentifier
-    };
-  }, [activeEntitlements]);
+    return latestPlanInfo;
+  }, [latestPlanInfo]);
 
   useEffect(() => {
-    // Always initialize to fetch packages
     if (!isInitialized.current) {
       initRevenueCat();
       isInitialized.current = true;
@@ -79,10 +54,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       syncUserWithRevenueCat();
     }
 
-    // Refresh on focus (when returning from settings)
     const handleFocus = () => {
       if (Capacitor.isNativePlatform()) {
-        console.log("[SUBSCRIPTION] App focused, re-checking status...");
         checkSubscriptionStatus();
       }
     };
@@ -104,17 +77,13 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const initRevenueCat = async () => {
     try {
       setLoading(true);
-      
       if (Capacitor.isNativePlatform()) {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
         if (Capacitor.getPlatform() === 'ios') {
           await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
         }
-
-        // Add real-time listener for customer info changes
+        
         await Purchases.addCustomerInfoUpdateListener((info) => {
-          console.log("[SUBSCRIPTION] Real-time CustomerInfo update detected");
-          // The 'info' parameter is already the CustomerInfo object
           processCustomerInfo(info);
         });
 
@@ -146,7 +115,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       { identifier: 'monthly', isMock: true, product: { title: 'Monthly Pro', priceString: '$4.99' } },
       { identifier: 'yearly', isMock: true, product: { title: 'Yearly Pro', priceString: '$24.99' } }
     ];
-
     try {
       const offerings = await Purchases.getOfferings();
       if (offerings.current !== null && offerings.current.availablePackages.length !== 0) {
@@ -160,19 +128,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const processCustomerInfo = (customerInfo: any) => {
-    console.log("[SUBSCRIPTION] Processing CustomerInfo...");
-    
-    // 1. Update active entitlements (Only those that are currently giving access)
+    // 1. Update active entitlements
     const active = Object.values(customerInfo.entitlements.active);
-    console.log(`[SUBSCRIPTION] Active Entitlements: ${active.length}`, JSON.stringify(active));
     setActiveEntitlements(active);
 
     const activeIds = customerInfo.activeSubscriptions;
     const allDates = customerInfo.allPurchaseDates;
 
-    // 2. Determine the prioritized plan
-    if (active.length > 0 && activeIds.length > 0) {
-      // Sort active product IDs by their purchase date
+    // 2. Identify latest purchase using the reliable absolute newest logic
+    if (activeIds.length > 0) {
       const sortedPlans = activeIds
         .map((id: string) => ({
           id,
@@ -181,8 +145,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         .sort((a: any, b: any) => b.date - a.date);
 
       const winnerId = sortedPlans[0].id;
-      console.log("[SUBSCRIPTION] Identified latest active plan:", winnerId);
-
       const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
       
       let type = 'premium';
@@ -197,17 +159,13 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         productIdentifier: winnerId
       });
     } else {
-      console.log("[SUBSCRIPTION] No active plans or entitlements. Reverting to FREE.");
       setLatestPlanInfo(null);
-      // Ensure activeEntitlements is empty
-      if (active.length > 0) setActiveEntitlements([]);
     }
   };
 
   const checkSubscriptionStatus = async () => {
     try {
       if (!Capacitor.isNativePlatform()) return;
-      console.log("[SUBSCRIPTION] Manually checking latest status...");
       const { customerInfo } = await Purchases.getCustomerInfo();
       processCustomerInfo(customerInfo);
     } catch (error) {
@@ -220,7 +178,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const logTransactionToSupabase = async (transactionId: string, productId: string) => {
     if (!user?.id) return;
     try {
-      console.log("[SUPABASE] Logging transaction history...");
       await supabase
         .from('payments')
         .insert({
@@ -240,31 +197,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setLoading(true);
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
-        
-        // Refresh everything after purchase
         processCustomerInfo(customerInfo);
-        
         if (customerInfo.entitlements.active['pro']) {
           await logTransactionToSupabase(productIdentifier, pkg.identifier);
           return true;
         }
       } else {
-        // Simulation for Mock
-        console.log("Simulating purchase for:", pkg.identifier);
+        // Mock
         const fakeExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-        
-        setActiveEntitlements([{ productIdentifier: pkg.identifier, expirationDate: fakeExpiry }]);
-        
-        let type = 'monthly';
-        if (pkg.identifier.includes('weekly')) type = 'weekly';
-        else if (pkg.identifier.includes('yearly')) type = 'yearly';
-
-        setLatestPlanInfo({
-          type,
-          endDate: fakeExpiry,
-          productIdentifier: pkg.identifier
-        });
-
+        const mockInfo = {
+          entitlements: { active: { pro: { productIdentifier: pkg.identifier, expirationDate: fakeExpiry, willRenew: true } } },
+          activeSubscriptions: [pkg.identifier],
+          allPurchaseDates: { [pkg.identifier]: new Date().toISOString() }
+        };
+        processCustomerInfo(mockInfo);
         await logTransactionToSupabase(`sim_${Date.now()}`, pkg.identifier);
         return true;
       }
