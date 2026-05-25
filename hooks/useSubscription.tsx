@@ -35,13 +35,40 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // SOURCE OF TRUTH: PRO if there is at least one active entitlement in RevenueCat
-  const isPro = activeEntitlements.length > 0;
+  // SOURCE OF TRUTH: PRO if there is an active entitlement AND it is set to renew
+  // (User specifically asked for badge to disappear on cancel)
+  const isPro = useMemo(() => {
+    return activeEntitlements.length > 0 && activeEntitlements.some((ent: any) => ent.willRenew !== false);
+  }, [activeEntitlements]);
 
-  // Use the state-tracked latest plan info, or fallback to memoized calculation
+  // Determine the primary active plan from RevenueCat state
   const currentPlan = useMemo(() => {
-    return latestPlanInfo;
-  }, [latestPlanInfo]);
+    if (activeEntitlements.length === 0) return null;
+
+    // Filter only those that will renew (active according to user's "immediate disappear on cancel" rule)
+    const validEntitlements = activeEntitlements.filter((ent: any) => ent.willRenew !== false);
+    if (validEntitlements.length === 0) return null;
+
+    // Sort by latest purchase date DESCENDING (newest first)
+    const sorted = [...validEntitlements].sort((a, b) => {
+      const dateA = new Date(a.latestPurchaseDate || a.originalPurchaseDate || 0).getTime();
+      const dateB = new Date(b.latestPurchaseDate || b.originalPurchaseDate || 0).getTime();
+      return dateB - dateA;
+    });
+    
+    const primary = sorted[0];
+    let subType = 'premium';
+    const idLower = primary.productIdentifier.toLowerCase();
+    if (idLower.includes('weekly')) subType = 'weekly';
+    else if (idLower.includes('monthly')) subType = 'monthly';
+    else if (idLower.includes('yearly')) subType = 'yearly';
+
+    return {
+      type: subType,
+      endDate: primary.expirationDate,
+      productIdentifier: primary.productIdentifier
+    };
+  }, [activeEntitlements]);
 
   useEffect(() => {
     // Always initialize to fetch packages
