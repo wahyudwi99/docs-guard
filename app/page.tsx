@@ -297,7 +297,7 @@ function HomeContent() {
                           <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
                           <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
                             <Zap className="w-3 h-3 fill-amber-600 text-amber-600 mr-1" />
-                            PRO {currentPlan?.type?.toUpperCase() || ''}
+                            PRO
                           </span>
                         </div>
                         {currentPlan?.endDate && (
@@ -737,6 +737,16 @@ function HomeContent() {
                             </div>
                           );
                        })}
+                       
+                       {/* Subscription Logic Information Note */}
+                       {isPro && activeEntitlements.length > 1 && (
+                         <div className="mt-4 p-4 rounded-2xl bg-amber-50/50 border border-amber-100 flex gap-3 animate-in fade-in duration-1000">
+                           <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                           <p className="text-[10px] font-medium text-amber-800 leading-relaxed">
+                             Your auto-renewal has been updated. If you switched to a different plan, you will still enjoy the remaining time of your previous higher-tier subscription until the expiration date shown above.
+                           </p>
+                         </div>
+                       )}
                     </div>
                   </div>
                 )}
