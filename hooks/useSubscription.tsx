@@ -51,6 +51,17 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } else if (user?.id) {
       syncUserWithRevenueCat();
     }
+
+    // Refresh on focus (when returning from settings)
+    const handleFocus = () => {
+      if (Capacitor.isNativePlatform()) {
+        console.log("[SUBSCRIPTION] App focused, re-checking status...");
+        checkSubscriptionStatus();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [user?.id]);
 
   const syncUserWithRevenueCat = async () => {
@@ -72,6 +83,12 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         if (Capacitor.getPlatform() === 'ios') {
           await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
         }
+
+        // Add real-time listener for customer info changes
+        await Purchases.addCustomerInfoUpdateListener((info) => {
+          console.log("[SUBSCRIPTION] Real-time CustomerInfo update detected");
+          processCustomerInfo(info.customerInfo);
+        });
 
         await fetchPackages();
 
@@ -114,48 +131,47 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
 
+  const processCustomerInfo = (customerInfo: any) => {
+    // Update active entitlements for isPro check
+    const active = Object.values(customerInfo.entitlements.active);
+    setActiveEntitlements(active);
+
+    const activeIds = customerInfo.activeSubscriptions;
+    const allDates = customerInfo.allPurchaseDates;
+
+    if (activeIds.length > 0) {
+      const sortedPlans = activeIds
+        .map((id: string) => ({
+          id,
+          date: new Date(allDates[id] || 0).getTime()
+        }))
+        .sort((a: any, b: any) => b.date - a.date);
+
+      const winnerId = sortedPlans[0].id;
+      const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
+      
+      let type = 'premium';
+      if (winnerId.toLowerCase().includes('weekly')) type = 'weekly';
+      else if (winnerId.toLowerCase().includes('monthly')) type = 'monthly';
+      else if (winnerId.toLowerCase().includes('yearly')) type = 'yearly';
+
+      setLatestPlanInfo({
+        type,
+        endDate: entitlement?.expirationDate || null,
+        productIdentifier: winnerId
+      });
+    } else {
+      console.log("[SUBSCRIPTION] No active plans in processed info.");
+      setLatestPlanInfo(null);
+    }
+  };
+
   const checkSubscriptionStatus = async () => {
     try {
       if (!Capacitor.isNativePlatform()) return;
-      console.log("[SUBSCRIPTION] Checking latest status...");
+      console.log("[SUBSCRIPTION] Manually checking latest status...");
       const { customerInfo } = await Purchases.getCustomerInfo();
-      
-      // Update active entitlements for isPro check
-      const active = Object.values(customerInfo.entitlements.active);
-      setActiveEntitlements(active);
-
-      // CRITICAL: Determine the prioritized plan using ALL purchase data
-      const activeIds = customerInfo.activeSubscriptions;
-      const allDates = customerInfo.allPurchaseDates;
-
-      if (activeIds.length > 0) {
-        // Sort active product IDs by their purchase date
-        const sortedPlans = activeIds
-          .map(id => ({
-            id,
-            date: new Date(allDates[id] || 0).getTime()
-          }))
-          .sort((a, b) => b.date - a.date);
-
-        const winnerId = sortedPlans[0].id;
-        console.log("[SUBSCRIPTION] WINNER detected via direct ID check:", winnerId);
-
-        // Find expiration from entitlements if possible, or use a default
-        const entitlement = active.find(e => e.productIdentifier === winnerId) || active[0];
-        
-        let type = 'premium';
-        if (winnerId.toLowerCase().includes('weekly')) type = 'weekly';
-        else if (winnerId.toLowerCase().includes('monthly')) type = 'monthly';
-        else if (winnerId.toLowerCase().includes('yearly')) type = 'yearly';
-
-        setLatestPlanInfo({
-          type,
-          endDate: entitlement?.expirationDate || null,
-          productIdentifier: winnerId
-        });
-      } else {
-        setLatestPlanInfo(null);
-      }
+      processCustomerInfo(customerInfo);
     } catch (error) {
       console.error("Error checking status", error);
     } finally {
@@ -188,7 +204,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
         
         // Refresh everything after purchase
-        await checkSubscriptionStatus();
+        processCustomerInfo(customerInfo);
         
         if (customerInfo.entitlements.active['pro']) {
           await logTransactionToSupabase(productIdentifier, pkg.identifier);
@@ -227,9 +243,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       setLoading(true);
       if (!Capacitor.isNativePlatform()) return false;
-      await Purchases.restorePurchases();
-      await checkSubscriptionStatus();
-      return true;
+      const { customerInfo } = await Purchases.restorePurchases();
+      processCustomerInfo(customerInfo);
+      return Object.keys(customerInfo.entitlements.active).length > 0;
     } catch (error) {
       return false;
     } finally {
