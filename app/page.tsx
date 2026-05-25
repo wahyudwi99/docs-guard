@@ -292,20 +292,25 @@ function HomeContent() {
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
                     {isPro && (
-                      <div className="flex items-center gap-1 animate-in fade-in zoom-in duration-500">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-[9px] font-black text-white uppercase tracking-wider shadow-lg shadow-orange-100/50 border border-white/20">
-                          <Zap className="w-2.5 h-2.5 fill-white mr-0.5" />
-                          PRO {currentPlan?.type?.toUpperCase() || ''}
-                        </span>
-                        {currentPlan?.endDate && (
-                          <span className="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200 uppercase tracking-tighter">
-                            {(() => {
-                              const end = new Date(currentPlan.endDate);
-                              const diff = end.getTime() - new Date().getTime();
-                              const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                              return days > 0 ? `${days}d left` : 'Active';
-                            })()}
+                      <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
+                        <div className="relative group">
+                          <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                          <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
+                            <Zap className="w-3 h-3 fill-amber-900 text-amber-900 mr-1 animate-pulse" />
+                            PRO {currentPlan?.type?.toUpperCase() || ''}
                           </span>
+                        </div>
+                        {currentPlan?.endDate && (
+                          <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
+                            <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
+                              {(() => {
+                                const end = new Date(currentPlan.endDate);
+                                const diff = end.getTime() - new Date().getTime();
+                                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                                return days > 0 ? `${days} days left` : 'Active';
+                              })()}
+                            </span>
+                          </div>
                         )}
                       </div>
                     )}
@@ -582,46 +587,69 @@ function HomeContent() {
 
                 {activeTab === 'subscription' && (
                   <div className="space-y-6">
+                    {/* Premium Status Card */}
                     <div className={cn(
-                      "p-8 rounded-[32px] text-white text-center space-y-4 shadow-xl overflow-hidden relative transition-all duration-700",
+                      "p-8 rounded-[40px] text-white overflow-hidden relative transition-all duration-700 shadow-2xl",
                       isPro 
-                        ? "bg-gradient-to-br from-amber-400/90 to-amber-500 shadow-amber-200/50" 
-                        : "bg-gradient-to-br from-indigo-600 to-violet-700 shadow-xl shadow-indigo-200"
+                        ? "bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 shadow-amber-200/50 scale-[1.02]" 
+                        : "bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-200"
                     )}>
-                      <div className="absolute top-0 right-0 p-4 opacity-10">
-                         <Zap className="h-24 w-24 fill-white" />
+                      {/* Decorative elements */}
+                      <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                         <Zap className="h-32 w-32 fill-white" />
                       </div>
-                      <div className={cn(
-                        "h-16 w-16 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md relative z-10",
-                        isPro ? "bg-white/30" : "bg-white/20"
-                      )}>
-                        <Zap className={cn("h-8 w-8 text-amber-300 fill-amber-300", isPro && "animate-pulse")} />
-                      </div>
-                      <div className="space-y-1 relative z-10">
-                        <h3 className="text-xl font-black">
-                          {isPro ? "You are a PRO Member!" : "Go Pro Today"}
-                        </h3>
-                        <p className={cn("text-xs font-medium mb-4", isPro ? "text-amber-50/90" : "text-indigo-100/80")}>
-                          {isPro 
-                            ? `Package: ${currentPlan?.type?.toUpperCase() || 'PREMIUM'} | Expires: ${currentPlan?.endDate ? new Date(currentPlan.endDate).toLocaleDateString() : 'Active'}` 
-                            : "Choose a plan to unlock all premium tools"}
-                        </p>
+                      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                      
+                      <div className="flex flex-col items-center relative z-10 text-center">
+                        <div className={cn(
+                          "h-20 w-20 rounded-[28px] flex items-center justify-center mb-6 backdrop-blur-xl border relative shadow-inner",
+                          isPro ? "bg-white/30 border-white/40" : "bg-white/10 border-white/20"
+                        )}>
+                          <Zap className={cn(
+                            "h-10 w-10 drop-shadow-md transition-all duration-500", 
+                            isPro ? "text-amber-900 fill-amber-900 animate-pulse" : "text-amber-300 fill-amber-300"
+                          )} />
+                        </div>
                         
-                        {isPro && (
-                          <button 
-                            onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
-                            className="mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-[9px] font-black uppercase tracking-widest rounded-xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
-                          >
-                            <Settings className="h-3 w-3" />
-                            Cancel Subscription
-                          </button>
-                        )}
+                        <div className="space-y-2">
+                          <h3 className="text-2xl font-black tracking-tight leading-none uppercase">
+                            {isPro ? "Premium Experience" : "Go Pro Today"}
+                          </h3>
+                          <div className="h-px w-12 bg-white/30 mx-auto my-4"></div>
+                          
+                          {isPro ? (
+                            <div className="space-y-4">
+                              <div className="flex flex-wrap justify-center gap-2">
+                                <span className="px-3 py-1 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                                  {currentPlan?.type || 'PRO'} Membership
+                                </span>
+                                {currentPlan?.endDate && (
+                                  <span className="px-3 py-1 bg-amber-900/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-900/20 text-amber-900">
+                                    {(() => {
+                                      const end = new Date(currentPlan.endDate);
+                                      const diff = end.getTime() - new Date().getTime();
+                                      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                                      return days > 0 ? `${days} Days Left` : 'Life-time Access';
+                                    })()}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm font-bold text-amber-50/90 leading-relaxed max-w-[200px] mx-auto italic">
+                                Thank you for your trust. All premium features are now at your fingertips.
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-xs font-medium text-indigo-100/80 leading-relaxed max-w-[240px] mx-auto">
+                              Unlock privacy-first professional tools and process documents without limits.
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 gap-4">
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
-                         {isPro ? "Switch or Renew Plan" : "Available Plans"}
+                         {isPro ? "Upgrade or Switch Plan" : "Choose Your Plan"}
                        </p>
                        
                        {/* Always show Plan Cards - Sorted by duration */}
