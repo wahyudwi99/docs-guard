@@ -296,7 +296,7 @@ function HomeContent() {
                         <div className="relative group">
                           <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
                           <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
-                            <Zap className="w-3 h-3 fill-amber-600 text-amber-600 mr-1" />
+                            <Zap className="w-3 h-3 fill-amber-700 text-amber-700 mr-1" />
                             PRO
                           </span>
                         </div>
@@ -606,7 +606,7 @@ function HomeContent() {
                         )}>
                           <Zap className={cn(
                             "h-10 w-10 drop-shadow-md transition-all duration-500", 
-                            isPro ? "text-amber-600 fill-amber-600" : "text-amber-300 fill-amber-300"
+                            isPro ? "text-amber-700 fill-amber-700" : "text-amber-300 fill-amber-300"
                           )} />
                         </div>
                         
@@ -619,8 +619,8 @@ function HomeContent() {
                           {isPro ? (
                             <div className="space-y-4">
                               <div className="flex flex-wrap justify-center gap-2">
-                                <span className="px-3 py-1 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
-                                  {currentPlan?.type || 'PRO'} Membership
+                                <span className="px-3 py-1 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 text-white">
+                                  PRO
                                 </span>
                                 {currentPlan?.endDate && (
                                   <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/30 text-white">
