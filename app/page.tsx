@@ -739,12 +739,17 @@ function HomeContent() {
                        })}
                        
                        {/* Subscription Logic Information Note */}
-                       {isPro && activeEntitlements.length > 1 && (
-                         <div className="mt-4 p-4 rounded-2xl bg-amber-50/50 border border-amber-100 flex gap-3 animate-in fade-in duration-1000">
-                           <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                           <p className="text-[10px] font-medium text-amber-800 leading-relaxed">
-                             Your auto-renewal has been updated. If you switched to a different plan, you will still enjoy the remaining time of your previous higher-tier subscription until the expiration date shown above.
-                           </p>
+                       {isPro && (
+                         <div className="mt-4 p-4 rounded-3xl bg-amber-50/80 backdrop-blur-sm border border-amber-200/50 flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-1000">
+                           <div className="h-8 w-8 rounded-2xl bg-amber-100 flex items-center justify-center shrink-0">
+                             <Info className="h-4 w-4 text-amber-600" />
+                           </div>
+                           <div className="space-y-1">
+                             <p className="text-[11px] font-bold text-amber-900">Subscription Status Note</p>
+                             <p className="text-[10px] font-medium text-amber-800/80 leading-relaxed">
+                               Your auto-renewal status has been updated. If you've switched plans, please note that you will continue to have full access to your previous plan's benefits until the current billing period expires on the date shown above.
+                             </p>
+                           </div>
                          </div>
                        )}
                     </div>
