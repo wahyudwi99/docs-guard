@@ -658,6 +658,22 @@ function HomeContent() {
                           const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
                           const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
 
+                          // Logic for smart plan labels
+                          const pkgType = isWeekly ? 'weekly' : isMonthly ? 'monthly' : 'yearly';
+                          const isActive = isPro && currentPlan?.type?.toLowerCase() === pkgType;
+                          
+                          let buttonLabel = "Subscribe";
+                          if (!session) {
+                             buttonLabel = "Login to Subscribe";
+                          } else if (isActive) {
+                             buttonLabel = "Current Plan";
+                          } else if (isPro) {
+                             const planOrder = ['weekly', 'monthly', 'yearly'];
+                             const currentTier = planOrder.indexOf(currentPlan?.type?.toLowerCase() || 'weekly');
+                             const pkgTier = planOrder.indexOf(pkgType);
+                             buttonLabel = pkgTier > currentTier ? "Upgrade Now" : "Switch Plan";
+                          }
+
                           // Robust naming logic
                           let displayName = pkg.product.title;
                           if (!displayName || displayName.trim() === "") {
@@ -668,39 +684,57 @@ function HomeContent() {
                           }
 
                           return (
-                            <button
-                              key={pkg.identifier}
-                              onClick={async () => {
-                                if (!session) {
-                                  setShowLoginModal(true);
-                                } else {
-                                  const success = await subscribe(pkg);
-                                  if (success) {
-                                    // Hard refresh to show splash and sync state
-                                    window.location.reload();
+                            <div key={pkg.identifier} className="relative">
+                              <button
+                                disabled={isActive}
+                                onClick={async () => {
+                                  if (!session) {
+                                    setShowLoginModal(true);
+                                  } else {
+                                    const success = await subscribe(pkg);
+                                    if (success) {
+                                      window.location.reload();
+                                    }
                                   }
-                                }
-                              }}
-                              className={cn(
-                                "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
-                                isYearly 
-                                  ? "bg-indigo-50 border-indigo-200 shadow-sm" 
-                                  : "bg-white border-slate-100 hover:border-indigo-200"
-                              )}
-                            >
-                              {isYearly && (
-                                <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
-                                  Best Value
+                                }}
+                                className={cn(
+                                  "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                                  isActive 
+                                    ? "bg-slate-50 border-amber-300 opacity-90 cursor-default" 
+                                    : isYearly 
+                                      ? "bg-indigo-50 border-indigo-200 shadow-sm hover:border-indigo-400" 
+                                      : "bg-white border-slate-100 hover:border-indigo-200"
+                                )}
+                              >
+                                {isYearly && !isActive && (
+                                  <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
+                                    Best Value
+                                  </div>
+                                )}
+                                {isActive && (
+                                  <div className="absolute top-2 right-4 px-2 py-0.5 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20 flex items-center gap-1">
+                                    <CheckCircle2 className="h-2 w-2" /> Active
+                                  </div>
+                                )}
+                                
+                                <div className="flex justify-between items-center mb-1">
+                                  <span className="font-bold text-sm text-slate-900 pr-16">{displayName}</span>
+                                  <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
                                 </div>
-                              )}
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="font-bold text-sm text-slate-900 pr-16">{displayName}</span>
-                                <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
-                              </div>
-                              <p className="text-[10px] font-medium text-slate-400">
-                                {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
-                              </p>
-                            </button>
+                                <p className="text-[10px] font-medium text-slate-400 mb-4">
+                                  {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                                </p>
+                                
+                                <div className={cn(
+                                  "w-full py-2 rounded-xl text-center text-[9px] font-black uppercase tracking-widest transition-all",
+                                  isActive 
+                                    ? "bg-amber-100 text-amber-700 border border-amber-200" 
+                                    : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100"
+                                )}>
+                                  {buttonLabel}
+                                </div>
+                              </button>
+                            </div>
                           );
                        })}
                     </div>
