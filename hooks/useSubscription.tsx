@@ -133,14 +133,19 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const processCustomerInfo = (customerInfo: any) => {
-    // Update active entitlements for isPro check
+    console.log("[SUBSCRIPTION] Processing CustomerInfo...");
+    
+    // 1. Update active entitlements (Only those that are currently giving access)
     const active = Object.values(customerInfo.entitlements.active);
+    console.log(`[SUBSCRIPTION] Active Entitlements: ${active.length}`, JSON.stringify(active));
     setActiveEntitlements(active);
 
     const activeIds = customerInfo.activeSubscriptions;
     const allDates = customerInfo.allPurchaseDates;
 
-    if (activeIds.length > 0) {
+    // 2. Determine the prioritized plan
+    if (active.length > 0 && activeIds.length > 0) {
+      // Sort active product IDs by their purchase date
       const sortedPlans = activeIds
         .map((id: string) => ({
           id,
@@ -148,23 +153,27 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         }))
         .sort((a: any, b: any) => b.date - a.date);
 
-        const winnerId = sortedPlans[0].id;
-        // Find expiration from entitlements if possible, or use a default
-        const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
+      const winnerId = sortedPlans[0].id;
+      console.log("[SUBSCRIPTION] Identified latest active plan:", winnerId);
 
-        let type = 'premium';
-        if (winnerId.toLowerCase().includes('weekly')) type = 'weekly';
-        else if (winnerId.toLowerCase().includes('monthly')) type = 'monthly';
-        else if (winnerId.toLowerCase().includes('yearly')) type = 'yearly';
+      const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
+      
+      let type = 'premium';
+      const idLower = winnerId.toLowerCase();
+      if (idLower.includes('weekly')) type = 'weekly';
+      else if (idLower.includes('monthly')) type = 'monthly';
+      else if (idLower.includes('yearly')) type = 'yearly';
 
-        setLatestPlanInfo({
-          type,
-          endDate: (entitlement as any)?.expirationDate || null,
-          productIdentifier: winnerId
-        });
+      setLatestPlanInfo({
+        type,
+        endDate: (entitlement as any)?.expirationDate || null,
+        productIdentifier: winnerId
+      });
     } else {
-      console.log("[SUBSCRIPTION] No active plans in processed info.");
+      console.log("[SUBSCRIPTION] No active plans or entitlements. Reverting to FREE.");
       setLatestPlanInfo(null);
+      // Ensure activeEntitlements is empty
+      if (active.length > 0) setActiveEntitlements([]);
     }
   };
 
