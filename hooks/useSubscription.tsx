@@ -87,7 +87,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         // Add real-time listener for customer info changes
         await Purchases.addCustomerInfoUpdateListener((info) => {
           console.log("[SUBSCRIPTION] Real-time CustomerInfo update detected");
-          processCustomerInfo(info.customerInfo);
+          // The 'info' parameter is already the CustomerInfo object
+          processCustomerInfo(info);
         });
 
         await fetchPackages();
