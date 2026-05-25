@@ -148,19 +148,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         }))
         .sort((a: any, b: any) => b.date - a.date);
 
-      const winnerId = sortedPlans[0].id;
-      const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
-      
-      let type = 'premium';
-      if (winnerId.toLowerCase().includes('weekly')) type = 'weekly';
-      else if (winnerId.toLowerCase().includes('monthly')) type = 'monthly';
-      else if (winnerId.toLowerCase().includes('yearly')) type = 'yearly';
+        const winnerId = sortedPlans[0].id;
+        // Find expiration from entitlements if possible, or use a default
+        const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
 
-      setLatestPlanInfo({
-        type,
-        endDate: entitlement?.expirationDate || null,
-        productIdentifier: winnerId
-      });
+        let type = 'premium';
+        if (winnerId.toLowerCase().includes('weekly')) type = 'weekly';
+        else if (winnerId.toLowerCase().includes('monthly')) type = 'monthly';
+        else if (winnerId.toLowerCase().includes('yearly')) type = 'yearly';
+
+        setLatestPlanInfo({
+          type,
+          endDate: (entitlement as any)?.expirationDate || null,
+          productIdentifier: winnerId
+        });
     } else {
       console.log("[SUBSCRIPTION] No active plans in processed info.");
       setLatestPlanInfo(null);
