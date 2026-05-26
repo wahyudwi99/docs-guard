@@ -23,6 +23,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginModal } from "@/components/LoginModal";
+import { motion, AnimatePresence } from 'framer-motion';
 
 function HomeContent() {
   const { t, locale } = useI18n();
@@ -38,7 +39,15 @@ function HomeContent() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
-  const { isPro, packages, subscribe, currentPlan, activeEntitlements } = useSubscription();
+  const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict } = useSubscription();
+
+  const [showConflictModal, setShowConflictModal] = useState(false);
+
+  useEffect(() => {
+    if (subscriptionConflict) {
+      setShowConflictModal(true);
+    }
+  }, [subscriptionConflict]);
 
   useEffect(() => {
     console.log("Auth Status:", isLoadingAuth ? 'loading' : (session ? 'authenticated' : 'unauthenticated'));
@@ -843,6 +852,54 @@ function HomeContent() {
       {showPaywall && (
         <Paywall onClose={() => setShowPaywall(false)} />
       )}
+
+      {/* Subscription Conflict Modal */}
+      <AnimatePresence>
+        {showConflictModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+              onClick={() => setShowConflictModal(false)}
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl text-center space-y-6 overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                 <Shield className="h-32 w-32 fill-amber-600" />
+              </div>
+              
+              <div className="h-20 w-20 bg-amber-100 rounded-[28px] flex items-center justify-center mx-auto relative z-10">
+                <Info className="h-10 w-10 text-amber-600" />
+              </div>
+              
+              <div className="space-y-2 relative z-10">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">Subscription Conflict</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  We found an active subscription on this device, but it is linked to a different account.
+                </p>
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 mt-4">
+                   <p className="text-[10px] font-medium text-amber-800 text-left">
+                     To use premium features on this account, please use the original email address or manage your subscription in iPhone settings.
+                   </p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowConflictModal(false)}
+                className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-lg shadow-amber-100 relative z-10"
+              >
+                I Understand
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
