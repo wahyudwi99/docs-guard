@@ -284,6 +284,38 @@ function HomeContent() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* Tier Status Badge - Always Visible */}
+            {!isLoadingAuth && (
+              <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
+                {isPro ? (
+                  <div className="flex items-center gap-1.5">
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                      <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
+                        <Zap className="w-3 h-3 fill-amber-700 text-amber-700 mr-1" />
+                        PRO
+                      </span>
+                    </div>
+                    {currentPlan?.endDate && (
+                      <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
+                        <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
+                          Expires: {(() => {
+                            const end = new Date(currentPlan.endDate);
+                            const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                            return end.toLocaleDateString('en-GB', options);
+                          })()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-[10px] font-black text-white uppercase tracking-wider shadow-md border border-indigo-200/50">
+                    FREE
+                  </span>
+                )}
+              </div>
+            )}
+
             {!isPro && session && (
                <button 
                 onClick={() => setShowPaywall(true)}
@@ -298,31 +330,7 @@ function HomeContent() {
             ) : session ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end leading-none">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
-                    {isPro && (
-                      <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
-                        <div className="relative group">
-                          <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                          <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
-                            <Zap className="w-3 h-3 fill-amber-700 text-amber-700 mr-1" />
-                            PRO
-                          </span>
-                        </div>
-                        {currentPlan?.endDate && (
-                          <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
-                            <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
-                              Expires: {(() => {
-                                const end = new Date(currentPlan.endDate);
-                                const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                return end.toLocaleDateString('en-GB', options);
-                              })()}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
                 </div>
                 <button 
                   onClick={handleLogout}

@@ -38,10 +38,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // SOURCE OF TRUTH: PRO if there is an active entitlement AND it is NOT canceled (willRenew !== false)
+  // SOURCE OF TRUTH: PRO if user is logged in AND there is an active entitlement that is NOT canceled
   const isPro = useMemo(() => {
-    return activeEntitlements.length > 0 && activeEntitlements.some((ent: any) => ent.willRenew !== false);
-  }, [activeEntitlements]);
+    return !!user?.id && activeEntitlements.length > 0 && activeEntitlements.some((ent: any) => ent.willRenew !== false);
+  }, [activeEntitlements, user?.id]);
 
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
