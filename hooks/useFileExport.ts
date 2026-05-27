@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { Media } from "@capacitor-community/media";
+import { Capacitor } from "@capacitor/core";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
 import { jsPDF, jsPDFOptions } from "jspdf";
 
