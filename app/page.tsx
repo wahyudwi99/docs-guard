@@ -904,7 +904,6 @@ function HomeContent() {
                   onClick={() => {
                     setLimitExceeded(false);
                     setActiveTab('subscription');
-                    setShowPaywall(true);
                   }}
                   className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-lg shadow-amber-100"
                 >

@@ -66,11 +66,6 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                 Continue with Google
               </button>
-              
-              <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-bold">
-                <Lock className="w-3 h-3" />
-                <span>Secure Authentication</span>
-              </div>
             </div>
           </motion.div>
         </div>
