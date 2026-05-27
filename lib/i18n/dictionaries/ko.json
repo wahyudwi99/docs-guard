@@ -129,7 +129,7 @@
     "download_note": "첫 페이지만 샘플로 미리 봅니다. 모든 페이지에 적용하려면 다운로드하세요."
   },
   "footer": {
-    "copyright": "© {year} Built with Privacy by Wahyu",
+    "copyright": "© {year} Built with Privacy by Exponential Labs",
     "security_protocol": "보안 프로토콜",
     "local_first": "로컬 우선"
   },

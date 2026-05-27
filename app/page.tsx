@@ -869,15 +869,6 @@ function HomeContent() {
               {t('footer.copyright', { year: new Date().getFullYear() })}
             </p>
           </div>
-          <div className="flex gap-8">
-            <div className="flex flex-col items-center md:items-end gap-1">
-              <span className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em]">{t('footer.security_protocol')}</span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                <div className="h-1 w-1 rounded-full bg-emerald-400"></div>
-                AES-256 {t('footer.local_first')}
-              </span>
-            </div>
-          </div>
         </div>
       </footer>
 

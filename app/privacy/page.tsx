@@ -112,14 +112,6 @@ export default function PrivacyPolicy() {
                 {t('privacy.technical_description')}
               </p>
             </section>
-
-            <section className="space-y-4 pt-8 border-t border-slate-100">
-              <h2 className="text-2xl font-black tracking-tight">{t('privacy.contact_title')}</h2>
-              <p className="text-slate-600 leading-relaxed">
-                {t('privacy.contact_description')}
-              </p>
-              <p className="text-sm font-bold text-indigo-600">security@docsguard.app</p>
-            </section>
           </div>
         </div>
       </main>
