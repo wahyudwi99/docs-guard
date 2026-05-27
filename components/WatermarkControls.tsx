@@ -33,7 +33,7 @@ interface WatermarkControlsProps {
   setPassword?: (password: string) => void;
   isPro?: boolean;
   onUpgrade?: () => void;
-  documentType?: "image" | "pdf" | null;
+  documentType?: "image" | "pdf" | "video" | null;
   blurStrength: number;
   setBlurStrength: (strength: number) => void;
 }
@@ -111,17 +111,19 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
             )}
           </button>
           <button
-            onClick={() => setDesignTab("blur")}
+            onClick={() => documentType !== "video" && setDesignTab("blur")}
+            disabled={documentType === "video"}
             className={cn(
               "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
+              documentType === "video" && "opacity-40 grayscale cursor-not-allowed"
             )}
           >
             {t('watermark_controls.blur_mode')}
             {blurAreas.length > 0 && (
               <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
             )}
-            {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
+            {documentType === "video" ? <Lock className="h-2.5 w-2.5 ml-1 text-slate-400" /> : !isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
           </button>
           <button
             onClick={() => documentType === "pdf" && setDesignTab("password")}

@@ -4,7 +4,7 @@ import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
 import { useI18n } from "@/hooks/useI18n";
 import { useSubscription } from "@/hooks/useSubscription";
 
-type DocumentType = "image" | "pdf" | null;
+type DocumentType = "image" | "pdf" | "video" | null;
 
 interface UseDocumentProps {
   canvases: HTMLCanvasElement[];
@@ -16,18 +16,21 @@ export function useDocument({ canvases }: UseDocumentProps) {
   const [file, setFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>(null);
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [limitExceeded, setLimitExceeded] = useState(false);
 
   const clearDocument = useCallback(() => {
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
     setFile(null);
     setDocumentType(null);
     setPdfDoc(null);
+    setVideoUrl(null);
     setNumPages(0);
     setError(null);
     setLimitExceeded(false);
-  }, []);
+  }, [videoUrl]);
 
   const loadImage = useCallback(
     async (imageFile: File, canvas: HTMLCanvasElement) => {
@@ -56,7 +59,7 @@ export function useDocument({ canvases }: UseDocumentProps) {
   );
 
   const drawDocumentOnCanvases = useCallback(
-    async (selectedFile: File, currentCanvases: HTMLCanvasElement[]) => {
+    async (selectedFile: File, currentCanvases: HTMLCanvasElement[], videoElement?: HTMLVideoElement | null) => {
       if (currentCanvases.length === 0) return;
 
       try {
@@ -65,10 +68,16 @@ export function useDocument({ canvases }: UseDocumentProps) {
           // Only load and draw if dimensions are not set (first time)
           if (canvas.width === 0 || canvas.height === 0) {
             await loadImage(selectedFile, canvas);
-          } else {
-            // Just clear and redraw from the existing state if needed, 
-            // but for images, the watermark logic handles the redraw.
-            // We only need the base image once.
+          }
+        } else if (selectedFile.type.startsWith("video/") && videoElement) {
+          const canvas = currentCanvases[0];
+          const context = canvas.getContext("2d");
+          if (context && videoElement.readyState >= 2) {
+            if (canvas.width !== videoElement.videoWidth) {
+              canvas.width = videoElement.videoWidth;
+              canvas.height = videoElement.videoHeight;
+            }
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
           }
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
@@ -111,12 +120,18 @@ export function useDocument({ canvases }: UseDocumentProps) {
       setError(null);
       setLimitExceeded(false);
       setPdfDoc(null);
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+      setVideoUrl(null);
       setFile(selectedFile);
       
       try {
         if (selectedFile.type.startsWith("image/")) {
           setDocumentType("image");
           setNumPages(1);
+        } else if (selectedFile.type.startsWith("video/")) {
+          setDocumentType("video");
+          setNumPages(1);
+          setVideoUrl(URL.createObjectURL(selectedFile));
         } else if (selectedFile.type === "application/pdf") {
           setDocumentType("pdf");
           const doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
@@ -150,6 +165,7 @@ export function useDocument({ canvases }: UseDocumentProps) {
     file,
     documentType,
     pdfDoc,
+    videoUrl,
     numPages,
     error,
     limitExceeded,

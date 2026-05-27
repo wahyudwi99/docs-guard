@@ -13,7 +13,7 @@ import { WatermarkControls } from "@/components/WatermarkControls";
 import { ExportButton } from "@/components/ExportButton";
 import { CameraCapture } from "@/components/CameraCapture";
 import { Paywall } from "@/components/Paywall";
-import { useCallback, useState, useEffect, Suspense } from "react";
+import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
 import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
@@ -30,6 +30,7 @@ function HomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -96,6 +97,8 @@ function HomeContent() {
   const {
     file,
     documentType,
+    pdfDoc,
+    videoUrl,
     numPages,
     error,
     limitExceeded,
@@ -103,12 +106,11 @@ function HomeContent() {
     handleFileChange,
     clearDocument,
     drawDocumentOnCanvases,
-  } = useDocument({ canvases });
-
+    } = useDocument({ canvases });
   // Callback to redraw the current document (image or PDF pages)
   const redrawDocument = useCallback(async (currentCanvases: HTMLCanvasElement[]) => {
     if (!file || !documentType || currentCanvases.length === 0) return;
-    await drawDocumentOnCanvases(file, currentCanvases);
+    await drawDocumentOnCanvases(file, currentCanvases, videoRef.current);
   }, [file, documentType, drawDocumentOnCanvases]);
 
   // Watermark management
@@ -142,7 +144,7 @@ function HomeContent() {
     setBlurStrength,
     resetWatermark,
     drawWatermark,
-  } = useWatermark({ canvases, redrawDocument });
+  } = useWatermark({ canvases, redrawDocument, documentType, videoRef });
 
   const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Renew canvases and state to avoid "canvas already used" error
@@ -169,9 +171,11 @@ function HomeContent() {
   useEffect(() => {
     if (file) {
       setActiveTab('design');
-      setDesignTab('watermark');
+      if (documentType === 'video') {
+        setDesignTab('watermark');
+      }
     }
-  }, [file, setActiveTab, setDesignTab]);
+  }, [file, documentType, setActiveTab, setDesignTab]);
 
   const handleNewFile = useCallback(() => {
     clearDocument();
@@ -287,12 +291,12 @@ function HomeContent() {
             {/* Tier Status Badge - Always Visible */}
             {!isLoadingAuth && (
               <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
-                {isPro ? (
+                {isPro && session ? (
                   <div className="flex items-center gap-1.5">
                     <div className="relative group">
                       <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
                       <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
-                        <Zap className="w-3 h-3 fill-amber-700 text-amber-700 mr-1" />
+                        <Zap className="w-3 h-3 fill-amber-600 text-amber-600 mr-1" />
                         PRO
                       </span>
                     </div>
@@ -414,6 +418,8 @@ function HomeContent() {
                   addBlurArea(area);
                 }}
                 blurAreas={blurAreas}
+                documentType={documentType}
+                videoUrl={videoUrl}
               />
             </div>
           )}
@@ -586,7 +592,11 @@ function HomeContent() {
                             )}
                           >
                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
-                            {isSaving ? t('preview_modal.saving') : `${documentType === 'pdf' ? t('preview_modal.download_pdf') : t('preview_modal.download_png')}`}
+                            {isSaving ? t('preview_modal.saving') : 
+                              documentType === 'pdf' ? t('preview_modal.download_pdf') : 
+                              documentType === 'video' ? 'Download Video' : 
+                              t('preview_modal.download_png')
+                            }
                           </button>
                         </div>
 

@@ -16,6 +16,9 @@ interface CanvasDisplayProps {
   isSelectionMode?: boolean;
   onAreaSelected?: (area: BlurArea) => void;
   blurAreas?: BlurArea[];
+  documentType?: "image" | "pdf" | "video" | null;
+  videoUrl?: string | null;
+  videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
 }
 
 export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ 
@@ -23,7 +26,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   registerCanvas,
   isSelectionMode = false,
   onAreaSelected,
-  blurAreas = []
+  blurAreas = [],
+  documentType,
+  videoUrl,
+  videoRef
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -31,6 +37,9 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const internalVideoRef = useRef<HTMLVideoElement | null>(null);
+  const activeVideoRef = videoRef || internalVideoRef;
+  const requestRef = useRef<number | null>(null);
 
   const handleNext = () => {
     if (currentPage < numPages - 1) setCurrentPage(prev => prev + 1);
@@ -43,6 +52,48 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleJumpToPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentPage(parseInt(e.target.value));
   };
+
+  // Video to Canvas rendering loop for real-time watermark preview
+  useEffect(() => {
+    if (documentType !== 'video' || !videoUrl) {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (activeVideoRef.current) activeVideoRef.current = null;
+      return;
+    }
+
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    activeVideoRef.current = video;
+
+    const renderFrame = () => {
+      const canvases = containerRef.current?.querySelectorAll('canvas');
+      const canvas = canvases?.[0];
+      if (canvas && video.readyState >= 2) {
+        // We'll let hooks/useWatermark handle the drawing to avoid sync issues.
+        if (canvas.width !== video.videoWidth) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        }
+      }
+      requestRef.current = requestAnimationFrame(renderFrame);
+    };
+
+    video.play().then(() => {
+      renderFrame();
+    });
+
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      video.pause();
+      video.src = "";
+      video.load();
+      activeVideoRef.current = null;
+    };
+  }, [documentType, videoUrl, activeVideoRef]);
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;

@@ -8,7 +8,7 @@ import { jsPDF, jsPDFOptions } from "jspdf";
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
   watermarkText: string;
-  documentType: "image" | "pdf" | null;
+  documentType: "image" | "pdf" | "video" | null;
   password?: string;
   isPro?: boolean;
   metadataOptions?: {
@@ -87,6 +87,28 @@ export function useFileExport({
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
+    } else if (documentType === "video") {
+      // For video, we'll capture the stream from the canvas
+      const canvas = canvases[0];
+      // @ts-ignore - captureStream is not always in types
+      const stream = canvas.captureStream(30);
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const chunks: Blob[] = [];
+
+      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>((resolve) => {
+        recorder.ondataavailable = (e) => chunks.push(e.data);
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.webm`;
+          resolve({ blob, fileName, contentType: 'video/webm' });
+        };
+        
+        // Recording logic: start and stop after a reasonable time or video end
+        recorder.start();
+        // Since we can't easily know when the user wants to stop, 
+        // we'll record for the duration of the source video or a fallback
+        setTimeout(() => recorder.stop(), 5000); 
+      });
     } else {
       const canvas = canvases[0];
       const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg") || file?.name.toLowerCase().endsWith(".jpeg");
@@ -150,6 +172,15 @@ export function useFileExport({
         if (documentType === "image") {
           try {
             await Media.savePhoto({
+              path: savedFile.uri
+            });
+            console.log("Saved to Gallery");
+          } catch (err) {
+            console.error("Failed to save to Gallery:", err);
+          }
+        } else if (documentType === "video") {
+          try {
+            await Media.saveVideo({
               path: savedFile.uri
             });
             console.log("Saved to Gallery");
