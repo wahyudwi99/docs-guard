@@ -190,14 +190,14 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
       
       if (!video) {
         // Only log once to avoid flooding
-        if (renderRequestRef.current % 60 === 0) console.log("[VIDEO] No video element found in ref");
+        if (renderRequestRef.current !== null && renderRequestRef.current % 60 === 0) console.log("[VIDEO] No video element found in ref");
         return;
       }
 
       if (!context) return;
 
       if (video.readyState < 2) {
-        if (renderRequestRef.current % 60 === 0) console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
+        if (renderRequestRef.current !== null && renderRequestRef.current % 60 === 0) console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
         // Optional: draw a loading state or keep previous frame
         return;
       }
