@@ -92,21 +92,32 @@ export function useFileExport({
       const canvas = canvases[0];
       // @ts-ignore - captureStream is not always in types
       const stream = canvas.captureStream(30);
-      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      
+      // Determine the best MIME type for the platform (iOS prefers mp4)
+      const isIOS = Capacitor.getPlatform() === 'ios';
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
+      const fileExt = file?.name.split('.').pop() || (isIOS ? 'mp4' : 'webm');
+      
+      const recorder = new MediaRecorder(stream, { mimeType });
       const chunks: Blob[] = [];
 
       return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>((resolve) => {
-        recorder.ondataavailable = (e) => chunks.push(e.data);
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'video/webm' });
-          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.webm`;
-          resolve({ blob, fileName, contentType: 'video/webm' });
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) chunks.push(e.data);
         };
         
-        // Recording logic: start and stop after a reasonable time or video end
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: mimeType });
+          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
+          resolve({ blob, fileName, contentType: mimeType });
+        };
+        
+        // Start recording
         recorder.start();
-        // Since we can't easily know when the user wants to stop, 
-        // we'll record for the duration of the source video or a fallback
+        
+        // In a real scenario, we should record until the video ends.
+        // For now, we'll record for a fixed duration placeholder (e.g., 10s)
+        // or let the user decide.
         setTimeout(() => recorder.stop(), 5000); 
       });
     } else {
@@ -158,12 +169,11 @@ export function useFileExport({
       } else {
         const base64Data = await blobToBase64(blob);
         
-        // 1. Always save to Filesystem first (Documents folder)
+        // 1. Always save to Filesystem first (Data folder for better visibility to plugins)
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
-          directory: Directory.Documents,
-          recursive: true,
+          directory: Directory.Data,
         });
         
         console.log("Saved to Filesystem:", savedFile.uri);
@@ -180,12 +190,18 @@ export function useFileExport({
           }
         } else if (documentType === "video") {
           try {
+            // Ensure the file is treated as a video during gallery save
             await Media.saveVideo({
               path: savedFile.uri
             });
-            console.log("Saved to Gallery");
+            console.log("Video saved to Gallery successfully");
           } catch (err) {
-            console.error("Failed to save to Gallery:", err);
+            console.error("Failed to save video to Gallery:", err);
+            // Fallback: trigger share dialog so user can "Save to Files"
+            await Share.share({
+              title: fileName,
+              url: savedFile.uri
+            });
           }
         } else if (documentType === "pdf") {
           // On iOS, sometimes saving to Documents isn't enough to "see" it immediately
