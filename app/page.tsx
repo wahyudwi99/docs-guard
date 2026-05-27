@@ -236,6 +236,19 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Hidden Video Source for Watermarking */}
+      {documentType === 'video' && videoUrl && (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          muted
+          loop
+          playsInline
+          autoPlay
+          className="fixed -top-[1000px] -left-[1000px] w-10 h-10 opacity-0 pointer-events-none"
+        />
+      )}
+
       {/* Splash Screen Overlay */}
       {showSplash && (
         <div className={cn(

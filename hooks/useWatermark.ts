@@ -184,21 +184,34 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
     if (canvases.length === 0) return;
 
     if (documentType === "video") {
-      const video = videoRef?.current;
+      let video = videoRef?.current;
+      
+      // Secondary search: If ref is null, try to find the video element in the DOM
+      if (!video) {
+        video = document.querySelector('video') as HTMLVideoElement | null;
+      }
+
       const canvas = canvases[0];
       const context = canvas.getContext("2d");
       
       if (!video) {
-        // Only log once to avoid flooding
-        if (renderRequestRef.current !== null && renderRequestRef.current % 60 === 0) console.log("[VIDEO] No video element found in ref");
+        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
+          console.log("[VIDEO] No video element found in ref or DOM");
+        }
         return;
       }
 
       if (!context) return;
 
+      // Ensure video is playing (iOS sometimes pauses hidden videos)
+      if (video.paused && video.readyState >= 2) {
+        video.play().catch(e => console.warn("[VIDEO] Auto-play blocked:", e));
+      }
+
       if (video.readyState < 2) {
-        if (renderRequestRef.current !== null && renderRequestRef.current % 60 === 0) console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
-        // Optional: draw a loading state or keep previous frame
+        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
+          console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
+        }
         return;
       }
 
@@ -206,7 +219,6 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
       if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        console.log(`[VIDEO] Canvas synced to video: ${canvas.width}x${canvas.height}`);
       }
 
       // Draw the video frame
