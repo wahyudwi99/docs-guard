@@ -110,38 +110,37 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
             )}
           </button>
-          {isPro && (
-            <button
-              onClick={() => documentType !== "video" && setDesignTab("blur")}
-              disabled={documentType === "video"}
-              className={cn(
-                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-                designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
-                documentType === "video" && "opacity-40 grayscale cursor-not-allowed"
-              )}
-            >
-              {t('watermark_controls.blur_mode')}
-              {blurAreas.length > 0 && (
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              )}
-              {documentType === "video" && <Zap className="h-2.5 w-2.5 ml-1 text-slate-400" />}
-            </button>
-          )}
-          {isPro && (
-            <button
-              onClick={() => documentType === "pdf" && setDesignTab("password")}
-              disabled={documentType !== "pdf"}
-              className={cn(
-                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:grayscale",
-                designTab === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              {t('watermark_controls.pdf_password')}
-              {password && (
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              )}
-            </button>
-          )}
+          <button
+            onClick={() => isPro && documentType !== "video" && setDesignTab("blur")}
+            disabled={!isPro || documentType === "video"}
+            className={cn(
+              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+              designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
+              (!isPro || documentType === "video") && "opacity-40 grayscale cursor-not-allowed"
+            )}
+          >
+            {t('watermark_controls.blur_mode')}
+            {blurAreas.length > 0 && (
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            )}
+            {!isPro ? <Zap className="h-2.5 w-2.5 ml-1 text-amber-500 fill-amber-500" /> : documentType === "video" && <Zap className="h-2.5 w-2.5 ml-1 text-slate-400" />}
+          </button>
+          
+          <button
+            onClick={() => isPro && documentType === "pdf" && setDesignTab("password")}
+            disabled={!isPro || documentType !== "pdf"}
+            className={cn(
+              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+              designTab === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
+              (!isPro || documentType !== "pdf") && "opacity-40 grayscale cursor-not-allowed"
+            )}
+          >
+            {t('watermark_controls.pdf_password')}
+            {password && (
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            )}
+            {!isPro && <Zap className="h-2.5 w-2.5 ml-1 text-amber-500 fill-amber-500" />}
+          </button>
         </div>
       </div>
 
