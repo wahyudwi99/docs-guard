@@ -651,9 +651,8 @@ function HomeContent() {
                         
                         <div className="space-y-2">
                           <h3 className="text-2xl font-black tracking-tight leading-none uppercase">
-                            {isPro ? "PRO" : "Go Pro Today"}
+                            {isPro ? "" : "Go Pro Today"}
                           </h3>
-                          <div className="h-px w-12 bg-white/30 mx-auto my-4"></div>
                           
                           {isPro ? (
                             <div className="space-y-4">
