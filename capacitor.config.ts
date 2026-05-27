@@ -7,8 +7,8 @@ const config: CapacitorConfig = {
   plugins: {
     SocialLogin: {
       google: {
-        serverClientId: '1031627117513-07m0g7c5o5ij8k7l79he83fkblfd4g6q.apps.googleusercontent.com',
-        iosClientId: '1031627117513-v2uh5j60iodalgou66ighsc9ohivc7a8.apps.googleusercontent.com'
+        serverClientId: '1002837023207-n0hgfsi8vu9u107bqvigiej06jbma312.apps.googleusercontent.com',
+        iosClientId: '1002837023207-imr2p14jh9ni0chtv0r8vmveoe4dgdnb.apps.googleusercontent.com'
       },
     },
   },
