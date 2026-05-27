@@ -41,6 +41,30 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const activeVideoRef = videoRef || internalVideoRef;
   const requestRef = useRef<number | null>(null);
 
+  // Sync canvas dimensions with video when it loads
+  useEffect(() => {
+    const video = activeVideoRef.current;
+    if (!video || documentType !== 'video') return;
+
+    const handleLoadedMetadata = () => {
+      const canvases = containerRef.current?.querySelectorAll('canvas');
+      const canvas = canvases?.[0];
+      if (canvas) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        console.log(`[VIDEO] Canvas resized to: ${video.videoWidth}x${video.videoHeight}`);
+      }
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    // If already loaded
+    if (video.readyState >= 1) handleLoadedMetadata();
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [documentType, activeVideoRef.current]);
+
   const handleNext = () => {
     if (currentPage < numPages - 1) setCurrentPage(prev => prev + 1);
   };
@@ -53,47 +77,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     setCurrentPage(parseInt(e.target.value));
   };
 
-  // Video to Canvas rendering loop for real-time watermark preview
-  useEffect(() => {
-    if (documentType !== 'video' || !videoUrl) {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      if (activeVideoRef.current) activeVideoRef.current = null;
-      return;
-    }
-
-    const video = document.createElement('video');
-    video.src = videoUrl;
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    activeVideoRef.current = video;
-
-    const renderFrame = () => {
-      const canvases = containerRef.current?.querySelectorAll('canvas');
-      const canvas = canvases?.[0];
-      if (canvas && video.readyState >= 2) {
-        // We'll let hooks/useWatermark handle the drawing to avoid sync issues.
-        if (canvas.width !== video.videoWidth) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-        }
-      }
-      requestRef.current = requestAnimationFrame(renderFrame);
-    };
-
-    video.play().then(() => {
-      renderFrame();
-    });
-
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      video.pause();
-      video.src = "";
-      video.load();
-      activeVideoRef.current = null;
-    };
-  }, [documentType, videoUrl, activeVideoRef]);
+  // The video loop is now handled by hooks/useWatermark.ts
+  // We only need to provide the video element as a source.
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
@@ -244,6 +229,17 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
           isSelectionMode && "cursor-crosshair"
         )}
       >
+        {documentType === 'video' && videoUrl && (
+          <video
+            ref={activeVideoRef}
+            src={videoUrl}
+            className="hidden"
+            muted
+            loop
+            playsInline
+            autoPlay
+          />
+        )}
         {Array.from({ length: numPages }).map((_, index) => (
           <div 
             key={index} 

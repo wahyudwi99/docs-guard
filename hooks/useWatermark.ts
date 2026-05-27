@@ -187,15 +187,33 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
       const video = videoRef?.current;
       const canvas = canvases[0];
       const context = canvas.getContext("2d");
-      if (!video || !context || video.readyState < 2) return;
-
-      if (canvas.width !== video.videoWidth) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      
+      if (!video) {
+        // Only log once to avoid flooding
+        if (renderRequestRef.current % 60 === 0) console.log("[VIDEO] No video element found in ref");
+        return;
       }
 
+      if (!context) return;
+
+      if (video.readyState < 2) {
+        if (renderRequestRef.current % 60 === 0) console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
+        // Optional: draw a loading state or keep previous frame
+        return;
+      }
+
+      // Sync canvas dimensions
+      if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        console.log(`[VIDEO] Canvas synced to video: ${canvas.width}x${canvas.height}`);
+      }
+
+      // Draw the video frame
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Apply watermark (shared logic)
       applyWatermarkToContext(context, canvas.width, canvas.height);
       return;
     }
