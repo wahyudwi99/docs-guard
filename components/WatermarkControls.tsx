@@ -239,7 +239,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
           {isPro && password && (
             <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
               <Zap className="h-2.5 w-2.5 fill-emerald-600" />
-              AES-256 Encryption will be applied
+              Encryption will be applied
             </p>
           )}
         </div>

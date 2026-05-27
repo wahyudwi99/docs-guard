@@ -69,7 +69,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               
               <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-900 dark:text-zinc-100 uppercase tracking-widest font-bold">
                 <Lock className="w-3 h-3" />
-                <span>Secure AES-256 Authentication</span>
+                <span>Secure Authentication</span>
               </div>
             </div>
           </motion.div>
