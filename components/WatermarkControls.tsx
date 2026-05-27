@@ -110,35 +110,38 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
             )}
           </button>
-          <button
-            onClick={() => documentType !== "video" && setDesignTab("blur")}
-            disabled={documentType === "video"}
-            className={cn(
-              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
-              designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
-              documentType === "video" && "opacity-40 grayscale cursor-not-allowed"
-            )}
-          >
-            {t('watermark_controls.blur_mode')}
-            {blurAreas.length > 0 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-            )}
-            {documentType === "video" ? <Lock className="h-2.5 w-2.5 ml-1 text-slate-400" /> : !isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
-          </button>
-          <button
-            onClick={() => documentType === "pdf" && setDesignTab("password")}
-            disabled={documentType !== "pdf"}
-            className={cn(
-              "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:grayscale",
-              designTab === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            {t('watermark_controls.pdf_password')}
-            {password && (
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-            )}
-            {!isPro && <Lock className="h-2.5 w-2.5 ml-1 text-amber-500" />}
-          </button>
+          {isPro && (
+            <button
+              onClick={() => documentType !== "video" && setDesignTab("blur")}
+              disabled={documentType === "video"}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2",
+                designTab === "blur" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700",
+                documentType === "video" && "opacity-40 grayscale cursor-not-allowed"
+              )}
+            >
+              {t('watermark_controls.blur_mode')}
+              {blurAreas.length > 0 && (
+                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              )}
+              {documentType === "video" && <Zap className="h-2.5 w-2.5 ml-1 text-slate-400" />}
+            </button>
+          )}
+          {isPro && (
+            <button
+              onClick={() => documentType === "pdf" && setDesignTab("password")}
+              disabled={documentType !== "pdf"}
+              className={cn(
+                "flex-1 py-2 rounded-[12px] text-[10px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-40 disabled:grayscale",
+                designTab === "password" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {t('watermark_controls.pdf_password')}
+              {password && (
+                <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -231,7 +234,7 @@ export const WatermarkControls: React.FC<WatermarkControlsProps> = ({
               )}
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
-              {!isPro ? <Lock className="h-4 w-4" /> : <Lock className="h-4 w-4 opacity-50" />}
+              {!isPro ? <Zap className="h-4 w-4 fill-amber-500 text-amber-500" /> : <Zap className="h-4 w-4 opacity-50" />}
             </div>
           </div>
           {isPro && password && (

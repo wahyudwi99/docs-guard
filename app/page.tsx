@@ -16,7 +16,7 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -398,11 +398,11 @@ function HomeContent() {
                   </span>
                 </div>
                 {!session ? (
-                   <p className="text-xs font-medium text-slate-600 leading-relaxed text-left">
+                   <p className="text-xs font-normal text-slate-600 leading-relaxed text-left">
                      {t('nav.privacy_banner')}
                    </p>
                 ) : (
-                  <p className="text-[10px] font-medium text-slate-500 italic">
+                  <p className="text-[10px] font-normal text-slate-500 italic">
                     {t('nav.privacy_banner')}
                   </p>
                 )}
@@ -640,44 +640,39 @@ function HomeContent() {
                       
                       <div className="flex flex-col items-center relative z-10 text-center">
                         <div className={cn(
-                          "h-20 w-20 rounded-[28px] flex items-center justify-center mb-6 backdrop-blur-xl border relative shadow-inner",
-                          isPro ? "bg-white/30 border-white/40" : "bg-white/10 border-white/20"
+                          "px-10 py-3 rounded-[24px] flex items-center justify-center mb-6 backdrop-blur-xl border-2 border-white/40 shadow-2xl bg-white/20"
                         )}>
-                          <Zap className={cn(
-                            "h-10 w-10 drop-shadow-md transition-all duration-500", 
-                            isPro ? "text-amber-700 fill-amber-700" : "text-amber-300 fill-amber-300"
-                          )} />
+                          <span className="text-4xl font-black text-white tracking-tighter drop-shadow-md">PRO</span>
                         </div>
                         
-                        <div className="space-y-2">
-                          <h3 className="text-2xl font-black tracking-tight leading-none uppercase">
-                            {isPro ? "" : "Go Pro Today"}
-                          </h3>
-                          
+                        <div className="space-y-4">
                           {isPro ? (
                             <div className="space-y-4">
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Your Status</span>
-                                <div className="px-6 py-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl">
-                                  <span className="text-3xl font-black text-white tracking-tighter">PRO</span>
+                              {currentPlan?.endDate && (
+                                <div className="px-4 py-1.5 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
+                                  {(() => {
+                                    const end = new Date(currentPlan.endDate);
+                                    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                    return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
+                                  })()}
                                 </div>
-                                {currentPlan?.endDate && (
-                                  <div className="mt-2 px-3 py-1 bg-black/10 backdrop-blur-md rounded-full border border-white/10 shadow-inner">
-                                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">
-                                      {(() => {
-                                        const end = new Date(currentPlan.endDate);
-                                        const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                        return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
-                                      })()}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                              )}
+                              
+                              <button 
+                                onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
+                                className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                              >
+                                <Settings2 className="h-3.5 w-3.5" />
+                                Cancel Subscription
+                              </button>
                             </div>
                           ) : (
-                            <p className="text-xs font-medium text-indigo-100/80 leading-relaxed max-w-[240px] mx-auto">
-                              Unlock privacy-first professional tools and process documents without limits.
-                            </p>
+                            <div className="space-y-2">
+                              <h3 className="text-2xl font-black tracking-tight leading-none uppercase">Go Pro Today</h3>
+                              <p className="text-xs font-medium text-indigo-100/80 leading-relaxed max-w-[240px] mx-auto">
+                                Unlock privacy-first professional tools and process documents without limits.
+                              </p>
+                            </div>
                           )}
                         </div>
                       </div>
