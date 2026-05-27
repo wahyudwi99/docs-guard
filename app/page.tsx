@@ -306,10 +306,9 @@ function HomeContent() {
               <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
                 {isPro && session ? (
                   <div className="flex items-center gap-1.5">
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                      <span className="relative inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-600 text-[10px] font-black text-white uppercase tracking-wider shadow-lg border border-amber-200/50">
-                        <Zap className="w-3 h-3 fill-amber-600 text-amber-600 mr-1" />
+                    <div className="flex items-center">
+                      <Zap className="w-3.5 h-3.5 fill-amber-600 text-amber-600 mr-1" />
+                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
                         PRO
                       </span>
                     </div>
@@ -326,9 +325,11 @@ function HomeContent() {
                     )}
                   </div>
                 ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-[10px] font-black text-white uppercase tracking-wider shadow-md border border-indigo-200/50">
-                    FREE
-                  </span>
+                  <div className="flex items-center">
+                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+                      FREE
+                    </span>
+                  </div>
                 )}
               </div>
             )}
@@ -480,7 +481,7 @@ function HomeContent() {
                   )}
                 >
                   <CreditCard className="h-3.5 w-3.5" />
-                  {t('tabs.subscription')}
+                  Go Pro
                 </button>
               </div>
 
@@ -656,18 +657,21 @@ function HomeContent() {
                           
                           {isPro ? (
                             <div className="space-y-4">
-                              <div className="flex flex-wrap justify-center gap-2">
-                                <span className="px-3 py-1 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 text-white">
-                                  PRO
-                                </span>
+                              <div className="flex flex-col items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Your Status</span>
+                                <div className="px-6 py-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl">
+                                  <span className="text-3xl font-black text-white tracking-tighter">PRO</span>
+                                </div>
                                 {currentPlan?.endDate && (
-                                  <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/30 text-white">
-                                    {(() => {
-                                      const end = new Date(currentPlan.endDate);
-                                      const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                      return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
-                                    })()}
-                                  </span>
+                                  <div className="mt-2 px-3 py-1 bg-black/10 backdrop-blur-md rounded-full border border-white/10 shadow-inner">
+                                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                                      {(() => {
+                                        const end = new Date(currentPlan.endDate);
+                                        const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                        return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
+                                      })()}
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                             </div>
