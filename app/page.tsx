@@ -910,7 +910,10 @@ function HomeContent() {
                   Upgrade to Pro
                 </button>
                 <button 
-                  onClick={() => setLimitExceeded(false)}
+                  onClick={() => {
+                    setLimitExceeded(false);
+                    setActiveTab('upload');
+                  }}
                   className="w-full py-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-600"
                 >
                   Maybe Later
