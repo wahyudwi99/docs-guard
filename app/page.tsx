@@ -871,6 +871,57 @@ function HomeContent() {
         <Paywall onClose={() => setShowPaywall(false)} />
       )}
 
+      {/* Premium Limit Modal */}
+      <AnimatePresence>
+        {limitExceeded && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+              onClick={() => setLimitExceeded(false)}
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl text-center space-y-6 overflow-hidden"
+            >
+              <div className="h-20 w-20 bg-amber-100 rounded-[28px] flex items-center justify-center mx-auto">
+                <Zap className="h-10 w-10 text-amber-600 fill-amber-600" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">Premium Limit Reached</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Free users are limited to videos up to 15 seconds and PDFs up to 3 pages.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <button 
+                  onClick={() => {
+                    setLimitExceeded(false);
+                    setActiveTab('subscription');
+                    setShowPaywall(true);
+                  }}
+                  className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-lg shadow-amber-100"
+                >
+                  Upgrade to Pro
+                </button>
+                <button 
+                  onClick={() => setLimitExceeded(false)}
+                  className="w-full py-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-600"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Subscription Conflict Modal */}
       <AnimatePresence>
         {showConflictModal && (

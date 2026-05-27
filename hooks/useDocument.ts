@@ -129,21 +129,42 @@ export function useDocument({ canvases }: UseDocumentProps) {
           setDocumentType("image");
           setNumPages(1);
         } else if (selectedFile.type.startsWith("video/")) {
-          setDocumentType("video");
-          setNumPages(1);
-          setVideoUrl(URL.createObjectURL(selectedFile));
+          // Detect video duration for PRO limit
+          const video = document.createElement('video');
+          video.preload = 'metadata';
+          
+          await new Promise<void>((resolve, reject) => {
+            video.onloadedmetadata = () => {
+              window.URL.revokeObjectURL(video.src);
+              if (!isPro && video.duration > 15) {
+                setLimitExceeded(true);
+                setDocumentType(null);
+                setFile(null);
+                setNumPages(0);
+                resolve();
+                return;
+              }
+              setDocumentType("video");
+              setNumPages(1);
+              setVideoUrl(URL.createObjectURL(selectedFile));
+              resolve();
+            };
+            video.onerror = () => reject(new Error("Failed to load video metadata"));
+            video.src = URL.createObjectURL(selectedFile);
+          });
         } else if (selectedFile.type === "application/pdf") {
-          setDocumentType("pdf");
-          const doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
+          const arrayBuffer = await selectedFile.arrayBuffer();
+          const doc = await loadPdf(new Uint8Array(arrayBuffer));
           
           if (!isPro && doc.numPages > 3) {
             setLimitExceeded(true);
-            setPdfDoc(null);
+            setDocumentType(null);
             setFile(null);
             setNumPages(0);
             return;
           }
 
+          setDocumentType("pdf");
           setPdfDoc(doc);
           setNumPages(doc.numPages);
         } else {
