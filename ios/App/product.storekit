@@ -43,7 +43,21 @@
 
           ],
           "codeOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "6.99",
+              "eligibility" : [
+                "existing",
+                "expired",
+                "new"
+              ],
+              "internalID" : "4F098491",
+              "isStackable" : true,
+              "numberOfPeriods" : 1,
+              "paymentMode" : "payAsYouGo",
+              "referenceName" : "Monthly Subscription",
+              "subscriptionPeriod" : "P1M"
+            }
           ],
           "displayPrice" : "6.99",
           "familyShareable" : false,
@@ -73,14 +87,43 @@
 
           ],
           "codeOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "2.99",
+              "eligibility" : [
+                "expired",
+                "existing",
+                "new"
+              ],
+              "internalID" : "F6FEFE62",
+              "isStackable" : true,
+              "numberOfPeriods" : 1,
+              "paymentMode" : "payAsYouGo",
+              "referenceName" : "Weekly Subscription",
+              "subscriptionPeriod" : "P1W"
+            }
           ],
           "displayPrice" : "2.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "748B6554",
+          "introductoryOffer" : {
+            "billingPlanType" : "BILLED_UPFRONT",
+            "displayPrice" : "0.99",
+            "internalID" : "0587F83B",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1W"
+          },
           "introductoryOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "0.99",
+              "internalID" : "0587F83B",
+              "numberOfPeriods" : 1,
+              "paymentMode" : "payAsYouGo",
+              "subscriptionPeriod" : "P1W"
+            }
           ],
           "localizations" : [
             {
@@ -103,7 +146,21 @@
 
           ],
           "codeOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "27.99",
+              "eligibility" : [
+                "existing",
+                "expired",
+                "new"
+              ],
+              "internalID" : "56BA25E2",
+              "isStackable" : true,
+              "numberOfPeriods" : 1,
+              "paymentMode" : "payAsYouGo",
+              "referenceName" : "Yearly Subscription",
+              "subscriptionPeriod" : "P1Y"
+            }
           ],
           "displayPrice" : "27.99",
           "familyShareable" : false,
