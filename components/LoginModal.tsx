@@ -51,7 +51,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
 
             <div className="text-center">
               <div className="mb-6 inline-flex h-20 w-20 rounded-2xl overflow-hidden shadow-xl mx-auto">
-                <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
               </div>
               
               <h2 className="text-2xl font-bold mb-2">Welcome to DocsGuard</h2>

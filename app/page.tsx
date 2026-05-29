@@ -294,7 +294,7 @@ function HomeContent() {
         <div className="max-w-5xl mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-3 group transition-all">
             <div className="flex h-10 w-10 items-center justify-center rounded-[12px] overflow-hidden shadow-lg shadow-indigo-200">
-              <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">{t('nav.title')}</span>
@@ -881,7 +881,7 @@ function HomeContent() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">
             <div className="flex items-center gap-2 grayscale opacity-50">
-               <img src="/logo.jpeg" alt="Logo" className="h-4 w-4 rounded-sm object-cover" />
+               <img src="/logo.png" alt="Logo" className="h-4 w-4 rounded-sm object-cover" />
                <span className="text-xs font-black tracking-tight uppercase">DocsGuard</span>
             </div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
