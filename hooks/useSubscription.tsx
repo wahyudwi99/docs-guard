@@ -37,7 +37,24 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
   const [latestPlanInfo, setLatestPlanInfo] = useState<ActivePlan | null>(null);
   const [subscriptionConflict, setSubscriptionConflict] = useState(false);
-  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccessState] = useState(false);
+
+  // Persistence for purchaseSuccess so it survives window.location.reload()
+  useEffect(() => {
+    const saved = localStorage.getItem('docsguard_purchase_success');
+    if (saved === 'true') {
+      setPurchaseSuccessState(true);
+    }
+  }, []);
+
+  const setPurchaseSuccess = (val: boolean) => {
+    setPurchaseSuccessState(val);
+    if (val) {
+      localStorage.setItem('docsguard_purchase_success', 'true');
+    } else {
+      localStorage.removeItem('docsguard_purchase_success');
+    }
+  };
   
   const isInitialized = useRef(false);
 
