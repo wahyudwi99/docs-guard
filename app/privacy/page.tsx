@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
         <div className="space-y-12">
           {/* Hero Section */}
           <div className="text-center space-y-4">
-            <div className="inline-flex h-20 w-20 items-center justify-center mb-4">
+            <div className="inline-flex h-32 w-32 items-center justify-center mb-4">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">

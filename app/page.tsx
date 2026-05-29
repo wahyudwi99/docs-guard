@@ -261,10 +261,8 @@ function HomeContent() {
           </div>
           
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-            <div className="relative h-24 w-24 flex items-center justify-center rounded-[32px] overflow-hidden bg-[#3b82f6] isolation-auto transform-gpu translate-z-0">
-              {/* Using a solid background on parent and absolute gradient to mask sub-pixel borders */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6] to-[#4f46e5] transform-gpu"></div>
-              <Shield className="h-12 w-12 text-white relative z-10" />
+            <div className="relative h-32 w-32 flex items-center justify-center isolation-auto transform-gpu translate-z-0">
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10" />
             </div>
             <div className="flex flex-col items-center gap-2">
               <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">{t('nav.title')}</h1>
@@ -293,7 +291,7 @@ function HomeContent() {
       <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)] pt-[env(safe-area-inset-top)]">
         <div className="max-w-5xl mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-3 group transition-all">
-            <div className="flex h-10 w-10 items-center justify-center">
+            <div className="flex h-14 w-14 items-center justify-center">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col leading-tight">
@@ -881,7 +879,7 @@ function HomeContent() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">
             <div className="flex items-center gap-2 grayscale opacity-50">
-               <img src="/logo.png" alt="Logo" className="h-4 w-4 object-contain" />
+               <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
                <span className="text-xs font-black tracking-tight uppercase">DocsGuard</span>
             </div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
