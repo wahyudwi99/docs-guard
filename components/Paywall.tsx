@@ -19,31 +19,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const router = useRouter();
 
   const features = [
-    { 
-      icon: <FileText className="w-5 h-5 text-blue-500" />, 
-      text: t('paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
-      detail: t('paywall_feature_unlimited_pdf_detail') || 'Bebas dari limit 3 halaman'
-    },
-    { 
-      icon: <Video className="w-5 h-5 text-red-500" />, 
-      text: t('paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
-      detail: t('paywall_feature_unlimited_video_detail') || 'Kualitas visual 100% asli'
-    },
-    { 
-      icon: <Lock className="w-5 h-5 text-green-500" />, 
-      text: t('paywall_feature_encryption') || 'PDF Lock & Encryption',
-      detail: t('paywall_feature_encryption_detail') || 'Amankan file dengan sandi'
-    },
-    { 
-      icon: <EyeOff className="w-5 h-5 text-purple-500" />, 
-      text: t('paywall_feature_smart_blur') || 'Information Masking (Smart Blur)',
-      detail: t('paywall_feature_smart_blur_detail') || 'Blur area rahasia gambar/PDF'
-    },
-    { 
-      icon: <Zap className="w-5 h-5 text-yellow-500" />, 
-      text: t('paywall_feature_ad_free') || '100% Ad-Free & Fast Processing',
-      detail: t('paywall_feature_ad_free_detail') || 'Proses lebih cepat tanpa iklan'
-    },
+    t('paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
+    t('paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
+    t('paywall_feature_encryption') || 'PDF Lock & Encryption',
+    t('paywall_feature_smart_blur') || 'Smart Blur (Info Masking)',
+    t('paywall_feature_ad_free') || '100% Ad-Free Experience',
   ];
 
   const authenticated = !!session;
@@ -80,16 +60,13 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             {t('paywall_subtitle') || 'Unlock all premium features and protect your documents like a pro.'}
           </p>
           
-          <div className="space-y-5 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
+          <div className="space-y-3 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1 p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-zinc-100 dark:border-zinc-700">
-                  {feature.icon}
+              <div key={index} className="flex items-center gap-3">
+                <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
                 </div>
-                <div>
-                  <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-none mb-1">{feature.text}</div>
-                  <div className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">{feature.detail}</div>
-                </div>
+                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{feature}</span>
               </div>
             ))}
           </div>

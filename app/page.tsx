@@ -684,22 +684,19 @@ function HomeContent() {
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">
                               Exclusive Pro Benefits
                             </p>
-                            <div className="grid grid-cols-1 gap-3">
+                            <div className="grid grid-cols-1 gap-2.5">
                               {[
-                                { icon: <FileText className="h-4 w-4 text-blue-500" />, text: t('paywall_feature_unlimited_pdf'), detail: t('paywall_feature_unlimited_pdf_detail') },
-                                { icon: <Video className="h-4 w-4 text-red-500" />, text: t('paywall_feature_unlimited_video'), detail: t('paywall_feature_unlimited_video_detail') },
-                                { icon: <Lock className="h-4 w-4 text-green-500" />, text: t('paywall_feature_encryption'), detail: t('paywall_feature_encryption_detail') },
-                                { icon: <EyeOff className="h-4 w-4 text-purple-500" />, text: t('paywall_feature_smart_blur'), detail: t('paywall_feature_smart_blur_detail') },
-                                { icon: <Zap className="h-4 w-4 text-yellow-500" />, text: t('paywall_feature_ad_free'), detail: t('paywall_feature_ad_free_detail') },
+                                t('paywall_feature_unlimited_pdf'),
+                                t('paywall_feature_unlimited_video'),
+                                t('paywall_feature_encryption'),
+                                t('paywall_feature_smart_blur'),
+                                t('paywall_feature_ad_free'),
                               ].map((feat, i) => (
-                                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm">
-                                  <div className="shrink-0 p-1.5 rounded-lg bg-white shadow-sm border border-slate-100">
-                                    {feat.icon}
+                                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100/50 shadow-sm">
+                                  <div className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50 text-emerald-600">
+                                    <CheckCircle2 className="h-3.5 w-3.5" />
                                   </div>
-                                  <div>
-                                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{feat.text}</p>
-                                    <p className="text-[9px] font-medium text-slate-500 leading-tight">{feat.detail}</p>
-                                  </div>
+                                  <p className="text-[11px] font-bold text-slate-800 leading-tight">{feat}</p>
                                 </div>
                               ))}
                             </div>
