@@ -19,6 +19,8 @@ interface SubscriptionContextType {
   activeEntitlements: any[];
   currentPlan: ActivePlan | null;
   subscriptionConflict: boolean;
+  purchaseSuccess: boolean;
+  setPurchaseSuccess: (success: boolean) => void;
   subscribe: (pkg: any) => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
   checkSubscriptionStatus: () => Promise<void>;
@@ -35,6 +37,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
   const [latestPlanInfo, setLatestPlanInfo] = useState<ActivePlan | null>(null);
   const [subscriptionConflict, setSubscriptionConflict] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   
   const isInitialized = useRef(false);
 
@@ -222,6 +225,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         processCustomerInfo(customerInfo);
         if (customerInfo.entitlements.active['pro']) {
           await logTransactionToSupabase(productIdentifier, pkg.identifier);
+          setPurchaseSuccess(true);
           return true;
         }
       } else {
@@ -234,6 +238,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         };
         processCustomerInfo(mockInfo);
         await logTransactionToSupabase(`sim_${Date.now()}`, pkg.identifier);
+        setPurchaseSuccess(true);
         return true;
       }
       return false;
@@ -267,6 +272,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       activeEntitlements, 
       currentPlan, 
       subscriptionConflict,
+      purchaseSuccess,
+      setPurchaseSuccess,
       subscribe, 
       restorePurchases, 
       checkSubscriptionStatus,

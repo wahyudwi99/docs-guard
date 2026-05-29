@@ -24,6 +24,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginModal } from "@/components/LoginModal";
 import { motion, AnimatePresence } from 'framer-motion';
+import { InAppReview } from '@capacitor-community/in-app-review';
 
 function HomeContent() {
   const { t, locale } = useI18n();
@@ -40,9 +41,30 @@ function HomeContent() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
-  const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict } = useSubscription();
+  const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
+
+  // Trigger In-App Review after successful purchase and returning to Home
+  useEffect(() => {
+    if (purchaseSuccess && !showSplash && !isExiting) {
+      const triggerReview = async () => {
+        try {
+          if (Capacitor.isNativePlatform()) {
+            await InAppReview.requestReview();
+          }
+          // Reset success state after triggering
+          setPurchaseSuccess(false);
+        } catch (error) {
+          console.error("Failed to trigger review:", error);
+        }
+      };
+      
+      // Small delay to ensure the splash screen exit is smooth before showing the dialog
+      const timer = setTimeout(triggerReview, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [purchaseSuccess, showSplash, isExiting, setPurchaseSuccess]);
 
   useEffect(() => {
     if (subscriptionConflict) {
