@@ -696,7 +696,7 @@ function HomeContent() {
                                   <div className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50 text-emerald-600">
                                     <CheckCircle2 className="h-3.5 w-3.5" />
                                   </div>
-                                  <p className="text-[11px] font-medium text-slate-600 leading-tight">{feat}</p>
+                                  <p className="text-sm font-medium text-slate-600 leading-tight">{feat}</p>
                                 </div>
                               ))}
                             </div>

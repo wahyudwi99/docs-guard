@@ -66,7 +66,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                 <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
                 </div>
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{feature}</span>
+                <span className="text-base font-medium text-zinc-700 dark:text-zinc-200">{feature}</span>
               </div>
             ))}
           </div>
