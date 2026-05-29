@@ -60,13 +60,13 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             {t('paywall_subtitle') || 'Unlock all premium features and protect your documents like a pro.'}
           </p>
           
-          <div className="space-y-3 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
+          <div className="space-y-2.5 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
                 </div>
-                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{feature}</span>
+                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{feature}</span>
               </div>
             ))}
           </div>
