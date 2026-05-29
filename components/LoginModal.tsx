@@ -50,7 +50,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
             </button>
 
             <div className="text-center">
-              <div className="mb-6 inline-flex h-64 w-64 mx-auto">
+              <div className="mb-6 inline-flex h-40 w-40 mx-auto">
                 <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
               </div>
               
