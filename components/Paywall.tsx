@@ -19,11 +19,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const router = useRouter();
 
   const features = [
-    t('paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
-    t('paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
-    t('paywall_feature_encryption') || 'PDF Lock & Encryption',
-    t('paywall_feature_smart_blur') || 'Smart Blur (Info Masking)',
-    t('paywall_feature_ad_free') || '100% Ad-Free Experience',
+    t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
+    t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
+    t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
+    t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur (Info Masking)',
+    t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
   ];
 
   const authenticated = !!session;

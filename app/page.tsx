@@ -686,11 +686,11 @@ function HomeContent() {
                             </p>
                             <div className="space-y-2 p-5 rounded-3xl bg-slate-50 border border-slate-100 shadow-sm">
                               {[
-                                t('paywall_feature_unlimited_pdf'),
-                                t('paywall_feature_unlimited_video'),
-                                t('paywall_feature_encryption'),
-                                t('paywall_feature_smart_blur'),
-                                t('paywall_feature_ad_free'),
+                                t('subscription_section.paywall_feature_unlimited_pdf'),
+                                t('subscription_section.paywall_feature_unlimited_video'),
+                                t('subscription_section.paywall_feature_encryption'),
+                                t('subscription_section.paywall_feature_smart_blur'),
+                                t('subscription_section.paywall_feature_ad_free'),
                               ].map((feat, i) => (
                                 <div key={i} className="flex items-center gap-3">
                                   <div className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50 text-emerald-600">
