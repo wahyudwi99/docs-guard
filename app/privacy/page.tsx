@@ -35,8 +35,8 @@ export default function PrivacyPolicy() {
         <div className="space-y-12">
           {/* Hero Section */}
           <div className="text-center space-y-4">
-            <div className="inline-flex h-20 w-20 items-center justify-center rounded-[24px] overflow-hidden shadow-xl shadow-indigo-200 mb-4">
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+            <div className="inline-flex h-20 w-20 items-center justify-center mb-4">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">
               "{t('privacy.hero_title')}" <br /> {t('privacy.title')}

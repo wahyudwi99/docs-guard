@@ -22,7 +22,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
     t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
     t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
     t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
-    t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur (Info Masking)',
+    t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur',
     t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
   ];
 
