@@ -95,12 +95,11 @@
     "login_required_desc": "Silakan masuk untuk berlangganan dan melindungi dokumen Anda dengan fitur Pro.",
     "login_with_google": "Masuk dengan Google",
     "features": [
-      "Pemrosesan Batch Tanpa Batas",
-      "Area Sensor Tanpa Batas",
-      "Watermark Gambar Kustom",
-      "Koleksi Font Premium",
-      "Prioritas Pemrosesan Lokal",
-      "Tanpa Iklan (Segera Hadir)"
+      "Watermark PDF Tanpa Batas (Bebas limit 3 halaman)",
+      "Watermark Video Durasi Bebas (Kualitas visual 100% asli)",
+      "Kunci & Enkripsi PDF (Amankan file dengan sandi)",
+      "Sensor Informasi (Smart Blur) (Blur area rahasia)",
+      "100% Bebas Iklan & Proses Lebih Cepat"
     ],
     "plans": {
       "weekly": {
@@ -121,7 +120,19 @@
     },
     "subscribe_now": "Berlangganan Sekarang",
     "restore": "Pulihkan Pembelian",
-    "active": "Langganan Pro Aktif"
+    "active": "Langganan Pro Aktif",
+    "paywall_feature_unlimited_pdf": "Watermark PDF Tanpa Batas",
+    "paywall_feature_unlimited_pdf_detail": "Bebas dari limit 3 halaman",
+    "paywall_feature_unlimited_video": "Watermark Video Durasi Bebas",
+    "paywall_feature_unlimited_video_detail": "Kualitas visual dijamin 100% asli",
+    "paywall_feature_encryption": "Kunci & Enkripsi PDF",
+    "paywall_feature_encryption_detail": "Amankan file dengan sandi",
+    "paywall_feature_smart_blur": "Sensor Informasi (Smart Blur)",
+    "paywall_feature_smart_blur_detail": "Blur area rahasia pada gambar/PDF",
+    "paywall_feature_ad_free": "100% Bebas Iklan",
+    "paywall_feature_ad_free_detail": "Proses lebih cepat tanpa gangguan iklan",
+    "paywall_subtitle": "Buka semua fitur premium dan lindungi dokumen Anda seperti profesional.",
+    "paywall_restore": "Pulihkan Pembelian"
   },
   "info_card": {
     "how_it_works": "Cara kerjanya",

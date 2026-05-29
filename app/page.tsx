@@ -16,7 +16,7 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -679,6 +679,33 @@ function HomeContent() {
                     </div>
                     
                     <div className="grid grid-cols-1 gap-4">
+                       {!isPro && (
+                         <div className="space-y-3 mb-4">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">
+                              Exclusive Pro Benefits
+                            </p>
+                            <div className="grid grid-cols-1 gap-3">
+                              {[
+                                { icon: <FileText className="h-4 w-4 text-blue-500" />, text: t('paywall_feature_unlimited_pdf'), detail: t('paywall_feature_unlimited_pdf_detail') },
+                                { icon: <Video className="h-4 w-4 text-red-500" />, text: t('paywall_feature_unlimited_video'), detail: t('paywall_feature_unlimited_video_detail') },
+                                { icon: <Lock className="h-4 w-4 text-green-500" />, text: t('paywall_feature_encryption'), detail: t('paywall_feature_encryption_detail') },
+                                { icon: <EyeOff className="h-4 w-4 text-purple-500" />, text: t('paywall_feature_smart_blur'), detail: t('paywall_feature_smart_blur_detail') },
+                                { icon: <Zap className="h-4 w-4 text-yellow-500" />, text: t('paywall_feature_ad_free'), detail: t('paywall_feature_ad_free_detail') },
+                              ].map((feat, i) => (
+                                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm">
+                                  <div className="shrink-0 p-1.5 rounded-lg bg-white shadow-sm border border-slate-100">
+                                    {feat.icon}
+                                  </div>
+                                  <div>
+                                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{feat.text}</p>
+                                    <p className="text-[9px] font-medium text-slate-500 leading-tight">{feat.detail}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                         </div>
+                       )}
+
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
                          {isPro ? "Upgrade or Switch Plan" : "Choose Your Plan"}
                        </p>

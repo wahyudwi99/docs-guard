@@ -95,12 +95,11 @@
     "login_required_desc": "Please login to subscribe and protect your documents with Pro features.",
     "login_with_google": "Login with Google",
     "features": [
-      "Unlimited Batch Processing",
-      "Unlimited Blur Areas",
-      "Custom Image Watermarks",
-      "PDF Password Protection & Encryption",
-      "Premium Font Collection",
-      "Priority Local Processing"
+      "Unlimited PDF Watermarking (No 3-page limit)",
+      "Unlimited Video Watermarking (100% Original Quality)",
+      "PDF Lock & Encryption (Secure with password)",
+      "Information Masking (Smart Blur for sensitive areas)",
+      "100% Ad-Free & Faster Processing"
     ],
     "plans": {
       "weekly": {
@@ -122,10 +121,16 @@
     "subscribe_now": "Subscribe Now",
     "restore": "Restore Purchases",
     "active": "Pro Subscription Active",
-    "paywall_feature_unlimited_blur": "Unlimited Blur & Pixelation",
-    "paywall_feature_password": "PDF Password Protection",
-    "paywall_feature_metadata": "Full Metadata Stripper",
-    "paywall_feature_high_quality": "High Quality Export",
+    "paywall_feature_unlimited_pdf": "Unlimited PDF Watermarking",
+    "paywall_feature_unlimited_pdf_detail": "No 3-page limit on documents",
+    "paywall_feature_unlimited_video": "Unlimited Video Watermarking",
+    "paywall_feature_unlimited_video_detail": "100% original visual quality",
+    "paywall_feature_encryption": "PDF Lock & Encryption",
+    "paywall_feature_encryption_detail": "Secure your files with passwords",
+    "paywall_feature_smart_blur": "Information Masking (Smart Blur)",
+    "paywall_feature_smart_blur_detail": "Blur sensitive areas in images/PDFs",
+    "paywall_feature_ad_free": "Ad-Free & Fast Processing",
+    "paywall_feature_ad_free_detail": "Faster processing with zero ads",
     "paywall_subtitle": "Unlock all premium features and protect your documents like a pro.",
     "paywall_restore": "Restore Purchases"
   },

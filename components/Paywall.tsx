@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
-import { Check, X, Shield, Zap, Lock } from 'lucide-react';
+import { Check, X, Shield, Zap, Lock, FileText, Video, EyeOff, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
@@ -19,10 +19,31 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   const router = useRouter();
 
   const features = [
-    { icon: <Zap className="w-5 h-5 text-yellow-500" />, text: t('paywall_feature_unlimited_blur') || 'Unlimited Blur & Pixelation' },
-    { icon: <Lock className="w-5 h-5 text-blue-500" />, text: t('paywall_feature_password') || 'PDF Password Protection' },
-    { icon: <Shield className="w-5 h-5 text-green-500" />, text: t('paywall_feature_metadata') || 'Full Metadata Stripper' },
-    { icon: <Check className="w-5 h-5 text-purple-500" />, text: t('paywall_feature_high_quality') || 'High Quality Export' },
+    { 
+      icon: <FileText className="w-5 h-5 text-blue-500" />, 
+      text: t('paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
+      detail: t('paywall_feature_unlimited_pdf_detail') || 'Bebas dari limit 3 halaman'
+    },
+    { 
+      icon: <Video className="w-5 h-5 text-red-500" />, 
+      text: t('paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
+      detail: t('paywall_feature_unlimited_video_detail') || 'Kualitas visual 100% asli'
+    },
+    { 
+      icon: <Lock className="w-5 h-5 text-green-500" />, 
+      text: t('paywall_feature_encryption') || 'PDF Lock & Encryption',
+      detail: t('paywall_feature_encryption_detail') || 'Amankan file dengan sandi'
+    },
+    { 
+      icon: <EyeOff className="w-5 h-5 text-purple-500" />, 
+      text: t('paywall_feature_smart_blur') || 'Information Masking (Smart Blur)',
+      detail: t('paywall_feature_smart_blur_detail') || 'Blur area rahasia gambar/PDF'
+    },
+    { 
+      icon: <Zap className="w-5 h-5 text-yellow-500" />, 
+      text: t('paywall_feature_ad_free') || '100% Ad-Free & Fast Processing',
+      detail: t('paywall_feature_ad_free_detail') || 'Proses lebih cepat tanpa iklan'
+    },
   ];
 
   const authenticated = !!session;
@@ -36,32 +57,39 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="relative p-6 text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800">
+        <div className="relative p-8 text-center">
           {onClose && (
             <button 
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full bg-zinc-100 dark:bg-zinc-800"
+              className="absolute top-6 right-6 p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           )}
           
-          <div className="mt-4 mb-6 inline-flex p-3 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600">
-            <Shield className="w-10 h-10" />
+          <div className="mt-2 mb-6 inline-flex p-4 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none">
+            <Star className="w-8 h-8 fill-current" />
           </div>
           
-          <h2 className="text-2xl font-bold mb-2">DocsGuard Pro</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8">
+          <h2 className="text-3xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+            DocsGuard Pro
+          </h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-medium">
             {t('paywall_subtitle') || 'Unlock all premium features and protect your documents like a pro.'}
           </p>
           
-          <div className="space-y-4 mb-8 text-left">
+          <div className="space-y-5 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div className="flex-shrink-0">{feature.icon}</div>
-                <span className="text-sm font-medium">{feature.text}</span>
+              <div key={index} className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1 p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-zinc-100 dark:border-zinc-700">
+                  {feature.icon}
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-none mb-1">{feature.text}</div>
+                  <div className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">{feature.detail}</div>
+                </div>
               </div>
             ))}
           </div>
