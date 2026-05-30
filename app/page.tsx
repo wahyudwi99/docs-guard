@@ -51,8 +51,14 @@ function HomeContent() {
 
     return new Promise(async (resolve) => {
       try {
-        // Rewarded Ad Unit ID from environment or fallback to Google's Test ID
-        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_APP_ID || 'ca-app-pub-3940256099942544/1712485313';
+        // Rewarded Ad Unit ID from environment (Must be provided in .env)
+        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_APP_ID as string;
+        
+        if (!adId) {
+          console.error('AdMob Ad Unit ID is missing in environment variables');
+          resolve(true);
+          return;
+        }
         
         await AdMob.prepareRewardVideoAd({ adId });
         
