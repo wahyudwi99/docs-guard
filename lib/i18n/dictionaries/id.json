@@ -194,7 +194,35 @@
     "contact_title": "Kontak",
     "contact_description": "Jika Anda memiliki pertanyaan tentang kebijakan 'Amnesia Total' kami, Anda dapat menghubungi tim keamanan kami. Kami berkomitmen untuk menjaga standar tertinggi privasi di perangkat.",
     "back_button": "Kembali",
-    "last_updated": "Terakhir Diperbarui: {date}"
+    "last_updated": "Terakhir Diperbarui: {date}",
+    "premium_title": "Keuntungan Premium",
+    "benefits_details": [
+      {
+        "title": "Perlindungan Dokumen Tanpa Batas",
+        "description": "Tambahkan watermark ke ratusan halaman PDF secara bersamaan dalam hitungan detik. Bebas dari limit 3 halaman dan selesaikan pekerjaan berat Anda secara instan.",
+        "icon": "zap"
+      },
+      {
+        "title": "Watermark Video Tanpa Batas (Kualitas Asli)",
+        "description": "Bebaskan video Anda dari batasan durasi. Beri watermark pada video panjang dengan jaminan kualitas ekspor asli 100%. Tanpa penurunan resolusi, tanpa kompresi.",
+        "icon": "video"
+      },
+      {
+        "title": "Enkripsi PDF Lanjutan (PDF Vault)",
+        "description": "Kunci dokumen sensitif Anda dengan enkripsi lokal yang aman. Pastikan kontrak, laporan keuangan, dan data pribadi hanya dapat diakses oleh mereka yang Anda izinkan.",
+        "icon": "lock"
+      },
+      {
+        "title": "Smart Blur",
+        "description": "Sembunyikan informasi rahasia! Blur area spesifik secara permanen pada dokumen atau gambar (seperti nomor rekening atau nomor ID) sebelum membagikannya.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "Pemrosesan Prioritas & Bebas Iklan",
+        "description": "Nikmati antarmuka yang bersih dan terfokus. Alami pemrosesan di perangkat yang lebih cepat dan sepenuhnya bebas dari iklan yang mengganggu.",
+        "icon": "shield-check"
+      }
+    ]
   },
   "errors": {
     "unsupported_file": "Tipe file tidak didukung: {type}",

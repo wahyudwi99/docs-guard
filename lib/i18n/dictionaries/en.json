@@ -194,7 +194,35 @@
     "contact_title": "Contact",
     "contact_description": "If you have questions about our 'Amnesia Total' policy, you can reach out to our security team. We are committed to maintaining the highest standards of on-device privacy.",
     "back_button": "Back",
-    "last_updated": "Last Updated: {date}"
+    "last_updated": "Last Updated: {date}",
+    "premium_title": "Premium Benefits",
+    "benefits_details": [
+      {
+        "title": "Unlimited Document Protection",
+        "description": "Add watermarks to hundreds of PDF pages simultaneously in seconds. Break free from the 3-page limit and crush your heavy workloads instantly.",
+        "icon": "zap"
+      },
+      {
+        "title": "Unlimited Video Watermarking (Original Quality)",
+        "description": "Free your videos from duration limits. Watermark long videos with a 100% original export quality guarantee. Zero resolution loss, zero compression.",
+        "icon": "video"
+      },
+      {
+        "title": "Advanced PDF Encryption (PDF Vault)",
+        "description": "Lock your sensitive documents with secure local encryption. Ensure contracts, financial reports, and personal data can only be accessed by those you authorize.",
+        "icon": "lock"
+      },
+      {
+        "title": "Smart Blur",
+        "description": "Hide confidential information! Permanently blur specific areas on documents or images (like bank accounts or ID numbers) before sharing them.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "Priority Processing & Ad-Free",
+        "description": "Enjoy a clean, focused interface. Experience faster, on-device processing completely free from any annoying ads.",
+        "icon": "shield-check"
+      }
+    ]
   },
   "errors": {
     "unsupported_file": "Unsupported file type: {type}",

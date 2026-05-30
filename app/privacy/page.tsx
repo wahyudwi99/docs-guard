@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Lock, EyeOff, ServerOff, Database, CheckCircle2, ChevronLeft } from "lucide-react";
+import { Shield, Lock, EyeOff, ServerOff, Database, CheckCircle2, ChevronLeft, Zap, Video, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useI18n } from "@/hooks/useI18n";
 
@@ -8,6 +8,19 @@ export default function PrivacyPolicy() {
   const { t, locale } = useI18n();
 
   const features = t('privacy.features') as string[];
+  const premiumBenefits = t('privacy.benefits_details') as any[];
+  
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'zap': return <Zap className="h-5 w-5" />;
+      case 'video': return <Video className="h-5 w-5" />;
+      case 'lock': return <Lock className="h-5 w-5" />;
+      case 'eye-off': return <EyeOff className="h-5 w-5" />;
+      case 'shield-check': return <ShieldCheck className="h-5 w-5" />;
+      default: return <Shield className="h-5 w-5" />;
+    }
+  };
+
   const lastUpdated = t('privacy.last_updated', { 
     date: new Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { 
       month: 'long', 
@@ -44,6 +57,30 @@ export default function PrivacyPolicy() {
             <p className="text-slate-500 font-medium max-w-md mx-auto">
               {t('privacy.hero_subtitle')}
             </p>
+          </div>
+
+          {/* Premium Benefits Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <div className="h-1 w-8 bg-indigo-600 rounded-full"></div>
+              <h2 className="text-2xl font-black tracking-tight uppercase text-indigo-600">{t('privacy.premium_title')}</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {premiumBenefits.map((benefit, i) => (
+                <div key={i} className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 flex flex-col md:flex-row gap-6 items-start transition-all hover:shadow-md hover:border-indigo-100 group">
+                  <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    {getIcon(benefit.icon)}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold tracking-tight text-slate-900">{benefit.title}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Key Points Grid */}
