@@ -62,6 +62,14 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>DocsGuard requires camera access to take photos of documents for watermarking.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>DocsGuard requires permission to save watermarked documents and videos to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>DocsGuard requires access to your photo library to select documents and videos for watermarking.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>SKAdNetworkItems</key>
