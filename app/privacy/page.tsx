@@ -60,20 +60,20 @@ export default function PrivacyPolicy() {
           </div>
 
           {/* Premium Benefits Section */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <div className="h-1 w-8 bg-indigo-600 rounded-full"></div>
-              <h2 className="text-2xl font-black tracking-tight uppercase text-indigo-600">{t('privacy.premium_title')}</h2>
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-6">
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <Zap className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+              <h2 className="text-xl font-black tracking-tight uppercase text-slate-900">{t('privacy.premium_title')}</h2>
             </div>
             
-            <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-6">
               {premiumBenefits.map((benefit, i) => (
-                <div key={i} className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 flex flex-col md:flex-row gap-6 items-start transition-all hover:shadow-md hover:border-indigo-100 group">
-                  <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div key={i} className="flex gap-5 items-start">
+                  <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
                     {getIcon(benefit.icon)}
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold tracking-tight text-slate-900">{benefit.title}</h3>
+                  <div className="space-y-1">
+                    <h3 className="text-base font-bold tracking-tight text-slate-900">{benefit.title}</h3>
                     <p className="text-sm text-slate-600 leading-relaxed font-medium">
                       {benefit.description}
                     </p>
