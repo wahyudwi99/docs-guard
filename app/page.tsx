@@ -46,8 +46,36 @@ function HomeContent() {
 
   const [showConflictModal, setShowConflictModal] = useState(false);
 
+  // AdMob Initialization
+  useEffect(() => {
+    const initAdMob = async () => {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          console.log('AdMob: Initializing...');
+          
+          // Step 1: Request tracking authorization for iOS
+          await AdMob.requestTrackingAuthorization();
+          
+          // Step 2: Initialize AdMob
+          await AdMob.initialize({
+            testingDevices: [],
+            initializeForTesting: true,
+          });
+          
+          console.log('AdMob: Initialized successfully');
+        } catch (error) {
+          console.error('AdMob: Initialization failed', error);
+        }
+      }
+    };
+    
+    initAdMob();
+  }, []);
+
   const showRewardedAd = useCallback(async (): Promise<boolean> => {
     if (!Capacitor.isNativePlatform() || isPro) return true;
+
+    console.log('AdMob: Attempting to show Rewarded Ad');
 
     return new Promise(async (resolve) => {
       try {
@@ -55,48 +83,45 @@ function HomeContent() {
         const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_APP_ID as string;
         
         if (!adId) {
-          console.error('AdMob Ad Unit ID is missing in environment variables');
+          console.error('AdMob: Ad Unit ID is missing in environment variables');
           resolve(true);
           return;
         }
         
+        console.log('AdMob: Preparing Ad with ID:', adId);
         await AdMob.prepareRewardVideoAd({ adId });
         
         const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward: AdMobRewardItem) => {
-          console.log('Reward received:', reward);
+          console.log('AdMob: Reward received!', reward);
         });
 
         const dismissListener = await AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+          console.log('AdMob: Ad dismissed by user');
           rewardListener.remove();
           dismissListener.remove();
           resolve(true); // Continue download after ad is closed
         });
 
         const failedListener = await AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
-          console.error('Ad failed to load:', error);
+          console.error('AdMob: Ad failed to load', error);
           rewardListener.remove();
           dismissListener.remove();
           failedListener.remove();
           resolve(true); // Don't block user if ad fails
         });
 
+        console.log('AdMob: Showing Ad...');
         await AdMob.showRewardVideoAd();
-      } catch (error) {
-        console.error('AdMob Error:', error);
-        resolve(true); // Continue anyway on error
+      } catch (error: any) {
+        console.error('AdMob: Native Call Error:', error);
+        // If UNIMPLEMENTED, it means the plugin isn't linked correctly or running on an unsupported platform (like simulator)
+        if (error.code === 'UNIMPLEMENTED') {
+          console.warn('AdMob: Native feature not implemented. This is common in simulators.');
+        }
+        resolve(true); // Continue anyway on error so user isn't stuck
       }
     });
   }, [isPro]);
-
-  // AdMob Initialization
-  useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      AdMob.initialize({
-        testingDevices: [],
-        initializeForTesting: true,
-      });
-    }
-  }, []);
 
   // Trigger In-App Review after successful purchase and returning to Home
   useEffect(() => {
