@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@capacitor-community/admob": "^7.2.0",
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor-community/media": "9.1.0",
     "@capacitor/android": "8.3.1",
