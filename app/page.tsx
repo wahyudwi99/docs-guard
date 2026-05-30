@@ -51,8 +51,8 @@ function HomeContent() {
 
     return new Promise(async (resolve) => {
       try {
-        // iOS Test Rewarded Ad Unit ID
-        const adId = 'ca-app-pub-3940256099942544/1712485313';
+        // Rewarded Ad Unit ID from environment or fallback to Google's Test ID
+        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_APP_ID || 'ca-app-pub-3940256099942544/1712485313';
         
         await AdMob.prepareRewardVideoAd({ adId });
         
