@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LoginModal } from "@/components/LoginModal";
 import { motion, AnimatePresence } from 'framer-motion';
 import { InAppReview } from '@capacitor-community/in-app-review';
+import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
 function HomeContent() {
   const { t, locale } = useI18n();
@@ -44,6 +45,52 @@ function HomeContent() {
   const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
+
+  const showRewardedAd = useCallback(async (): Promise<boolean> => {
+    if (!Capacitor.isNativePlatform() || isPro) return true;
+
+    return new Promise(async (resolve) => {
+      try {
+        // iOS Test Rewarded Ad Unit ID
+        const adId = 'ca-app-pub-3940256099942544/1712485313';
+        
+        await AdMob.prepareRewardVideoAd({ adId });
+        
+        const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward: AdMobRewardItem) => {
+          console.log('Reward received:', reward);
+        });
+
+        const dismissListener = await AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+          rewardListener.remove();
+          dismissListener.remove();
+          resolve(true); // Continue download after ad is closed
+        });
+
+        const failedListener = await AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
+          console.error('Ad failed to load:', error);
+          rewardListener.remove();
+          dismissListener.remove();
+          failedListener.remove();
+          resolve(true); // Don't block user if ad fails
+        });
+
+        await AdMob.showRewardVideoAd();
+      } catch (error) {
+        console.error('AdMob Error:', error);
+        resolve(true); // Continue anyway on error
+      }
+    });
+  }, [isPro]);
+
+  // AdMob Initialization
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      AdMob.initialize({
+        testingDevices: [],
+        initializeForTesting: true,
+      });
+    }
+  }, []);
 
   // Trigger In-App Review after successful purchase and returning to Home
   useEffect(() => {
@@ -232,6 +279,12 @@ function HomeContent() {
 
   const handleFinalDownload = useCallback(async () => {
     setIsSaving(true);
+    
+    // Show Ad for non-Pro users
+    if (!isPro) {
+      await showRewardedAd();
+    }
+
     // Ensure all pages are watermarked before saving
     const success = await saveToDevice(() => drawWatermark(false));
     setIsSaving(false);
@@ -241,10 +294,16 @@ function HomeContent() {
       // Show success modal after a short delay to ensure cleanup
       setTimeout(() => setShowSuccessModal(true), 300);
     }
-  }, [saveToDevice, drawWatermark]);
+  }, [saveToDevice, drawWatermark, isPro, showRewardedAd]);
 
   const handleShare = useCallback(async () => {
     setIsSaving(true);
+
+    // Show Ad for non-Pro users
+    if (!isPro) {
+      await showRewardedAd();
+    }
+
     // Ensure all pages are watermarked before sharing
     const success = await shareFile(() => drawWatermark(false));
     setIsSaving(false);
@@ -252,7 +311,7 @@ function HomeContent() {
     if (success) {
       setPreviewUrls([]); // Clear preview
     }
-  }, [shareFile, drawWatermark]);
+  }, [shareFile, drawWatermark, isPro, showRewardedAd]);
 
 
 

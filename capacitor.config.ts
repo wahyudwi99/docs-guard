@@ -11,6 +11,9 @@ const config: CapacitorConfig = {
         iosClientId: '1002837023207-imr2p14jh9ni0chtv0r8vmveoe4dgdnb.apps.googleusercontent.com'
       },
     },
+    AdMob: {
+      appId: 'ca-app-pub-3940256099942544~1458002511', // Official Google iOS Test App ID
+    }
   },
 };
 
