@@ -111,10 +111,17 @@ export function useFileExport({
         // --- NEW: NATIVE IOS EXPORT (AVFoundation) ---
         return new Promise(async (resolve) => {
           try {
-            // Need the original file path. In a real scenario, this comes from the file picker URI.
-            // Since we are using File API, we need to write it temporarily to disk so Swift can read it.
+            // Write input file temporarily for Swift to read
             const arrayBuffer = await file!.arrayBuffer();
-            const base64Data = Buffer.from(arrayBuffer).toString('base64');
+            
+            // Native-friendly Base64 conversion without 'Buffer'
+            const uint8Array = new Uint8Array(arrayBuffer);
+            let binary = '';
+            const len = uint8Array.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+            const base64Data = window.btoa(binary);
             
             const tempFileName = `temp_input_${Date.now()}.${fileExt}`;
             const savedInput = await Filesystem.writeFile({
