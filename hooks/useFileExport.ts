@@ -93,19 +93,19 @@ export function useFileExport({
       }
 
       const canvas = canvases[0];
-      // Capture at 60fps for maximum smoothness on iOS, or 30 as fallback
+      // Capture at 60fps for maximum smoothness
       // @ts-ignore
       const stream = canvas.captureStream(60);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
-      // iOS WebKit only supports certain types. video/mp4 is usually safest via MediaRecorder in iOS 14+
+      // Use H.264 high profile if possible for best quality/compatibility balance
       const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // Use high bitrate (8Mbps) for "Original Quality"
+      // ULTRA HIGH BITRATE: 50Mbps (Crucial for 4K Original Quality)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 8000000 
+        videoBitsPerSecond: 50000000 
       });
       
       const chunks: Blob[] = [];
@@ -125,23 +125,28 @@ export function useFileExport({
         const wasPaused = video!.paused;
         video!.pause();
         video!.currentTime = 0;
-        video!.muted = true; // Mute to avoid feedback during processing
+        video!.muted = true; 
         
         // Start recording
-        recorder.start();
+        // We use a small timeslice (100ms) to ensure chunks are flushed frequently
+        recorder.start(100);
         
         // Play and wait until it ends
         try {
           await video!.play();
           
+          // Use a tighter check interval for frame-perfect ending
           const checkEnd = setInterval(() => {
             if (video!.ended || video!.currentTime >= video!.duration) {
               clearInterval(checkEnd);
-              recorder.stop();
-              if (wasPaused) video!.pause();
-              video!.muted = false;
+              // Wait a tiny bit more for the last frame to be encoded
+              setTimeout(() => {
+                recorder.stop();
+                if (wasPaused) video!.pause();
+                video!.muted = false;
+              }, 200);
             }
-          }, 100);
+          }, 50);
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
