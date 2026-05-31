@@ -122,62 +122,88 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
     });
   }, [blurAreas, blurStrength]);
 
+  // Offscreen cache for the watermark pattern itself
+  const watermarkCacheRef = useRef<HTMLCanvasElement | null>(null);
+
   const applyWatermarkToContext = useCallback((context: CanvasRenderingContext2D, width: number, height: number) => {
-    context.save();
-    context.globalAlpha = watermarkOpacity;
-    
-    let angle = 0;
-    if (orientation === "diagonal") angle = -Math.PI / 4;
-    else if (orientation === "vertical") angle = -Math.PI / 2;
-
-    context.translate(width / 2, height / 2);
-    context.rotate(angle);
-
-    if (watermarkType === "text") {
-      context.fillStyle = watermarkColor;
-      const responsiveFontSize = (width / 800) * fontSize;
-      context.font = `${responsiveFontSize}px ${fontFamily}`;
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-
-      if (watermarkLayout === "single") {
-        context.fillText(watermarkText, 0, 0);
-      } else {
-        const metrics = context.measureText(watermarkText);
-        const spaceWidth = context.measureText("  ").width;
-        const textWidth = metrics.width;
-        const textHeight = responsiveFontSize;
+    // If cache doesn't exist or dimensions changed, redraw it
+    if (!watermarkCacheRef.current || 
+        watermarkCacheRef.current.width !== width || 
+        watermarkCacheRef.current.height !== height) {
+      
+      const cache = document.createElement("canvas");
+      cache.width = width;
+      cache.height = height;
+      const ctx = cache.getContext("2d");
+      
+      if (ctx) {
+        ctx.save();
+        ctx.globalAlpha = watermarkOpacity;
         
-        const horizontalSpacing = textWidth + spaceWidth * 4; 
-        const verticalSpacing = textHeight * 4;
+        let angle = 0;
+        if (orientation === "diagonal") angle = -Math.PI / 4;
+        else if (orientation === "vertical") angle = -Math.PI / 2;
 
-        for (let i = -width * 1.5; i < width * 1.5; i += horizontalSpacing) {
-          for (let j = -height * 1.5; j < height * 1.5; j += verticalSpacing) {
-            context.fillText(watermarkText, i, j);
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(angle);
+
+        if (watermarkType === "text") {
+          ctx.fillStyle = watermarkColor;
+          const responsiveFontSize = (width / 800) * fontSize;
+          ctx.font = `${responsiveFontSize}px ${fontFamily}`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+
+          if (watermarkLayout === "single") {
+            ctx.fillText(watermarkText, 0, 0);
+          } else {
+            const metrics = ctx.measureText(watermarkText);
+            const spaceWidth = ctx.measureText("  ").width;
+            const textWidth = metrics.width;
+            const textHeight = responsiveFontSize;
+            
+            const horizontalSpacing = textWidth + spaceWidth * 4; 
+            const verticalSpacing = textHeight * 4;
+
+            for (let i = -width * 1.5; i < width * 1.5; i += horizontalSpacing) {
+              for (let j = -height * 1.5; j < height * 1.5; j += verticalSpacing) {
+                ctx.fillText(watermarkText, i, j);
+              }
+            }
+          }
+        } else if (watermarkType === "image" && watermarkImage) {
+          const baseWidth = (width / 4) * imageScale;
+          const aspectRatio = watermarkImage.height / watermarkImage.width;
+          const imgWidth = baseWidth;
+          const imgHeight = baseWidth * aspectRatio;
+
+          if (watermarkLayout === "single") {
+            ctx.drawImage(watermarkImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+          } else {
+            const horizontalSpacing = imgWidth * 2.5;
+            const verticalSpacing = imgHeight * 3;
+
+            for (let i = -width * 1.5; i < width * 1.5; i += horizontalSpacing) {
+              for (let j = -height * 1.5; j < height * 1.5; j += verticalSpacing) {
+                ctx.drawImage(watermarkImage, i - imgWidth / 2, j - imgHeight / 2, imgWidth, imgHeight);
+              }
+            }
           }
         }
-      }
-    } else if (watermarkType === "image" && watermarkImage) {
-      const baseWidth = (width / 4) * imageScale;
-      const aspectRatio = watermarkImage.height / watermarkImage.width;
-      const imgWidth = baseWidth;
-      const imgHeight = baseWidth * aspectRatio;
-
-      if (watermarkLayout === "single") {
-        context.drawImage(watermarkImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
-      } else {
-        const horizontalSpacing = imgWidth * 2.5;
-        const verticalSpacing = imgHeight * 3;
-
-        for (let i = -width * 1.5; i < width * 1.5; i += horizontalSpacing) {
-          for (let j = -height * 1.5; j < height * 1.5; j += verticalSpacing) {
-            context.drawImage(watermarkImage, i - imgWidth / 2, j - imgHeight / 2, imgWidth, imgHeight);
-          }
-        }
+        ctx.restore();
+        watermarkCacheRef.current = cache;
       }
     }
 
-    context.restore();
+    // Now just draw the CACHED watermark in ONE call
+    if (watermarkCacheRef.current) {
+      context.drawImage(watermarkCacheRef.current, 0, 0);
+    }
+  }, [watermarkOpacity, orientation, watermarkType, watermarkColor, fontSize, fontFamily, watermarkLayout, watermarkText, watermarkImage, imageScale]);
+
+  // Reset cache when any watermark property changes
+  useEffect(() => {
+    watermarkCacheRef.current = null;
   }, [watermarkOpacity, orientation, watermarkType, watermarkColor, fontSize, fontFamily, watermarkLayout, watermarkText, watermarkImage, imageScale]);
 
   const drawWatermark = useCallback(async (onlyFirstPage = false) => {
