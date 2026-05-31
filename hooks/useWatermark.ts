@@ -145,19 +145,24 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
       const actualIdx = parseInt(idxAttr);
       let offscreen = offscreenCanvasesRef.current.get(actualIdx);
 
-      // If dimensions don't match, we must recreate (OOM safety)
-      if (!offscreen || offscreen.width !== canvas.width || offscreen.height !== canvas.height) {
+      // CRITICAL FIX: Ensure both canvases are sized before rendering to break the infinite redraw loop
+      if (!offscreen || offscreen.width === 0) {
         offscreen = document.createElement("canvas");
-        offscreen.width = canvas.width;
-        offscreen.height = canvas.height;
+        offscreen.setAttribute('data-page-index', actualIdx.toString());
         offscreenCanvasesRef.current.set(actualIdx, offscreen);
         
-        // Single page redraw for base content
+        // Initial redraw to get dimensions and base content
         await redrawDocument([offscreen]);
       }
 
       const context = canvas.getContext("2d");
       if (!context) return;
+
+      // Sync dimensions from offscreen to UI canvas
+      if (canvas.width !== offscreen.width || canvas.height !== offscreen.height) {
+        canvas.width = offscreen.width;
+        canvas.height = offscreen.height;
+      }
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(offscreen, 0, 0);

@@ -43,19 +43,25 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
           const width = img.naturalWidth || img.width;
           const height = img.naturalHeight || img.height;
 
+          // 1. Set dimensions FIRST
           canvas.width = width;
           canvas.height = height;
 
+          // 2. Set CSS size for iOS WebKit stability
           const dpr = window.devicePixelRatio || 1;
           canvas.style.width = `${width / dpr}px`;
           canvas.style.height = `${height / dpr}px`;
 
+          // 3. Draw content
           context.clearRect(0, 0, width, height);
           context.drawImage(img, 0, 0, width, height);
           URL.revokeObjectURL(img.src);
           resolve();
         };
-        img.onerror = reject;
+        img.onerror = (e) => {
+          console.error("Image loading error", e);
+          reject(new Error("Failed to load image"));
+        };
         img.src = URL.createObjectURL(imageFile);
       });
     },
@@ -68,8 +74,8 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
 
       try {
         if (selectedFile.type.startsWith("image/")) {
-          const canvas = currentCanvases[0];
-          await loadImage(selectedFile, canvas);
+          // For images, we always target the first canvas provided
+          await loadImage(selectedFile, currentCanvases[0]);
         } else if (selectedFile.type.startsWith("video/") && videoElement) {
           const canvas = currentCanvases[0];
           const context = canvas.getContext("2d");
@@ -89,25 +95,27 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
           if (!doc) {
-            doc = await loadPdf(new Uint8Array(await selectedFile.arrayBuffer()));
+            const buffer = await selectedFile.arrayBuffer();
+            doc = await loadPdf(new Uint8Array(buffer));
             setPdfDoc(doc);
             setNumPages(doc.numPages);
           }
 
-          // In virtual windowing mode, 'currentCanvases' contains ONLY the 
-          // visible canvases. We render them by their actual index.
+          // Process each target canvas based on its data-page-index
           const renderPromises = currentCanvases.map(async (canvas) => {
-             // We find which index this canvas belongs to
-             // In useCanvas, the 'canvases' array is already sorted and filtered
-             // For PDF, we need the page number (1-based)
-             // We'll rely on the parent to manage the correct mapping.
+            const idxAttr = canvas.getAttribute('data-page-index');
+            if (idxAttr === null) return;
+            const pageIndex = parseInt(idxAttr);
+            
+            // PDF.js uses 1-based indexing for pages
+            await renderPdfPageToCanvas(doc!, pageIndex + 1, canvas);
           });
-          // This method is now primarily a proxy for the watermark loop.
+          
+          await Promise.all(renderPromises);
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "RenderingCancelledException") {
           console.error("Error drawing document:", err);
-          throw err;
         }
       }
     },
