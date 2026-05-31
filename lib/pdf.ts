@@ -12,9 +12,10 @@ async function getPdfjsLib() {
   // Use the standard build which is more compatible
   const PDFJS = await import("pdfjs-dist");
   
-  // Set the worker source - Versions MUST match the package.json version (4.10.38)
-  const version = "4.10.38";
-  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+  // DYNAMICALLY set the worker source based on the actual library version
+  // This prevents the "API version does not match worker version" error
+  console.log(`PDF.js: Loading API version ${PDFJS.version}`);
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS.version}/build/pdf.worker.min.mjs`;
   
   return PDFJS;
 }
