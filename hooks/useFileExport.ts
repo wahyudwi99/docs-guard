@@ -92,11 +92,42 @@ export function useFileExport({
         return null;
       }
 
+      // DETECT INPUT FPS: Measure actual frame rate of the video
+      const detectFps = async (): Promise<number> => {
+        return new Promise((resolve) => {
+          // @ts-ignore - only works in modern browsers/iOS
+          if (!video!.requestVideoFrameCallback) {
+            resolve(60); // Default fallback
+            return;
+          }
+
+          let frames = 0;
+          let startTime = 0;
+          
+          const check = (now: number, metadata: any) => {
+            if (startTime === 0) startTime = metadata.presentationTime;
+            frames++;
+            
+            // Measure over ~500ms for a stable estimate
+            if (metadata.presentationTime - startTime >= 500) {
+              const estimatedFps = Math.round((frames / (metadata.presentationTime - startTime)) * 1000);
+              console.log(`[VIDEO] Detected input FPS: ${estimatedFps}`);
+              resolve(estimatedFps);
+            } else {
+              // @ts-ignore
+              video!.requestVideoFrameCallback(check);
+            }
+          };
+          
+          // @ts-ignore
+          video!.requestVideoFrameCallback(check);
+        });
+      };
+
       const canvas = canvases[0];
+      const targetFps = await detectFps();
       
-      // DYNAMIC FPS DETECTION: Use 120fps for high-end smoothness if possible, fallback to 60
-      // 120fps provides a much more granular clock for the recorder, reducing jitter.
-      const targetFps = 120; 
+      // Use the detected FPS (or fallback) for a perfectly synced stream
       // @ts-ignore
       const stream = canvas.captureStream(targetFps);
       
@@ -104,10 +135,11 @@ export function useFileExport({
       const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // EXTREME HIGH BITRATE for 4K Original Quality
+      // OPTIMIZED BITRATE: 50Mbps is the sweet spot for 4K 60fps stability on iOS
+      // Too high (80Mbps) can cause the hardware encoder to drop frames (choppy output)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 80000000 // 80Mbps for ultra-sharp 4K at high FPS
+        videoBitsPerSecond: 50000000 
       });
       
       const chunks: Blob[] = [];
@@ -124,11 +156,12 @@ export function useFileExport({
         };
 
         // Ensure video is ready and reset
+        const wasPaused = video!.paused;
         video!.pause();
         video!.currentTime = 0;
         video!.muted = true; 
         
-        // Wait for seek to complete to avoid first frame glitch
+        // Wait for seek to complete
         await new Promise(r => {
           const onSeek = () => {
             video!.removeEventListener('seeked', onSeek);
@@ -137,25 +170,22 @@ export function useFileExport({
           video!.addEventListener('seeked', onSeek);
         });
         
-        // Start recording with tight flushing for high-fps stability
-        recorder.start(100);
+        // Start recording
+        recorder.start(200);
         
         try {
-          // Play at normal speed. The 120fps capture stream will handle the fluidity.
           await video!.play();
           
           const checkEnd = setInterval(() => {
-            // Precise end detection with safety margin
             if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
               clearInterval(checkEnd);
-              // Wait for final frames to be encoded
               setTimeout(() => {
                 recorder.stop();
-                video!.pause();
+                if (wasPaused) video!.pause();
                 video!.muted = false;
-              }, 800);
+              }, 500);
             }
-          }, 50);
+          }, 100);
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
