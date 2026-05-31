@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Hash } from "lucide-react";
 
@@ -17,6 +17,91 @@ interface CanvasDisplayProps {
   onAreaSelected?: (area: BlurArea) => void;
   blurAreas?: BlurArea[];
 }
+
+/**
+ * Individual Page component with stable ref handling
+ */
+const CanvasPage: React.FC<{
+  index: number;
+  isActive: boolean;
+  shouldRender: boolean;
+  registerCanvas: (el: HTMLCanvasElement | null, index: number) => void;
+  isDragging: boolean;
+  startPos: { x: number, y: number };
+  currentPos: { x: number, y: number };
+  blurAreas: BlurArea[];
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
+  onMouseMove: (e: React.MouseEvent | React.TouchEvent) => void;
+  onMouseUp: (e: React.MouseEvent | React.TouchEvent) => void;
+}> = React.memo(({ 
+  index, isActive, shouldRender, registerCanvas, 
+  isDragging, startPos, currentPos, blurAreas,
+  onMouseDown, onMouseMove, onMouseUp
+}) => {
+  const canvasRef = useCallback((el: HTMLCanvasElement | null) => {
+    registerCanvas(el, index);
+  }, [registerCanvas, index]);
+
+  return (
+    <div 
+      className={cn(
+        "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
+        isActive 
+          ? "opacity-100 scale-100 z-10 translate-x-0" 
+          : "opacity-0 scale-90 -z-10 pointer-events-none"
+      )}
+      onMouseDown={onMouseDown}
+      onTouchStart={onMouseDown}
+      onMouseMove={onMouseMove}
+      onTouchMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onTouchEnd={onMouseUp}
+    >
+      {shouldRender ? (
+        <canvas
+          ref={canvasRef}
+          className="max-w-full h-auto block"
+        />
+      ) : (
+        <div className="w-[300px] h-[400px] bg-slate-50 flex items-center justify-center">
+           <div className="animate-pulse flex flex-col items-center gap-2">
+              <div className="w-8 h-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+           </div>
+        </div>
+      )}
+
+      {/* Selection Overlay */}
+      {isActive && isDragging && (
+        <div 
+          className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none"
+          style={{
+            left: Math.min(startPos.x, currentPos.x),
+            top: Math.min(startPos.y, currentPos.y),
+            width: Math.abs(currentPos.x - startPos.x),
+            height: Math.abs(currentPos.y - startPos.y),
+          }}
+        />
+      )}
+
+      {/* Blur Areas */}
+      {isActive && blurAreas.filter(a => a.pageIndex === index).map((area, i) => (
+        <div 
+          key={i}
+          className="absolute border border-dashed border-rose-400 bg-rose-400/10 pointer-events-none"
+          style={{
+            display: 'none' // Hidden in raw preview mode to avoid scale conflicts
+          }}
+        >
+          <div className="absolute -top-4 -left-px bg-rose-400 text-white text-[8px] px-1 font-bold rounded-t">
+            Blur {i + 1}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+CanvasPage.displayName = "CanvasPage";
 
 export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ 
   numPages, 
@@ -44,16 +129,17 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     setCurrentPage(parseInt(e.target.value));
   };
 
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
-    // Aggressively prevent default and propagation on touchstart
     if ('touches' in e) {
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
     setIsDragging(true);
 
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -64,18 +150,19 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
 
     setStartPos({ x, y });
     setCurrentPos({ x, y });
-  };
+  }, [isSelectionMode]);
 
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
 
-    // Prevent scrolling and other gestures on touch devices while dragging
     if ('touches' in e) {
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
@@ -83,36 +170,18 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const y = clientY - rect.top;
 
     setCurrentPos({ x, y });
-  };
-
-  // Effect to add non-passive touchmove listener to the container
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging) {
-        e.preventDefault();
-      }
-    };
-
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    return () => {
-      container.removeEventListener('touchmove', handleTouchMove);
-    };
   }, [isDragging]);
 
-  const handleMouseUp = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleMouseUp = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !onAreaSelected) {
       setIsDragging(false);
       return;
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const canvases = containerRef.current?.querySelectorAll('canvas');
-    if (canvases && canvases[currentPage]) {
-      const canvas = canvases[currentPage];
-      
+    const rect = containerRef.current?.getBoundingClientRect();
+    const canvas = containerRef.current?.querySelector('canvas');
+    
+    if (rect && canvas) {
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
 
@@ -121,7 +190,6 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       const width = Math.abs(currentPos.x - startPos.x);
       const height = Math.abs(currentPos.y - startPos.y);
 
-      // Constrain and scale
       const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
       const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
       const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
@@ -139,7 +207,24 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     }
 
     setIsDragging(false);
-  };
+  }, [isDragging, onAreaSelected, startPos, currentPos, currentPage]);
+
+  // Effect to add non-passive touchmove listener to the container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => {
+      container.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isDragging]);
 
   return (
     <div className="w-full space-y-4">
@@ -193,72 +278,31 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
           isSelectionMode && "cursor-crosshair"
         )}
       >
-        {Array.from({ length: numPages }).map((_, index) => (
-          <div 
-            key={index} 
-            className={cn(
-              "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
-              currentPage === index 
-                ? "opacity-100 scale-100 z-10 translate-x-0" 
-                : index < currentPage 
-                  ? "opacity-0 scale-90 -z-10 -translate-x-full" 
-                  : "opacity-0 scale-90 -z-10 translate-x-full"
-            )}
-            onMouseDown={(e) => handleMouseDown(e)}
-            onTouchStart={(e) => handleMouseDown(e)}
-            onMouseMove={handleMouseMove}
-            onTouchMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onTouchEnd={handleMouseUp}
-          >
-            <canvas
-              ref={(el) => registerCanvas(el, index)}
-              className="max-w-full h-auto block"
+        {Array.from({ length: numPages }).map((_, index) => {
+          // VIRTUAL WINDOWING: Only render the current page and 1 neighbor
+          // This keeps only 3 canvases in memory max, preventing OOM.
+          const isActive = index === currentPage;
+          const isNeighbor = Math.abs(index - currentPage) <= 1;
+          const shouldRender = isActive || isNeighbor;
+
+          return (
+            <CanvasPage
+              key={index}
+              index={index}
+              isActive={isActive}
+              shouldRender={shouldRender}
+              registerCanvas={registerCanvas}
+              isDragging={isDragging}
+              startPos={startPos}
+              currentPos={currentPos}
+              blurAreas={blurAreas}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
             />
-
-            {/* Selection Overlay */}
-            {currentPage === index && isDragging && (
-              <div 
-                className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none"
-                style={{
-                  left: Math.min(startPos.x, currentPos.x),
-                  top: Math.min(startPos.y, currentPos.y),
-                  width: Math.abs(currentPos.x - startPos.x),
-                  height: Math.abs(currentPos.y - startPos.y),
-                }}
-              />
-            )}
-
-            {/* Existing Blur Areas visualization */}
-            {blurAreas.filter(a => a.pageIndex === index).map((area, i) => {
-              const canvas = containerRef.current?.querySelectorAll('canvas')[index];
-              if (!canvas) return null;
-
-              const rect = canvas.getBoundingClientRect();
-              const scaleX = rect.width / canvas.width;
-              const scaleY = rect.height / canvas.height;
-
-              return (
-                <div 
-                  key={i}
-                  className="absolute border border-dashed border-rose-400 bg-rose-400/10 pointer-events-none"
-                  style={{
-                    left: area.x * scaleX,
-                    top: area.y * scaleY,
-                    width: area.width * scaleX,
-                    height: area.height * scaleY,
-                  }}
-                >
-                  <div className="absolute -top-4 -left-px bg-rose-400 text-white text-[8px] px-1 font-bold rounded-t">
-                    Blur {i + 1}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 };
-

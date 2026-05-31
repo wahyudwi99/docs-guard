@@ -206,7 +206,7 @@ function HomeContent() {
     handleFileChange,
     clearDocument,
     drawDocumentOnCanvases,
-    } = useDocument({ canvases });
+    } = useDocument({ registerCanvas });
   // Callback to redraw the current document (image or PDF pages)
   const redrawDocument = useCallback(async (currentCanvases: HTMLCanvasElement[]) => {
     if (!file || !documentType || currentCanvases.length === 0) return;

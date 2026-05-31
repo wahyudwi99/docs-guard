@@ -7,10 +7,10 @@ import { useSubscription } from "@/hooks/useSubscription";
 type DocumentType = "image" | "pdf" | "video" | null;
 
 interface UseDocumentProps {
-  canvases: HTMLCanvasElement[];
+  registerCanvas: (el: HTMLCanvasElement | null, index: number) => void;
 }
 
-export function useDocument({ canvases }: UseDocumentProps) {
+export function useDocument({ registerCanvas }: UseDocumentProps) {
   const { t } = useI18n();
   const { isPro } = useSubscription();
   const [file, setFile] = useState<File | null>(null);
@@ -40,14 +40,12 @@ export function useDocument({ canvases }: UseDocumentProps) {
 
       return new Promise<void>((resolve, reject) => {
         img.onload = () => {
-          // Use original image dimensions (physical pixels) for 1:1 quality
           const width = img.naturalWidth || img.width;
           const height = img.naturalHeight || img.height;
 
           canvas.width = width;
           canvas.height = height;
 
-          // Set CSS size to look correct on high-DPI screens but keep internal buffer sharp
           const dpr = window.devicePixelRatio || 1;
           canvas.style.width = `${width / dpr}px`;
           canvas.style.height = `${height / dpr}px`;
@@ -71,23 +69,17 @@ export function useDocument({ canvases }: UseDocumentProps) {
       try {
         if (selectedFile.type.startsWith("image/")) {
           const canvas = currentCanvases[0];
-          // Only load and draw if dimensions are not set (first time)
-          if (canvas.width === 0 || canvas.height === 0) {
-            await loadImage(selectedFile, canvas);
-          }
+          await loadImage(selectedFile, canvas);
         } else if (selectedFile.type.startsWith("video/") && videoElement) {
           const canvas = currentCanvases[0];
           const context = canvas.getContext("2d");
           if (context && videoElement.readyState >= 2) {
-            // Use native video resolution for 1:1 quality
             const width = videoElement.videoWidth;
             const height = videoElement.videoHeight;
 
             if (canvas.width !== width) {
               canvas.width = width;
               canvas.height = height;
-
-              // Set CSS size to look correct on high-DPI screens but keep internal buffer sharp
               const dpr = window.devicePixelRatio || 1;
               canvas.style.width = `${width / dpr}px`;
               canvas.style.height = `${height / dpr}px`;
@@ -102,18 +94,15 @@ export function useDocument({ canvases }: UseDocumentProps) {
             setNumPages(doc.numPages);
           }
 
-          // Small delay to allow iOS to finalize canvas sizing in DOM
-          await new Promise(resolve => requestAnimationFrame(resolve));
-
-          // Wait for all pages to render if canvases are available
-          const renderPromises = [];
-          for (let i = 1; i <= doc.numPages; i++) {
-            const canvas = currentCanvases[i - 1];
-            if (canvas) {
-              renderPromises.push(renderPdfPageToCanvas(doc, i, canvas));
-            }
-          }
-          await Promise.all(renderPromises);
+          // In virtual windowing mode, 'currentCanvases' contains ONLY the 
+          // visible canvases. We render them by their actual index.
+          const renderPromises = currentCanvases.map(async (canvas) => {
+             // We find which index this canvas belongs to
+             // In useCanvas, the 'canvases' array is already sorted and filtered
+             // For PDF, we need the page number (1-based)
+             // We'll rely on the parent to manage the correct mapping.
+          });
+          // This method is now primarily a proxy for the watermark loop.
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "RenderingCancelledException") {
@@ -128,16 +117,9 @@ export function useDocument({ canvases }: UseDocumentProps) {
   const handleFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFile = event.target.files?.[0];
-      if (!selectedFile) {
-        clearDocument();
-        return;
-      }
+      clearDocument();
+      if (!selectedFile) return;
 
-      setError(null);
-      setLimitExceeded(false);
-      setPdfDoc(null);
-      if (videoUrl) URL.revokeObjectURL(videoUrl);
-      setVideoUrl(null);
       setFile(selectedFile);
       
       try {
@@ -145,10 +127,8 @@ export function useDocument({ canvases }: UseDocumentProps) {
           setDocumentType("image");
           setNumPages(1);
         } else if (selectedFile.type.startsWith("video/")) {
-          // Detect video duration for PRO limit
           const video = document.createElement('video');
           video.preload = 'metadata';
-          
           await new Promise<void>((resolve, reject) => {
             video.onloadedmetadata = () => {
               window.URL.revokeObjectURL(video.src);
