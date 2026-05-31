@@ -115,7 +115,8 @@ export function useFileExport({
           imageScale
         });
 
-        const imgData = tempCanvas.toDataURL("image/jpeg", 0.9);
+        // COMPRESSION: Use 0.7 quality for JPEG to significantly reduce PDF file size
+        const imgData = tempCanvas.toDataURL("image/jpeg", 0.7);
 
         if (!pdf) {
           pdf = new jsPDF({
@@ -213,7 +214,7 @@ export function useFileExport({
       
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
       const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob((b) => resolve(b), exportType, 0.95);
+        canvas.toBlob((b) => resolve(b), exportType, 0.7);
       });
       if (!blob) return null;
       return { blob, fileName, contentType: exportType };
