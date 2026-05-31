@@ -158,6 +158,10 @@ export function useFileExport({
         author: " ", creator: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0)
       } as any);
 
+      onProgress?.("COMPLETED");
+      // Small delay so user can see the checkmark before popup disappears
+      await new Promise(r => setTimeout(r, 600));
+
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       console.log(`[EXPORT] Done. Final size: ${Math.round(pdfBlob.size/1024)}KB`);
@@ -196,6 +200,9 @@ export function useFileExport({
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'video/mp4' });
+
+        onProgress?.("COMPLETED");
+        await new Promise(r => setTimeout(r, 600));
 
         const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
         return { blob, fileName, contentType: "video/mp4" };

@@ -1046,18 +1046,41 @@ function HomeContent() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="relative w-full max-w-[280px] bg-white rounded-[2.5rem] p-8 shadow-2xl text-center space-y-6"
             >
-              <div className="relative">
-                <div className="h-16 w-16 border-4 border-slate-100 rounded-full mx-auto" />
-                <div className="absolute inset-0 h-16 w-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="relative h-16 w-16 mx-auto">
+                <AnimatePresence mode="wait">
+                  {exportProgress === "COMPLETED" ? (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      className="flex items-center justify-center w-full h-full bg-indigo-100 rounded-full"
+                    >
+                      <CheckCircle2 className="h-10 w-10 text-indigo-600" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="loading"
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="relative w-full h-full"
+                    >
+                      <div className="h-16 w-16 border-4 border-slate-100 rounded-full mx-auto" />
+                      <div className="absolute inset-0 h-16 w-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-base font-black text-slate-900 tracking-tight">Preparing your file</h3>
+                <h3 className="text-base font-black text-slate-900 tracking-tight">
+                  {exportProgress === "COMPLETED" ? "All set!" : "Preparing your file"}
+                </h3>
                 <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest animate-pulse">
-                  {exportProgress}
+                  {exportProgress === "COMPLETED" ? "Download Started" : exportProgress}
                 </p>
                 <p className="text-[10px] font-medium text-slate-400">
-                  Please wait, this may take a moment for large files.
+                  {exportProgress === "COMPLETED" 
+                    ? "Your file has been successfully prepared."
+                    : "Please wait, this may take a moment for large files."}
                 </p>
               </div>
             </motion.div>
