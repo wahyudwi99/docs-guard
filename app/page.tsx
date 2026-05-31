@@ -298,7 +298,15 @@ function HomeContent() {
     watermarkColor,
     watermarkOpacity,
     watermarkLayout,
-    fontSize
+    fontSize,
+    fontFamily,
+    orientation,
+    watermarkType,
+    watermarkImage,
+    imageScale,
+    blurAreas,
+    blurStrength,
+    pdfDoc
   });
 
   const handleOpenPreview = useCallback(async () => {
