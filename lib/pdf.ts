@@ -13,8 +13,7 @@ async function getPdfjsLib() {
   const PDFJS = await import("pdfjs-dist");
   
   // Set the worker source - Using a specific version to ensure consistency
-  // On real devices, it's safer to use the standard worker path
-  const version = "4.10.38"; // Using a stable v4 version which is often better for mobile
+  const version = "4.10.38";
   PDFJS.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
   
   return PDFJS;
@@ -32,6 +31,7 @@ export async function renderPdfPageToCanvas(
   pageNumber: number,
   canvas: HTMLCanvasElement
 ): Promise<void> {
+  console.log(`PDF: Starting render for page ${pageNumber}`);
   // Cancel any ongoing render task on THIS specific canvas
   const existingTask = renderTasks.get(canvas);
   if (existingTask) {
@@ -48,22 +48,27 @@ export async function renderPdfPageToCanvas(
   canvas.width = viewport.width;
   canvas.height = viewport.height;
 
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext("2d", { alpha: false }); // Use alpha false for better performance
   if (!context) {
     throw new Error("Could not get 2D rendering context for canvas.");
   }
 
+  // FILL WITH WHITE FIRST to ensure it's not transparent/white background failure
+  context.fillStyle = "white";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
   const renderContext = {
     canvasContext: context,
     viewport: viewport,
-    canvas: canvas,
   };
 
   const renderTask = page.render(renderContext);
   renderTasks.set(canvas, renderTask);
 
   try {
+    console.log(`PDF: Rendering page ${pageNumber}...`);
     await renderTask.promise;
+    console.log(`PDF: Page ${pageNumber} rendered successfully`);
     renderTasks.delete(canvas);
     page.cleanup(); // Clean up page resources.
   } catch (error: unknown) {
