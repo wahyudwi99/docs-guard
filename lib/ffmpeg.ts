@@ -59,12 +59,8 @@ export async function processVideoWithWatermark(
   }
 
   // Execute FFmpeg command
-  // -c:v libx264 ensures a standard H.264 video codec
-  // -profile:v high -level 4.1 are standard high-quality settings for iOS
-  // -pix_fmt yuv420p is the most compatible pixel format for iOS Photos library
-  // -movflags +faststart moves the index to the beginning (important for iOS)
-  // -preset ultrafast provides the best speed for mobile devices
-  // -c:a copy preserves original audio without re-encoding
+  console.log(`[FFMPEG] Running command on ${inputName} (${videoFile.size} bytes)...`);
+  
   await ffmpeg.exec([
     '-i', inputName,
     '-vf', filter,
@@ -80,6 +76,14 @@ export async function processVideoWithWatermark(
 
   // Read the result
   const data = await ffmpeg.readFile(outputName);
+  const uint8Data = data as Uint8Array;
+  
+  console.log(`[FFMPEG] Output generated: ${uint8Data.length} bytes`);
+  
+  if (uint8Data.length === 0) {
+    throw new Error("FFmpeg produced an empty file. Check logs for details.");
+  }
+
   // @ts-ignore - Handle SharedArrayBuffer / BlobPart mismatch
-  return new Blob([data], { type: 'video/mp4' });
+  return new Blob([uint8Data], { type: 'video/mp4' });
 }
