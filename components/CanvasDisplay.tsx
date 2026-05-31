@@ -38,12 +38,18 @@ const CanvasPage: React.FC<{
   isDragging, startPos, currentPos, blurAreas,
   onMouseDown, onMouseMove, onMouseUp
 }) => {
+  const pageRef = useRef<HTMLDivElement>(null);
+  
   const canvasRef = useCallback((el: HTMLCanvasElement | null) => {
     registerCanvas(el, index);
   }, [registerCanvas, index]);
 
+  // Filter blur areas for this specific page
+  const pageBlurAreas = blurAreas.filter(a => a.pageIndex === index);
+
   return (
     <div 
+      ref={pageRef}
       className={cn(
         "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
         isActive 
@@ -73,7 +79,7 @@ const CanvasPage: React.FC<{
       {/* Selection Overlay */}
       {isActive && isDragging && (
         <div 
-          className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none"
+          className="absolute border-2 border-indigo-500 bg-indigo-500/20 pointer-events-none z-30"
           style={{
             left: Math.min(startPos.x, currentPos.x),
             top: Math.min(startPos.y, currentPos.y),
@@ -83,20 +89,33 @@ const CanvasPage: React.FC<{
         />
       )}
 
-      {/* Blur Areas */}
-      {isActive && blurAreas.filter(a => a.pageIndex === index).map((area, i) => (
-        <div 
-          key={i}
-          className="absolute border border-dashed border-rose-400 bg-rose-400/10 pointer-events-none"
-          style={{
-            display: 'none' // Hidden in raw preview mode to avoid scale conflicts
-          }}
-        >
-          <div className="absolute -top-4 -left-px bg-rose-400 text-white text-[8px] px-1 font-bold rounded-t">
-            Blur {i + 1}
+      {/* Existing Blur Areas Visualization */}
+      {isActive && pageBlurAreas.map((area, i) => {
+        const canvas = pageRef.current?.querySelector('canvas');
+        if (!canvas) return null;
+
+        const percX = (area.x / canvas.width) * 100;
+        const percY = (area.y / canvas.height) * 100;
+        const percW = (area.width / canvas.width) * 100;
+        const percH = (area.height / canvas.height) * 100;
+
+        return (
+          <div 
+            key={i}
+            className="absolute border-2 border-dashed border-rose-500/50 bg-rose-500/10 pointer-events-none z-20"
+            style={{
+              left: `${percX}%`,
+              top: `${percY}%`,
+              width: `${percW}%`,
+              height: `${percH}%`,
+            }}
+          >
+            <div className="absolute -top-5 left-0 bg-rose-500 text-white text-[9px] px-1.5 py-0.5 font-bold rounded-sm whitespace-nowrap shadow-sm">
+              Sensor {i + 1}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 });
@@ -132,14 +151,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isSelectionMode) return;
 
-    if ('touches' in e) {
-      if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
-    }
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    
+    // Use currentTarget to get the specific page div's relative coordinates
+    const rect = e.currentTarget.getBoundingClientRect();
     setIsDragging(true);
 
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -155,14 +168,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
 
-    if ('touches' in e) {
-      if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
-    }
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    
+    const rect = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
@@ -178,10 +184,11 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       return;
     }
 
-    const rect = containerRef.current?.getBoundingClientRect();
-    const canvas = containerRef.current?.querySelector('canvas');
+    const rect = e.currentTarget.getBoundingClientRect();
+    const canvas = e.currentTarget.querySelector('canvas');
     
     if (rect && canvas) {
+      // Scale from UI pixels to physical canvas pixels
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
 
