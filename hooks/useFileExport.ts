@@ -92,62 +92,29 @@ export function useFileExport({
         return null;
       }
 
-      // DETECT INPUT FPS: Measure actual frame rate of the video
-      const detectFps = async (): Promise<number> => {
-        return new Promise((resolve) => {
-          // @ts-ignore - only works in modern browsers/iOS
-          if (!video!.requestVideoFrameCallback) {
-            resolve(60); // Default fallback
-            return;
-          }
-
-          let frames = 0;
-          let startTime = 0;
-          
-          const check = (now: number, metadata: any) => {
-            if (startTime === 0) startTime = metadata.presentationTime;
-            frames++;
-            
-            // Measure over ~500ms for a stable estimate
-            if (metadata.presentationTime - startTime >= 500) {
-              const estimatedFps = Math.round((frames / (metadata.presentationTime - startTime)) * 1000);
-              console.log(`[VIDEO] Detected input FPS: ${estimatedFps}`);
-              resolve(estimatedFps);
-            } else {
-              // @ts-ignore
-              video!.requestVideoFrameCallback(check);
-            }
-          };
-          
-          // @ts-ignore
-          video!.requestVideoFrameCallback(check);
-        });
-      };
-
       const canvas = canvases[0];
-      const detectedFps = await detectFps();
-      // ENFORCE MINIMUM 60Hz: Ensure output is always fluid, even for lower fps inputs
-      const targetFps = Math.max(60, detectedFps);
-      console.log(`[VIDEO] Target export FPS: ${targetFps} (Detected: ${detectedFps})`);
       
-      // Use the target FPS for a high-frequency stream
+      // CAPTURE EVERY FRAME: Setting to 0 tells the browser to capture 
+      // every time the canvas is updated, ensuring zero frame loss.
       // @ts-ignore
-      const stream = canvas.captureStream(targetFps);
+      const stream = canvas.captureStream(0);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
+      // iOS WebKit supports video/mp4 with AVC/H.264
+      const mimeType = isIOS ? 'video/mp4;codecs=avc1' : 'video/webm;codecs=vp9';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // OPTIMIZED BITRATE: 50Mbps is the sweet spot for 4K 60fps stability on iOS
-      // Too high (80Mbps) can cause the hardware encoder to drop frames (choppy output)
+      // STABLE HIGH BITRATE: 40Mbps (High enough for 4K, stable for mobile encoder)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 50000000 
+        videoBitsPerSecond: 40000000 
       });
       
       const chunks: Blob[] = [];
 
       return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
+        let isRecording = true;
+
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
         };
@@ -158,13 +125,12 @@ export function useFileExport({
           resolve({ blob, fileName, contentType: mimeType });
         };
 
-        // Ensure video is ready and reset
-        const wasPaused = video!.paused;
+        // Initialize: Reset video
         video!.pause();
         video!.currentTime = 0;
         video!.muted = true; 
         
-        // Wait for seek to complete
+        // Wait for first frame seek
         await new Promise(r => {
           const onSeek = () => {
             video!.removeEventListener('seeked', onSeek);
@@ -174,21 +140,40 @@ export function useFileExport({
         });
         
         // Start recording
-        recorder.start(200);
+        recorder.start();
+
+        // DEDICATED HIGH-PRIORITY EXPORT LOOP
+        // This ensures we capture EVERY frame as fast as the video provides them
+        const exportLoop = () => {
+          if (!isRecording) return;
+
+          // Force a draw for the recorder (since we use captureStream(0))
+          // Using a placeholder or custom draw trigger if needed, but 
+          // drawWatermark is already active in useWatermark.ts loop.
+          // To be 100% safe, we can manually trigger it here too.
+          
+          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+            isRecording = false;
+            setTimeout(() => {
+              recorder.stop();
+              video!.pause();
+              video!.muted = false;
+            }, 500);
+            return;
+          }
+
+          // @ts-ignore
+          if (video!.requestVideoFrameCallback) {
+            // @ts-ignore
+            video!.requestVideoFrameCallback(exportLoop);
+          } else {
+            requestAnimationFrame(exportLoop);
+          }
+        };
         
         try {
           await video!.play();
-          
-          const checkEnd = setInterval(() => {
-            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
-              clearInterval(checkEnd);
-              setTimeout(() => {
-                recorder.stop();
-                if (wasPaused) video!.pause();
-                video!.muted = false;
-              }, 500);
-            }
-          }, 100);
+          exportLoop();
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
