@@ -82,12 +82,12 @@ export function useFileExport({
         return null;
       }
       
-      onProgress?.(`Starting export for ${pdfDoc.numPages} pages...`);
+      onProgress?.(`Preparing document...`);
       let pdf: jsPDF | null = null;
       const total = pdfDoc.numPages;
 
       for (let i = 1; i <= total; i++) {
-        onProgress?.(`Processing page ${i} of ${total}...`);
+        onProgress?.(`Preparing ${i}/${total} pages`);
         
         // Use a fresh temporary canvas for each page to ensure complete memory isolation
         const tempCanvas = document.createElement("canvas");
