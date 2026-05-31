@@ -93,19 +93,18 @@ export function useFileExport({
       }
 
       const canvas = canvases[0];
-      // Capture at 60fps for maximum smoothness
+      // For 4K, 30fps is the professional standard and much more stable for encoding
       // @ts-ignore
-      const stream = canvas.captureStream(60);
+      const stream = canvas.captureStream(30);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
-      // Use H.264 high profile if possible for best quality/compatibility balance
       const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // ULTRA HIGH BITRATE: 50Mbps (Crucial for 4K Original Quality)
+      // EXTREME HIGH BITRATE for 4K
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 50000000 
+        videoBitsPerSecond: 60000000 // 60Mbps for ultra-sharp 4K
       });
       
       const chunks: Blob[] = [];
@@ -121,32 +120,39 @@ export function useFileExport({
           resolve({ blob, fileName, contentType: mimeType });
         };
 
-        // Prepare for recording: Reset video
-        const wasPaused = video!.paused;
+        // Ensure video is ready and reset
         video!.pause();
         video!.currentTime = 0;
         video!.muted = true; 
         
-        // Start recording
-        // We use a small timeslice (100ms) to ensure chunks are flushed frequently
-        recorder.start(100);
+        // Wait for seek to complete to avoid first frame glitch
+        await new Promise(r => {
+          const onSeek = () => {
+            video!.removeEventListener('seeked', onSeek);
+            r(null);
+          };
+          video!.addEventListener('seeked', onSeek);
+        });
         
-        // Play and wait until it ends
+        // Start recording with periodic flushing
+        recorder.start(500);
+        
         try {
+          // Play at normal speed for high quality capture
           await video!.play();
           
-          // Use a tighter check interval for frame-perfect ending
           const checkEnd = setInterval(() => {
-            if (video!.ended || video!.currentTime >= video!.duration) {
+            // Precise end detection
+            if (video!.ended || video!.currentTime >= video!.duration - 0.1) {
               clearInterval(checkEnd);
-              // Wait a tiny bit more for the last frame to be encoded
+              // Small encoding tail to ensure no frame loss at end
               setTimeout(() => {
                 recorder.stop();
-                if (wasPaused) video!.pause();
+                video!.pause();
                 video!.muted = false;
-              }, 200);
+              }, 500);
             }
-          }, 50);
+          }, 100);
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();

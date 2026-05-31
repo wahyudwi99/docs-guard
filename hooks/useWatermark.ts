@@ -277,16 +277,39 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
       return;
     }
 
-    const loop = () => {
+    let video = videoRef?.current;
+    if (!video) video = document.querySelector('video');
+    if (!video) return;
+
+    let isRunning = true;
+
+    const renderLoop = () => {
+      if (!isRunning) return;
       drawWatermark(true);
-      renderRequestRef.current = requestAnimationFrame(loop);
+      
+      // @ts-ignore - requestVideoFrameCallback is available in iOS 15+
+      if (video?.requestVideoFrameCallback) {
+        // @ts-ignore
+        video.requestVideoFrameCallback(renderLoop);
+      } else {
+        renderRequestRef.current = requestAnimationFrame(renderLoop);
+      }
     };
 
-    renderRequestRef.current = requestAnimationFrame(loop);
+    // Start loop
+    // @ts-ignore
+    if (video.requestVideoFrameCallback) {
+      // @ts-ignore
+      video.requestVideoFrameCallback(renderLoop);
+    } else {
+      renderRequestRef.current = requestAnimationFrame(renderLoop);
+    }
+
     return () => {
+      isRunning = false;
       if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
     };
-  }, [documentType, drawWatermark]);
+  }, [documentType, drawWatermark, videoRef]);
 
   return {
     designTab,
