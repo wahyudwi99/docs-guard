@@ -31,7 +31,7 @@ export async function renderPdfPageToCanvas(
   pageNumber: number,
   canvas: HTMLCanvasElement
 ): Promise<void> {
-  console.log(`PDF: Rendering page ${pageNumber}...`);
+  console.log(`PDF: Rendering page ${pageNumber} at high resolution...`);
   // Cancel any ongoing render task on THIS specific canvas
   const existingTask = renderTasks.get(canvas);
   if (existingTask) {
@@ -41,16 +41,19 @@ export async function renderPdfPageToCanvas(
 
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
   
-  // Use scale 1.0 for maximum stability on real mobile devices
-  const viewport = page.getViewport({ scale: 1.0 }); 
+  // Use device pixel ratio for sharp rendering on Retina displays (iPhone)
+  // Fallback to 2.0 if window is not defined
+  const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 2 : 2;
+  const viewport = page.getViewport({ scale: dpr }); 
 
-  // Set canvas dimensions
+  // Set canvas dimensions to physical pixels
   canvas.width = viewport.width;
   canvas.height = viewport.height;
   
-  // Explicitly set style to match attributes for iOS WebKit
-  canvas.style.width = `${viewport.width}px`;
-  canvas.style.height = `${viewport.height}px`;
+  // Set CSS size to logical pixels for correct display scaling
+  const cssScale = 1 / dpr;
+  canvas.style.width = `${viewport.width * cssScale}px`;
+  canvas.style.height = `${viewport.height * cssScale}px`;
 
   const context = canvas.getContext("2d");
 
@@ -58,8 +61,8 @@ export async function renderPdfPageToCanvas(
     throw new Error("Could not get 2D rendering context for canvas.");
   }
 
-  // CLEAR WITH LIGHT YELLOW to see if canvas is alive
-  context.fillStyle = "#ffffe0";
+  // FILL WITH WHITE FIRST for consistency
+  context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   const renderContext = {
@@ -73,7 +76,7 @@ export async function renderPdfPageToCanvas(
 
   try {
     await renderTask.promise;
-    console.log(`PDF: Page ${pageNumber} render completed`);
+    console.log(`PDF: Page ${pageNumber} high-res render completed`);
     renderTasks.delete(canvas);
     page.cleanup(); 
   } catch (error: unknown) {

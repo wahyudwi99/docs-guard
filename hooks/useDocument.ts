@@ -40,12 +40,18 @@ export function useDocument({ canvases }: UseDocumentProps) {
 
       return new Promise<void>((resolve, reject) => {
         img.onload = () => {
-          // Use original image dimensions to maintain quality
-          const width = img.width;
-          const height = img.height;
+          // Use original image dimensions (physical pixels) for 1:1 quality
+          const width = img.naturalWidth || img.width;
+          const height = img.naturalHeight || img.height;
 
           canvas.width = width;
           canvas.height = height;
+
+          // Set CSS size to look correct on high-DPI screens but keep internal buffer sharp
+          const dpr = window.devicePixelRatio || 1;
+          canvas.style.width = `${width / dpr}px`;
+          canvas.style.height = `${height / dpr}px`;
+
           context.clearRect(0, 0, width, height);
           context.drawImage(img, 0, 0, width, height);
           URL.revokeObjectURL(img.src);
@@ -73,11 +79,20 @@ export function useDocument({ canvases }: UseDocumentProps) {
           const canvas = currentCanvases[0];
           const context = canvas.getContext("2d");
           if (context && videoElement.readyState >= 2) {
-            if (canvas.width !== videoElement.videoWidth) {
-              canvas.width = videoElement.videoWidth;
-              canvas.height = videoElement.videoHeight;
+            // Use native video resolution for 1:1 quality
+            const width = videoElement.videoWidth;
+            const height = videoElement.videoHeight;
+
+            if (canvas.width !== width) {
+              canvas.width = width;
+              canvas.height = height;
+
+              // Set CSS size to look correct on high-DPI screens but keep internal buffer sharp
+              const dpr = window.devicePixelRatio || 1;
+              canvas.style.width = `${width / dpr}px`;
+              canvas.style.height = `${height / dpr}px`;
             }
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            context.drawImage(videoElement, 0, 0, width, height);
           }
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
