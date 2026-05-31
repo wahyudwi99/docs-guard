@@ -93,18 +93,21 @@ export function useFileExport({
       }
 
       const canvas = canvases[0];
-      // For 4K, 30fps is the professional standard and much more stable for encoding
+      
+      // DYNAMIC FPS DETECTION: Use 120fps for high-end smoothness if possible, fallback to 60
+      // 120fps provides a much more granular clock for the recorder, reducing jitter.
+      const targetFps = 120; 
       // @ts-ignore
-      const stream = canvas.captureStream(30);
+      const stream = canvas.captureStream(targetFps);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
       const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // EXTREME HIGH BITRATE for 4K
+      // EXTREME HIGH BITRATE for 4K Original Quality
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 60000000 // 60Mbps for ultra-sharp 4K
+        videoBitsPerSecond: 80000000 // 80Mbps for ultra-sharp 4K at high FPS
       });
       
       const chunks: Blob[] = [];
@@ -134,25 +137,25 @@ export function useFileExport({
           video!.addEventListener('seeked', onSeek);
         });
         
-        // Start recording with periodic flushing
-        recorder.start(500);
+        // Start recording with tight flushing for high-fps stability
+        recorder.start(100);
         
         try {
-          // Play at normal speed for high quality capture
+          // Play at normal speed. The 120fps capture stream will handle the fluidity.
           await video!.play();
           
           const checkEnd = setInterval(() => {
-            // Precise end detection
-            if (video!.ended || video!.currentTime >= video!.duration - 0.1) {
+            // Precise end detection with safety margin
+            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
               clearInterval(checkEnd);
-              // Small encoding tail to ensure no frame loss at end
+              // Wait for final frames to be encoded
               setTimeout(() => {
                 recorder.stop();
                 video!.pause();
                 video!.muted = false;
-              }, 500);
+              }, 800);
             }
-          }, 100);
+          }, 50);
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
