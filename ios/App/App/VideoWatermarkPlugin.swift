@@ -3,8 +3,8 @@ import Capacitor
 import AVFoundation
 import CoreImage
 
-@objc(VideoWatermarkPlugin)
-public class VideoWatermarkPlugin: CAPPlugin {
+@objc(VideoWatermark)
+public class VideoWatermark: CAPPlugin {
     
     @objc func ping(_ call: CAPPluginCall) {
         call.resolve(["value": "pong"])
