@@ -294,7 +294,11 @@ function HomeContent() {
     isPro,
     file,
     videoRef,
-    drawWatermark
+    drawWatermark,
+    watermarkColor,
+    watermarkOpacity,
+    watermarkLayout,
+    fontSize
   });
 
   const handleOpenPreview = useCallback(async () => {

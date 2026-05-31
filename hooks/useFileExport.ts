@@ -6,6 +6,8 @@ import { Capacitor } from "@capacitor/core";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
 import { jsPDF, jsPDFOptions } from "jspdf";
 
+import { VideoWatermark } from "@/lib/plugins/VideoWatermark";
+
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
   watermarkText: string;
@@ -21,6 +23,10 @@ interface UseFileExportProps {
   file?: File | null;
   videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
   drawWatermark?: (onlyFirstPage?: boolean) => Promise<void>;
+  watermarkColor?: string;
+  watermarkOpacity?: number;
+  watermarkLayout?: string;
+  fontSize?: number;
 }
 
 export function useFileExport({ 
@@ -32,7 +38,11 @@ export function useFileExport({
   metadataOptions,
   file,
   videoRef,
-  drawWatermark
+  drawWatermark,
+  watermarkColor,
+  watermarkOpacity,
+  watermarkLayout,
+  fontSize
 }: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(async (onBeforeExport?: () => Promise<void>) => {
@@ -48,7 +58,7 @@ export function useFileExport({
     return [canvases[0].toDataURL("image/png", 0.9)];
   }, [canvases]);
 
-  const generateBlobAndFileName = useCallback(async () => {
+  const generateBlobAndFileName = useCallback(async (): Promise<{ blob: Blob, fileName: string, contentType: string } | null> => {
     if (canvases.length === 0) return null;
 
     if (documentType === "pdf") {
@@ -93,15 +103,65 @@ export function useFileExport({
       }
 
       const canvas = canvases[0];
+      const isIOS = Capacitor.getPlatform() === 'ios';
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
+      const fileExt = isIOS ? 'mp4' : 'webm';
       
+      if (isIOS) {
+        // --- NEW: NATIVE IOS EXPORT (AVFoundation) ---
+        return new Promise(async (resolve) => {
+          try {
+            // Need the original file path. In a real scenario, this comes from the file picker URI.
+            // Since we are using File API, we need to write it temporarily to disk so Swift can read it.
+            const arrayBuffer = await file!.arrayBuffer();
+            const base64Data = Buffer.from(arrayBuffer).toString('base64');
+            
+            const tempFileName = `temp_input_${Date.now()}.${fileExt}`;
+            const savedInput = await Filesystem.writeFile({
+              path: tempFileName,
+              data: base64Data,
+              directory: Directory.Cache,
+            });
+
+            console.log("Calling native VideoWatermark plugin...");
+            const result = await VideoWatermark.addTextWatermark({
+              videoUri: savedInput.uri,
+              text: watermarkText,
+              colorHex: watermarkColor || "#FFFFFF",
+              opacity: watermarkOpacity || 0.5,
+              layout: (watermarkLayout as "single" | "tiled") || "tiled",
+              fontSize: fontSize || 40
+            });
+            console.log("Native export success:", result.uri);
+
+            // Fetch the processed file back as a blob for consistent handling
+            const processedData = await Filesystem.readFile({
+              path: result.uri
+            });
+
+            const byteCharacters = atob(processedData.data as string);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {type: mimeType});
+
+            const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
+            
+            resolve({ blob, fileName, contentType: mimeType });
+          } catch (error) {
+            console.error("Native VideoWatermark failed, falling back to WebKit:", error);
+            // Fallback to webkit method below if native fails
+            resolve(null); 
+          }
+        });
+      }
+
+      // --- FALLBACK: WEBKIT CAPTURE (Used for Web/Android, or if Native fails) ---
       // EXTREME 120 FPS: High-frequency capture stream
       // @ts-ignore
       const stream = canvas.captureStream(120);
-      
-      const isIOS = Capacitor.getPlatform() === 'ios';
-      // Standard mp4 for iOS compatibility
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
-      const fileExt = isIOS ? 'mp4' : 'webm';
       
       // OPTIMIZED BITRATE for 120 FPS: 25Mbps
       // Lowering bitrate slightly helps the hardware encoder stay at high FPS
@@ -189,6 +249,7 @@ export function useFileExport({
       const blob = await new Promise<Blob | null>((resolve) => {
         canvas.toBlob((b) => resolve(b), exportType, 0.95);
       });
+      if (!blob) return null;
       return { blob, fileName, contentType: exportType };
     }
   }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file, videoRef, drawWatermark]);
