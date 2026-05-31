@@ -160,15 +160,19 @@ export function useFileExport({
         saveAndOpenBlob(blob, fileName, contentType);
       } else {
         const base64Data = await blobToBase64(blob);
+        const isIOS = Capacitor.getPlatform() === 'ios';
         
         // 1. Always save to Filesystem first
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
-          directory: Directory.Data,
+          directory: isIOS ? Directory.Documents : Directory.Data,
         });
         
         console.log("Saved to Filesystem:", savedFile.uri);
+
+        // Small delay to ensure the OS has finalized the file handle
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // 2. Additional handling per type
         if (documentType === "image") {

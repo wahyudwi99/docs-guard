@@ -59,11 +59,20 @@ export async function processVideoWithWatermark(
   }
 
   // Execute FFmpeg command
-  // -preset ultrafast is used for mobile performance
-  // -c:a copy preserves original audio perfectly
+  // -c:v libx264 ensures a standard H.264 video codec
+  // -profile:v high -level 4.1 are standard high-quality settings for iOS
+  // -pix_fmt yuv420p is the most compatible pixel format for iOS Photos library
+  // -movflags +faststart moves the index to the beginning (important for iOS)
+  // -preset ultrafast provides the best speed for mobile devices
+  // -c:a copy preserves original audio without re-encoding
   await ffmpeg.exec([
     '-i', inputName,
     '-vf', filter,
+    '-c:v', 'libx264',
+    '-profile:v', 'high',
+    '-level', '4.1',
+    '-pix_fmt', 'yuv420p',
+    '-movflags', '+faststart',
     '-preset', 'ultrafast',
     '-c:a', 'copy',
     outputName
