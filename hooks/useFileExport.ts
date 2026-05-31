@@ -94,17 +94,15 @@ export function useFileExport({
 
       const canvas = canvases[0];
       
-      // CAPTURE EVERY FRAME: Setting to 0 tells the browser to capture 
-      // every time the canvas is updated, ensuring zero frame loss.
+      // FIXED 60 FPS: Most stable for iOS WebKit to avoid "black screen" or sync issues.
       // @ts-ignore
-      const stream = canvas.captureStream(0);
+      const stream = canvas.captureStream(60);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
-      // iOS WebKit supports video/mp4 with AVC/H.264
-      const mimeType = isIOS ? 'video/mp4;codecs=avc1' : 'video/webm;codecs=vp9';
+      // Standard video/mp4 is safest for iOS Gallery compatibility
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // STABLE HIGH BITRATE: 40Mbps (High enough for 4K, stable for mobile encoder)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
         videoBitsPerSecond: 40000000 
@@ -113,8 +111,6 @@ export function useFileExport({
       const chunks: Blob[] = [];
 
       return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
-        let isRecording = true;
-
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
         };
@@ -139,41 +135,23 @@ export function useFileExport({
           video!.addEventListener('seeked', onSeek);
         });
         
-        // Start recording
-        recorder.start();
+        // Start recording with flushing
+        recorder.start(200);
 
-        // DEDICATED HIGH-PRIORITY EXPORT LOOP
-        // This ensures we capture EVERY frame as fast as the video provides them
-        const exportLoop = () => {
-          if (!isRecording) return;
-
-          // Force a draw for the recorder (since we use captureStream(0))
-          // Using a placeholder or custom draw trigger if needed, but 
-          // drawWatermark is already active in useWatermark.ts loop.
-          // To be 100% safe, we can manually trigger it here too.
-          
-          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
-            isRecording = false;
-            setTimeout(() => {
-              recorder.stop();
-              video!.pause();
-              video!.muted = false;
-            }, 500);
-            return;
-          }
-
-          // @ts-ignore
-          if (video!.requestVideoFrameCallback) {
-            // @ts-ignore
-            video!.requestVideoFrameCallback(exportLoop);
-          } else {
-            requestAnimationFrame(exportLoop);
-          }
-        };
-        
         try {
           await video!.play();
-          exportLoop();
+          
+          const checkEnd = setInterval(() => {
+            // Check for ending slightly before absolute duration to avoid encoder tail bugs
+            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+              clearInterval(checkEnd);
+              setTimeout(() => {
+                recorder.stop();
+                video!.pause();
+                video!.muted = false;
+              }, 500);
+            }
+          }, 100);
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
