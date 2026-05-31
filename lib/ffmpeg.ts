@@ -33,6 +33,16 @@ export async function processVideoWithWatermark(
   }
 ): Promise<Blob> {
   const ffmpeg = await getFFmpeg();
+  
+  // Add progress logging
+  ffmpeg.on('log', ({ message }) => {
+    console.log(`[FFMPEG LOG] ${message}`);
+  });
+
+  ffmpeg.on('progress', ({ progress, time }) => {
+    console.log(`[FFMPEG PROGRESS] ${Math.round(progress * 100)}% - Time: ${time}us`);
+  });
+
   const inputName = 'input' + videoFile.name.substring(videoFile.name.lastIndexOf('.'));
   const outputName = 'output.mp4';
 
@@ -46,31 +56,27 @@ export async function processVideoWithWatermark(
   
   let filter = '';
   if (layout === 'single') {
-    // Center single watermark with rotation
+    // Center single watermark
     filter = `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=(w-text_w)/2:y=(h-text_h)/2:fix_bounds=true`;
   } else {
-    // Tiled pattern - more complex but possible in FFmpeg
-    // For simplicity and speed, we'll start with a few strategic placements
-    filter = `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.2:y=h*0.2,` +
+    // Minimal tiled pattern for better performance on mobile
+    filter = `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.1:y=h*0.1,` +
              `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.5:y=h*0.5,` +
-             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.8:y=h*0.8,` +
-             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.2:y=h*0.8,` +
-             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.8:y=h*0.2`;
+             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.8:y=h*0.8`;
   }
 
   // Execute FFmpeg command
-  console.log(`[FFMPEG] Running command on ${inputName} (${videoFile.size} bytes)...`);
-  
+  // -map 0:v:0 -map 0:a? ensures audio is copied only if it exists
   await ffmpeg.exec([
     '-i', inputName,
     '-vf', filter,
     '-c:v', 'libx264',
-    '-profile:v', 'high',
-    '-level', '4.1',
-    '-pix_fmt', 'yuv420p',
-    '-movflags', '+faststart',
     '-preset', 'ultrafast',
+    '-pix_fmt', 'yuv420p',
+    '-map', '0:v:0',
+    '-map', '0:a?', 
     '-c:a', 'copy',
+    '-movflags', '+faststart',
     outputName
   ]);
 
@@ -78,12 +84,12 @@ export async function processVideoWithWatermark(
   const data = await ffmpeg.readFile(outputName);
   const uint8Data = data as Uint8Array;
   
-  console.log(`[FFMPEG] Output generated: ${uint8Data.length} bytes`);
+  console.log(`[FFMPEG] Final output size: ${uint8Data.length} bytes`);
   
   if (uint8Data.length === 0) {
-    throw new Error("FFmpeg produced an empty file. Check logs for details.");
+    throw new Error("FFmpeg output is 0Kb. Memory limit likely exceeded.");
   }
 
-  // @ts-ignore - Handle SharedArrayBuffer / BlobPart mismatch
+  // @ts-ignore - Handle SharedArrayBuffer
   return new Blob([uint8Data], { type: 'video/mp4' });
 }

@@ -159,47 +159,64 @@ export function useFileExport({
       if (!isNative) {
         saveAndOpenBlob(blob, fileName, contentType);
       } else {
-        const base64Data = await blobToBase64(blob);
         const isIOS = Capacitor.getPlatform() === 'ios';
         
-        // 1. Always save to Filesystem first
-        const savedFile = await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: isIOS ? Directory.Documents : Directory.Data,
-        });
-        
-        console.log("Saved to Filesystem:", savedFile.uri);
+        if (documentType === "video") {
+           // --- CHUNKED WRITING FOR VIDEO (Prevent RAM Crash) ---
+           console.log(`[EXPORT] Starting chunked write for video (${blob.size} bytes)...`);
+           
+           // Create empty file first
+           await Filesystem.writeFile({
+             path: fileName,
+             data: "",
+             directory: isIOS ? Directory.Documents : Directory.Data,
+           });
 
-        // Small delay to ensure the OS has finalized the file handle
-        await new Promise(resolve => setTimeout(resolve, 500));
+           const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+           let offset = 0;
 
-        // 2. Additional handling per type
-        if (documentType === "image") {
-          try {
-            await Media.savePhoto({ path: savedFile.uri });
-            console.log("Saved to Gallery");
-          } catch (err) {
-            console.error("Failed to save to Gallery:", err);
-          }
-        } else if (documentType === "video") {
-          try {
-            await Media.saveVideo({ path: savedFile.uri });
-            console.log("Video saved to Gallery successfully");
-          } catch (err) {
-            console.error("Failed to save video to Gallery:", err);
-            await Share.share({ title: fileName, url: savedFile.uri });
-          }
-        } else if (documentType === "pdf") {
-          try {
-             await Share.share({
-               title: fileName,
-               text: "Your watermarked PDF is ready",
-               url: savedFile.uri,
-               dialogTitle: "Save or Share PDF",
+           while (offset < blob.size) {
+             const chunk = blob.slice(offset, offset + CHUNK_SIZE);
+             const base64Chunk = await blobToBase64(chunk);
+             
+             await Filesystem.appendFile({
+               path: fileName,
+               data: base64Chunk,
+               directory: isIOS ? Directory.Documents : Directory.Data,
              });
-          } catch (err) {
-            console.error("Failed to trigger share for PDF:", err);
+             
+             offset += CHUNK_SIZE;
+             console.log(`[EXPORT] Written ${Math.min(offset, blob.size)} bytes...`);
+           }
+
+           const savedFile = await Filesystem.getUri({
+             path: fileName,
+             directory: isIOS ? Directory.Documents : Directory.Data,
+           });
+
+           console.log("Video saved to:", savedFile.uri);
+           await new Promise(resolve => setTimeout(resolve, 500));
+
+           try {
+             await Media.saveVideo({ path: savedFile.uri });
+             console.log("Video saved to Gallery successfully");
+           } catch (err) {
+             console.error("Gallery save failed:", err);
+             await Share.share({ title: fileName, url: savedFile.uri });
+           }
+        } else {
+          // Standard handle for images/pdf
+          const base64Data = await blobToBase64(blob);
+          const savedFile = await Filesystem.writeFile({
+            path: fileName,
+            data: base64Data,
+            directory: isIOS ? Directory.Documents : Directory.Data,
+          });
+          
+          if (documentType === "image") {
+            await Media.savePhoto({ path: savedFile.uri });
+          } else {
+            await Share.share({ title: fileName, url: savedFile.uri });
           }
         }
       }
