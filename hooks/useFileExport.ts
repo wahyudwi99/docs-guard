@@ -5,8 +5,7 @@ import { Media } from "@capacitor-community/media";
 import { Capacitor } from "@capacitor/core";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
 import { jsPDF, jsPDFOptions } from "jspdf";
-
-import { VideoWatermark } from "@/lib/plugins/VideoWatermark";
+import { processVideoWithWatermark } from "@/lib/ffmpeg";
 
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
@@ -93,159 +92,25 @@ export function useFileExport({
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
-    } else if (documentType === "video") {
-      let video = videoRef?.current;
-      if (!video) video = document.querySelector('video');
-      
-      if (!video) {
-        console.error("Video element not found for export");
+    } else if (documentType === "video" && file) {
+      // --- NEW: PROFESSIONAL FFMPEG.WASM EXPORT ---
+      // This guarantees 100% original quality and fluidity for 4K video.
+      try {
+        console.log("[VIDEO] Starting FFmpeg processing...");
+        const blob = await processVideoWithWatermark(file, watermarkText, {
+          color: watermarkColor,
+          opacity: watermarkOpacity,
+          fontSize: fontSize,
+          layout: watermarkLayout as any
+        });
+        
+        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
+        console.log("[VIDEO] FFmpeg processing complete.");
+        return { blob, fileName, contentType: "video/mp4" };
+      } catch (err) {
+        console.error("[VIDEO] FFmpeg processing failed:", err);
         return null;
       }
-
-      const canvas = canvases[0];
-      const isIOS = Capacitor.getPlatform() === 'ios';
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
-      const fileExt = isIOS ? 'mp4' : 'webm';
-      
-      if (isIOS) {
-        // --- NEW: NATIVE IOS EXPORT (AVFoundation) ---
-        return new Promise(async (resolve) => {
-          try {
-            // Write input file temporarily for Swift to read
-            const arrayBuffer = await file!.arrayBuffer();
-            
-            // Native-friendly Base64 conversion without 'Buffer'
-            const uint8Array = new Uint8Array(arrayBuffer);
-            let binary = '';
-            const len = uint8Array.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(uint8Array[i]);
-            }
-            const base64Data = window.btoa(binary);
-            
-            const tempFileName = `temp_input_${Date.now()}.${fileExt}`;
-            const savedInput = await Filesystem.writeFile({
-              path: tempFileName,
-              data: base64Data,
-              directory: Directory.Cache,
-            });
-
-            console.log("Calling native VideoWatermark plugin...");
-            const result = await VideoWatermark.addTextWatermark({
-              videoUri: savedInput.uri,
-              text: watermarkText,
-              colorHex: watermarkColor || "#FFFFFF",
-              opacity: watermarkOpacity || 0.5,
-              layout: (watermarkLayout as "single" | "tiled") || "tiled",
-              fontSize: fontSize || 40
-            });
-            console.log("Native export success:", result.uri);
-
-            // Fetch the processed file back as a blob for consistent handling
-            const processedData = await Filesystem.readFile({
-              path: result.uri
-            });
-
-            const byteCharacters = atob(processedData.data as string);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], {type: mimeType});
-
-            const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
-            
-            resolve({ blob, fileName, contentType: mimeType });
-          } catch (error) {
-            console.error("Native VideoWatermark failed, falling back to WebKit:", error);
-            // Fallback to webkit method below if native fails
-            resolve(null); 
-          }
-        });
-      }
-
-      // --- FALLBACK: WEBKIT CAPTURE (Used for Web/Android, or if Native fails) ---
-      // EXTREME 120 FPS: High-frequency capture stream
-      // @ts-ignore
-      const stream = canvas.captureStream(120);
-      
-      // OPTIMIZED BITRATE for 120 FPS: 25Mbps
-      // Lowering bitrate slightly helps the hardware encoder stay at high FPS
-      // without throttling due to heat or bandwidth limits.
-      const recorder = new MediaRecorder(stream, { 
-        mimeType,
-        videoBitsPerSecond: 25000000 
-      });
-      
-      const chunks: Blob[] = [];
-
-      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
-        let isRecording = true;
-
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) chunks.push(e.data);
-        };
-        
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: mimeType });
-          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
-          resolve({ blob, fileName, contentType: mimeType });
-        };
-
-        // Reset video to start
-        video!.pause();
-        video!.currentTime = 0;
-        video!.muted = true; 
-        
-        await new Promise(r => {
-          const onSeek = () => {
-            video!.removeEventListener('seeked', onSeek);
-            r(null);
-          };
-          video!.addEventListener('seeked', onSeek);
-        });
-
-        // Optimization: Disable image smoothing during heavy export to save CPU
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.imageSmoothingEnabled = false;
-        
-        // Start recording with tight flushing
-        recorder.start(100);
-
-        // AGGRESSIVE 120FPS DRAW LOOP during export
-        const exportLoop = async () => {
-          if (!isRecording) return;
-
-          // Manually force a redraw of the watermark on every frame possible
-          if (drawWatermark) {
-            await drawWatermark(true);
-          }
-          
-          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
-            isRecording = false;
-            setTimeout(() => {
-              recorder.stop();
-              video!.pause();
-              video!.muted = false;
-              if (ctx) ctx.imageSmoothingEnabled = true; // Restore
-            }, 500);
-            return;
-          }
-
-          // Use requestAnimationFrame which hits 120Hz on ProMotion iPhones
-          requestAnimationFrame(exportLoop);
-        };
-        
-        try {
-          await video!.play();
-          exportLoop();
-        } catch (err) {
-          console.error("Video playback failed during export", err);
-          recorder.stop();
-          resolve(null);
-        }
-      });
     } else {
       const canvas = canvases[0];
       const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg") || file?.name.toLowerCase().endsWith(".jpeg");
@@ -259,7 +124,7 @@ export function useFileExport({
       if (!blob) return null;
       return { blob, fileName, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file, videoRef, drawWatermark]);
+  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file, videoRef, drawWatermark, watermarkColor, watermarkOpacity, watermarkLayout, fontSize]);
 
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -296,7 +161,7 @@ export function useFileExport({
       } else {
         const base64Data = await blobToBase64(blob);
         
-        // 1. Always save to Filesystem first (Data folder for better visibility to plugins)
+        // 1. Always save to Filesystem first
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
@@ -308,31 +173,20 @@ export function useFileExport({
         // 2. Additional handling per type
         if (documentType === "image") {
           try {
-            await Media.savePhoto({
-              path: savedFile.uri
-            });
+            await Media.savePhoto({ path: savedFile.uri });
             console.log("Saved to Gallery");
           } catch (err) {
             console.error("Failed to save to Gallery:", err);
           }
         } else if (documentType === "video") {
           try {
-            // Ensure the file is treated as a video during gallery save
-            await Media.saveVideo({
-              path: savedFile.uri
-            });
+            await Media.saveVideo({ path: savedFile.uri });
             console.log("Video saved to Gallery successfully");
           } catch (err) {
             console.error("Failed to save video to Gallery:", err);
-            // Fallback: trigger share dialog so user can "Save to Files"
-            await Share.share({
-              title: fileName,
-              url: savedFile.uri
-            });
+            await Share.share({ title: fileName, url: savedFile.uri });
           }
         } else if (documentType === "pdf") {
-          // On iOS, sometimes saving to Documents isn't enough to "see" it immediately
-          // Triggering a share dialog for PDF is the standard way to "Save to Files"
           try {
              await Share.share({
                title: fileName,
