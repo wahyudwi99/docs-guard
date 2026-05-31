@@ -293,7 +293,8 @@ function HomeContent() {
     password,
     isPro,
     file,
-    videoRef
+    videoRef,
+    drawWatermark
   });
 
   const handleOpenPreview = useCallback(async () => {
