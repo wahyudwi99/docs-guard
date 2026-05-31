@@ -58,9 +58,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // SOURCE OF TRUTH: PRO if user is logged in AND there is an active entitlement that is NOT canceled
+  // SOURCE OF TRUTH: PRO if user is logged in AND there is an active entitlement
+  // Note: We remove the 'willRenew' check because users should remain Pro until the expiration date even if they cancel.
   const isPro = useMemo(() => {
-    return !!user?.id && activeEntitlements.length > 0 && activeEntitlements.some((ent: any) => ent.willRenew !== false);
+    return !!user?.id && activeEntitlements.length > 0;
   }, [activeEntitlements, user?.id]);
 
   const currentPlan = useMemo(() => {
@@ -172,25 +173,28 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const processCustomerInfo = (customerInfo: any) => {
-    const active = Object.values(customerInfo.entitlements.active);
-    setActiveEntitlements(active);
+    // 1. Update active entitlements list
+    const activeEnts = Object.values(customerInfo.entitlements.active);
+    setActiveEntitlements(activeEnts);
 
-    const activeIds = customerInfo.activeSubscriptions;
-    const allDates = customerInfo.allPurchaseDates;
+    // 2. Identify the primary active subscription (the "Current Plan")
+    const activeSubscriptions = customerInfo.activeSubscriptions;
+    const allPurchaseDates = customerInfo.allPurchaseDates;
 
-    if (activeIds.length > 0) {
-      const sortedPlans = activeIds
+    if (activeSubscriptions.length > 0) {
+      // Find the subscription with the latest purchase date to represent the "Current Plan"
+      const latestSubscriptionId = activeSubscriptions
         .map((id: string) => ({
           id,
-          date: new Date(allDates[id] || 0).getTime()
+          date: new Date(allPurchaseDates[id] || 0).getTime()
         }))
-        .sort((a: any, b: any) => b.date - a.date);
+        .sort((a: any, b: any) => b.date - a.date)[0].id;
 
-      const winnerId = sortedPlans[0].id;
-      const entitlement = active.find((e: any) => e.productIdentifier === winnerId) || active[0];
+      // Match this subscription with its corresponding entitlement info
+      const entitlement = activeEnts.find((e: any) => e.productIdentifier === latestSubscriptionId) || activeEnts[0];
       
       let type = 'premium';
-      const idLower = winnerId.toLowerCase();
+      const idLower = latestSubscriptionId.toLowerCase();
       if (idLower.includes('weekly')) type = 'weekly';
       else if (idLower.includes('monthly')) type = 'monthly';
       else if (idLower.includes('yearly')) type = 'yearly';
@@ -198,7 +202,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setLatestPlanInfo({
         type,
         endDate: (entitlement as any)?.expirationDate || null,
-        productIdentifier: winnerId
+        productIdentifier: latestSubscriptionId
       });
     } else {
       setLatestPlanInfo(null);
