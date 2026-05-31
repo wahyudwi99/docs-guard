@@ -40,6 +40,7 @@ function HomeContent() {
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [exportProgress, setExportProgress] = useState<string | null>(null);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
   const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
@@ -306,7 +307,8 @@ function HomeContent() {
     imageScale,
     blurAreas,
     blurStrength,
-    pdfDoc
+    pdfDoc,
+    onProgress: (text) => setExportProgress(text)
   });
 
   const handleOpenPreview = useCallback(async () => {
@@ -331,15 +333,16 @@ function HomeContent() {
     }
 
     // Ensure all pages are watermarked before saving
-    const success = await saveToDevice(() => drawWatermark(false));
+    const success = await saveToDevice();
     setIsSaving(false);
+    setExportProgress(null);
     
     if (success) {
       setPreviewUrls([]); // Clear preview
       // Show success modal after a short delay to ensure cleanup
       setTimeout(() => setShowSuccessModal(true), 300);
     }
-  }, [saveToDevice, drawWatermark, isPro, showRewardedAd]);
+  }, [saveToDevice, isPro, showRewardedAd]);
 
   const handleShare = useCallback(async () => {
     setIsSaving(true);
@@ -350,13 +353,14 @@ function HomeContent() {
     }
 
     // Ensure all pages are watermarked before sharing
-    const success = await shareFile(() => drawWatermark(false));
+    const success = await shareFile();
     setIsSaving(false);
+    setExportProgress(null);
     
     if (success) {
       setPreviewUrls([]); // Clear preview
     }
-  }, [shareFile, drawWatermark, isPro, showRewardedAd]);
+  }, [shareFile, isPro, showRewardedAd]);
 
 
 
@@ -1025,6 +1029,41 @@ function HomeContent() {
       {showPaywall && (
         <Paywall onClose={() => setShowPaywall(false)} />
       )}
+
+      {/* Export Progress Modal */}
+      <AnimatePresence>
+        {exportProgress && (
+          <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-[280px] bg-white rounded-[2.5rem] p-8 shadow-2xl text-center space-y-6"
+            >
+              <div className="relative">
+                <div className="h-16 w-16 border-4 border-slate-100 rounded-full mx-auto" />
+                <div className="absolute inset-0 h-16 w-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-base font-black text-slate-900 tracking-tight">Preparing your file</h3>
+                <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest animate-pulse">
+                  {exportProgress}
+                </p>
+                <p className="text-[10px] font-medium text-slate-400">
+                  Please wait, this may take a moment for large files.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Premium Limit Modal */}
       <AnimatePresence>

@@ -31,6 +31,7 @@ interface UseFileExportProps {
   blurStrength?: number;
   pdfDoc?: PDFDocumentProxy | null;
   drawWatermark?: (onlyFirstPage?: boolean) => Promise<void>;
+  onProgress?: (text: string) => void;
 }
 
 export function useFileExport({ 
@@ -41,6 +42,7 @@ export function useFileExport({
   isPro,
   file,
   videoRef,
+  drawWatermark,
   watermarkColor = "#000000",
   watermarkOpacity = 0.3,
   watermarkLayout = "tiled",
@@ -52,9 +54,9 @@ export function useFileExport({
   imageScale = 0.5,
   blurAreas = [],
   blurStrength = 10,
-  pdfDoc
+  pdfDoc,
+  onProgress
 }: UseFileExportProps) {
-  
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -80,12 +82,12 @@ export function useFileExport({
         return null;
       }
       
-      console.log(`[EXPORT] Starting sequential export for ${pdfDoc.numPages} pages...`);
+      onProgress?.(`Starting export for ${pdfDoc.numPages} pages...`);
       let pdf: jsPDF | null = null;
       const total = pdfDoc.numPages;
 
       for (let i = 1; i <= total; i++) {
-        console.log(`[EXPORT] Processing page ${i}/${total}...`);
+        onProgress?.(`Processing page ${i} of ${total}...`);
         
         // Use a fresh temporary canvas for each page to ensure complete memory isolation
         const tempCanvas = document.createElement("canvas");
@@ -163,6 +165,7 @@ export function useFileExport({
     } else if (documentType === "video" && file) {
       // --- NATIVE INLINE ENGINE FOR VIDEO ---
       try {
+        onProgress?.("Initializing high-speed video engine...");
         const isIOS = Capacitor.getPlatform() === 'ios';
         if (!isIOS) return null;
 
@@ -173,6 +176,7 @@ export function useFileExport({
           directory: Directory.Cache
         });
 
+        onProgress?.("Applying watermark at original quality...");
         const result = await VideoWatermark.addTextWatermark({
           videoUri: tempIn.uri,
           text: watermarkText,
@@ -182,6 +186,7 @@ export function useFileExport({
           fontSize: fontSize || 40
         });
 
+        onProgress?.("Finalizing video file...");
         const processed = await Filesystem.readFile({ path: result.uri });
         const byteCharacters = atob(processed.data as string);
         const byteNumbers = new Array(byteCharacters.length);
