@@ -14,6 +14,11 @@ export interface VideoWatermarkPlugin {
     opacity?: number;
     layout?: 'single' | 'tiled';
   }): Promise<{ uri: string }>;
+  
+  /**
+   * Simple test to verify the native bridge is connected.
+   */
+  ping(): Promise<{ value: string }>;
 }
 
 export const VideoWatermark = registerPlugin<VideoWatermarkPlugin>('VideoWatermark');
