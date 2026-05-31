@@ -4,8 +4,11 @@ import { Share } from "@capacitor/share";
 import { Media } from "@capacitor-community/media";
 import { Capacitor } from "@capacitor/core";
 import { isCapacitorApp, saveAndOpenBlob } from "@/lib/utils";
-import { jsPDF, jsPDFOptions } from "jspdf";
+import { jsPDF } from "jspdf";
 import { VideoWatermark } from "@/lib/plugins/VideoWatermark";
+import { applyWatermarkToContext, applyBlurToContext } from "@/lib/watermark_utils";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import { renderPdfPageToCanvas } from "@/lib/pdf";
 
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
@@ -13,19 +16,21 @@ interface UseFileExportProps {
   documentType: "image" | "pdf" | "video" | null;
   password?: string;
   isPro?: boolean;
-  metadataOptions?: {
-    stripAuthor: boolean;
-    stripCreationDate: boolean;
-    stripGPS: boolean;
-    nuclearClean: boolean;
-  };
   file?: File | null;
   videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
-  drawWatermark?: (onlyFirstPage?: boolean) => Promise<void>;
   watermarkColor?: string;
   watermarkOpacity?: number;
   watermarkLayout?: string;
   fontSize?: number;
+  fontFamily?: string;
+  orientation?: "horizontal" | "diagonal" | "vertical";
+  watermarkType?: "text" | "image";
+  watermarkImage?: HTMLImageElement | null;
+  imageScale?: number;
+  blurAreas?: any[];
+  blurStrength?: number;
+  pdfDoc?: PDFDocumentProxy | null;
+  drawWatermark?: (onlyFirstPage?: boolean) => Promise<void>;
 }
 
 export function useFileExport({ 
@@ -34,27 +39,23 @@ export function useFileExport({
   documentType, 
   password, 
   isPro,
-  metadataOptions,
   file,
   videoRef,
   drawWatermark,
-  watermarkColor,
-  watermarkOpacity,
-  watermarkLayout,
-  fontSize
+  watermarkColor = "#000000",
+  watermarkOpacity = 0.3,
+  watermarkLayout = "tiled",
+  fontSize = 40,
+  fontFamily = "Arial",
+  orientation = "diagonal",
+  watermarkType = "text",
+  watermarkImage = null,
+  imageScale = 0.5,
+  blurAreas = [],
+  blurStrength = 10,
+  pdfDoc
 }: UseFileExportProps) {
   
-  const getPreviewUrls = useCallback(async (onBeforeExport?: () => Promise<void>) => {
-    if (canvases.length === 0) return [];
-    
-    if (onBeforeExport) {
-      await onBeforeExport();
-      await new Promise(resolve => setTimeout(resolve, 150));
-    }
-    
-    return [canvases[0].toDataURL("image/png", 0.9)];
-  }, [canvases]);
-
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -73,49 +74,82 @@ export function useFileExport({
   };
 
   const generateBlobAndFileName = useCallback(async (): Promise<{ blob: Blob, fileName: string, contentType: string } | null> => {
-    if (canvases.length === 0) return null;
+    if (canvases.length === 0 && documentType !== "pdf") return null;
 
-    if (documentType === "pdf") {
-      const pdfOptions: jsPDFOptions = {
-        orientation: canvases[0].width > canvases[0].height ? "l" : "p",
-        unit: "px",
-        format: [canvases[0].width, canvases[0].height]
-      };
+    if (documentType === "pdf" && pdfDoc) {
+      // --- SEQUENTIAL PDF EXPORT (All Pages) ---
+      console.log(`[EXPORT] Starting sequential PDF export for ${pdfDoc.numPages} pages...`);
+      
+      const tempCanvas = document.createElement("canvas");
+      const ctx = tempCanvas.getContext("2d");
+      if (!ctx) throw new Error("Could not create export context");
 
-      if (isPro && password) {
-        pdfOptions.encryption = {
-          userPassword: password,
-          ownerPassword: password,
-          userPermissions: ["print", "modify", "copy", "annot-forms"]
-        };
+      let pdf: jsPDF | null = null;
+
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        // 1. Render base PDF page to temp canvas at high res
+        await renderPdfPageToCanvas(pdfDoc, i, tempCanvas);
+
+        // 2. Apply Blur and Watermark using shared utilities
+        applyBlurToContext(ctx, tempCanvas, i - 1, blurAreas, blurStrength);
+        applyWatermarkToContext(ctx, tempCanvas.width, tempCanvas.height, {
+          text: watermarkText,
+          type: watermarkType,
+          layout: watermarkLayout as any,
+          color: watermarkColor,
+          opacity: watermarkOpacity,
+          fontFamily,
+          fontSize,
+          orientation,
+          image: watermarkImage,
+          imageScale
+        });
+
+        // 3. Initialize or add to jsPDF
+        const imgData = tempCanvas.toDataURL("image/jpeg", 0.92);
+        
+        if (!pdf) {
+          const pdfOptions: any = {
+            orientation: tempCanvas.width > tempCanvas.height ? "l" : "p",
+            unit: "px",
+            format: [tempCanvas.width, tempCanvas.height]
+          };
+
+          if (isPro && password) {
+            pdfOptions.encryption = {
+              userPassword: password,
+              ownerPassword: password,
+              userPermissions: ["print", "modify", "copy", "annot-forms"]
+            };
+          }
+
+          pdf = new jsPDF(pdfOptions);
+        } else {
+          pdf.addPage([tempCanvas.width, tempCanvas.height], tempCanvas.width > tempCanvas.height ? "l" : "p");
+        }
+
+        pdf.addImage(imgData, "JPEG", 0, 0, tempCanvas.width, tempCanvas.height);
+        
+        // Small delay to let browser breathe
+        if (i % 10 === 0) await new Promise(r => setTimeout(r, 10));
       }
 
-      const pdf = new jsPDF(pdfOptions);
+      if (!pdf) return null;
 
-      canvases.forEach((canvas, index) => {
-        if (index > 0) {
-          pdf.addPage([canvas.width, canvas.height], canvas.width > canvas.height ? "l" : "p");
-        }
-        pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
-      });
-
-      const properties: any = {
-        author: " ", creator: " ", producer: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0)
-      };
-      pdf.setProperties(properties);
+      pdf.setProperties({
+        author: " ", creator: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0)
+      } as any);
 
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
-    } else if (documentType === "video" && file) {
-      // --- FINAL SOLUTION: NATIVE INLINE ENGINE ---
-      try {
-        console.log("[VIDEO] Starting Native Inline Processing...");
-        const isIOS = Capacitor.getPlatform() === 'ios';
-        
-        if (!isIOS) throw new Error("Native only for iOS");
 
-        // Prepare file for native
+    } else if (documentType === "video" && file) {
+      // --- NATIVE INLINE ENGINE FOR VIDEO ---
+      try {
+        const isIOS = Capacitor.getPlatform() === 'ios';
+        if (!isIOS) return null;
+
         const base64Input = await blobToBase64(file);
         const tempIn = await Filesystem.writeFile({
           path: `input_${Date.now()}.mp4`,
@@ -144,11 +178,14 @@ export function useFileExport({
         const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
         return { blob, fileName, contentType: "video/mp4" };
       } catch (err) {
-        console.error("[VIDEO] Native engine failed, check AppDelegate.swift registration:", err);
+        console.error("[VIDEO] Native engine failed:", err);
         return null;
       }
     } else {
+      // IMAGE EXPORT
       const canvas = canvases[0];
+      if (!canvas) return null;
+      
       const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg") || file?.name.toLowerCase().endsWith(".jpeg");
       const exportType = isOriginalJpg ? "image/jpeg" : "image/png";
       const fileExt = isOriginalJpg ? "jpg" : "png";
@@ -160,14 +197,11 @@ export function useFileExport({
       if (!blob) return null;
       return { blob, fileName, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file, videoRef, drawWatermark, watermarkColor, watermarkOpacity, watermarkLayout, fontSize]);
+  }, [canvases, watermarkText, documentType, password, isPro, file, watermarkColor, watermarkOpacity, watermarkLayout, fontSize, fontFamily, orientation, watermarkType, watermarkImage, imageScale, blurAreas, blurStrength, pdfDoc]);
 
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
-      if (onBeforeExport) {
-        await onBeforeExport();
-        await new Promise(resolve => setTimeout(resolve, 150));
-      }
+      if (onBeforeExport) await onBeforeExport();
       
       const result = await generateBlobAndFileName();
       if (!result || !result.blob) return false;
@@ -187,7 +221,6 @@ export function useFileExport({
           directory: isIOS ? Directory.Documents : Directory.Data,
         });
         
-        console.log("Saved to Filesystem:", savedFile.uri);
         await new Promise(resolve => setTimeout(resolve, 500));
 
         if (documentType === "image") {
@@ -211,10 +244,7 @@ export function useFileExport({
 
   const shareFile = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
-      if (onBeforeExport) {
-        await onBeforeExport();
-        await new Promise(resolve => setTimeout(resolve, 150));
-      }
+      if (onBeforeExport) await onBeforeExport();
 
       const result = await generateBlobAndFileName();
       if (!result || !result.blob) return false;
@@ -249,5 +279,5 @@ export function useFileExport({
     }
   }, [generateBlobAndFileName]);
 
-  return { getPreviewUrls, saveToDevice, shareFile };
+  return { saveToDevice, shareFile };
 }
