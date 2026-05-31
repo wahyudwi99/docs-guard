@@ -31,7 +31,7 @@ export async function renderPdfPageToCanvas(
   pageNumber: number,
   canvas: HTMLCanvasElement
 ): Promise<void> {
-  console.log(`PDF: Starting render for page ${pageNumber}`);
+  console.log(`PDF: Rendering page ${pageNumber}...`);
   // Cancel any ongoing render task on THIS specific canvas
   const existingTask = renderTasks.get(canvas);
   if (existingTask) {
@@ -41,19 +41,27 @@ export async function renderPdfPageToCanvas(
 
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
   
-  // Reduce scale to 1.5 for better memory performance on real mobile devices
-  const viewport = page.getViewport({ scale: 1.5 }); 
+  // Use scale 1.0 for maximum stability on real mobile devices (prevents white canvas due to memory)
+  const viewport = page.getViewport({ scale: 1.0 }); 
 
-  // Set canvas dimensions to match the PDF page dimensions at the specified scale
+  // Set canvas dimensions
   canvas.width = viewport.width;
   canvas.height = viewport.height;
+  
+  // Explicitly set style to match attributes for iOS WebKit
+  canvas.style.width = `${viewport.width}px`;
+  canvas.style.height = `${viewport.height}px`;
 
-  const context = canvas.getContext("2d", { alpha: false }); // Use alpha false for better performance
+  const context = canvas.getContext("2d", { 
+    alpha: false,
+    willReadFrequently: true // This helps iOS manage memory for frequently updated canvases
+  });
+
   if (!context) {
     throw new Error("Could not get 2D rendering context for canvas.");
   }
 
-  // FILL WITH WHITE FIRST to ensure it's not transparent/white background failure
+  // Clear with white
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -67,11 +75,10 @@ export async function renderPdfPageToCanvas(
   renderTasks.set(canvas, renderTask);
 
   try {
-    console.log(`PDF: Rendering page ${pageNumber}...`);
     await renderTask.promise;
-    console.log(`PDF: Page ${pageNumber} rendered successfully`);
+    console.log(`PDF: Page ${pageNumber} rendered OK`);
     renderTasks.delete(canvas);
-    page.cleanup(); // Clean up page resources.
+    page.cleanup(); 
   } catch (error: unknown) {
     // If it was cancelled, we don't want to throw an error up
     if (error instanceof Error && error.name === "RenderingCancelledException") {
