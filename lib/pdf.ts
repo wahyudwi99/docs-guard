@@ -12,9 +12,9 @@ async function getPdfjsLib() {
   // Use the standard build which is more compatible
   const PDFJS = await import("pdfjs-dist");
   
-  // Set the worker source - Versions MUST match the package.json version
-  const version = "5.6.205";
-  PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+  // Set the worker source - Versions MUST match the package.json version (4.10.38)
+  const version = "4.10.38";
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
   
   return PDFJS;
 }
@@ -41,7 +41,7 @@ export async function renderPdfPageToCanvas(
 
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
   
-  // Use scale 1.0 for maximum stability on real mobile devices (prevents white canvas due to memory)
+  // Use scale 1.0 for maximum stability on real mobile devices
   const viewport = page.getViewport({ scale: 1.0 }); 
 
   // Set canvas dimensions
@@ -54,16 +54,21 @@ export async function renderPdfPageToCanvas(
 
   const context = canvas.getContext("2d", { 
     alpha: false,
-    willReadFrequently: true // This helps iOS manage memory for frequently updated canvases
+    willReadFrequently: true 
   });
 
   if (!context) {
     throw new Error("Could not get 2D rendering context for canvas.");
   }
 
-  // Clear with white
+  // FILL WITH WHITE FIRST
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height);
+
+  // DEBUG: Draw a small indicator line to prove canvas is working on device
+  context.strokeStyle = "red";
+  context.lineWidth = 2;
+  context.strokeRect(5, 5, 20, 20); // Small red box top-left
 
   const renderContext = {
     canvasContext: context,
@@ -76,7 +81,7 @@ export async function renderPdfPageToCanvas(
 
   try {
     await renderTask.promise;
-    console.log(`PDF: Page ${pageNumber} rendered OK`);
+    console.log(`PDF: Page ${pageNumber} render completed`);
     renderTasks.delete(canvas);
     page.cleanup(); 
   } catch (error: unknown) {
