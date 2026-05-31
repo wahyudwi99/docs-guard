@@ -9,13 +9,12 @@ async function getPdfjsLib() {
     return null; // Don't load on server
   }
   
-  // Use the standard build which is more compatible
-  const PDFJS = await import("pdfjs-dist");
+  // Use the LEGACY build which is much more stable for mobile WebView / Capacitor
+  const PDFJS = await import("pdfjs-dist/legacy/build/pdf.mjs");
   
   // DYNAMICALLY set the worker source based on the actual library version
-  // This prevents the "API version does not match worker version" error
-  console.log(`PDF.js: Loading API version ${PDFJS.version}`);
-  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS.version}/build/pdf.worker.min.mjs`;
+  console.log(`PDF.js (Legacy): Loading API version ${PDFJS.version}`);
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS.version}/legacy/build/pdf.worker.min.mjs`;
   
   return PDFJS;
 }
@@ -53,23 +52,15 @@ export async function renderPdfPageToCanvas(
   canvas.style.width = `${viewport.width}px`;
   canvas.style.height = `${viewport.height}px`;
 
-  const context = canvas.getContext("2d", { 
-    alpha: false,
-    willReadFrequently: true 
-  });
+  const context = canvas.getContext("2d");
 
   if (!context) {
     throw new Error("Could not get 2D rendering context for canvas.");
   }
 
-  // FILL WITH WHITE FIRST
-  context.fillStyle = "white";
+  // CLEAR WITH LIGHT YELLOW to see if canvas is alive
+  context.fillStyle = "#ffffe0";
   context.fillRect(0, 0, canvas.width, canvas.height);
-
-  // DEBUG: Draw a small indicator line to prove canvas is working on device
-  context.strokeStyle = "red";
-  context.lineWidth = 2;
-  context.strokeRect(5, 5, 20, 20); // Small red box top-left
 
   const renderContext = {
     canvasContext: context,

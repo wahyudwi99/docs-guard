@@ -87,13 +87,14 @@ export function useDocument({ canvases }: UseDocumentProps) {
             setNumPages(doc.numPages);
           }
 
+          // Small delay to allow iOS to finalize canvas sizing in DOM
+          await new Promise(resolve => requestAnimationFrame(resolve));
+
           // Wait for all pages to render if canvases are available
           const renderPromises = [];
           for (let i = 1; i <= doc.numPages; i++) {
             const canvas = currentCanvases[i - 1];
             if (canvas) {
-              const ctx = canvas.getContext("2d");
-              if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
               renderPromises.push(renderPdfPageToCanvas(doc, i, canvas));
             }
           }
