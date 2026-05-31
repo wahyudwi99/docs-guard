@@ -9,12 +9,13 @@ async function getPdfjsLib() {
     return null; // Don't load on server
   }
   
-  // Try importing the minified mjs build
-  const PDFJS = await import("pdfjs-dist/build/pdf.min.mjs");
+  // Use the standard build which is more compatible
+  const PDFJS = await import("pdfjs-dist");
   
-  // Set the worker source
-  const version = "5.6.205";
-  PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+  // Set the worker source - Using a specific version to ensure consistency
+  // On real devices, it's safer to use the standard worker path
+  const version = "4.10.38"; // Using a stable v4 version which is often better for mobile
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
   
   return PDFJS;
 }
@@ -39,7 +40,9 @@ export async function renderPdfPageToCanvas(
   }
 
   const page: PDFPageProxy = await pdfDocument.getPage(pageNumber);
-  const viewport = page.getViewport({ scale: 2.0 }); // Higher scale for better quality
+  
+  // Reduce scale to 1.5 for better memory performance on real mobile devices
+  const viewport = page.getViewport({ scale: 1.5 }); 
 
   // Set canvas dimensions to match the PDF page dimensions at the specified scale
   canvas.width = viewport.width;

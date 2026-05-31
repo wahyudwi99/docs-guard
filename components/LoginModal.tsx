@@ -54,8 +54,8 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
                 <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
               </div>
               
-              <h2 className="text-2xl font-bold mb-2">Welcome to DocsGuard</h2>
-              <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">
+              <h2 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">Welcome to DocsGuard</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 mb-8 text-sm">
                 Sign in to protect your documents and manage your Pro subscription across devices.
               </p>
               
