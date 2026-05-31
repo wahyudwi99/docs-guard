@@ -833,10 +833,10 @@ function HomeContent() {
                           const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
                           const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
                           const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
-
-                          // Logic for smart plan labels
                           const pkgType = isWeekly ? 'weekly' : isMonthly ? 'monthly' : 'yearly';
-                          const isActive = isPro && currentPlan?.type?.toLowerCase() === pkgType;
+
+                          // Logic for precise plan matching using productIdentifier
+                          const isActive = isPro && currentPlan?.productIdentifier === pkg.product.identifier;
                           
                           let buttonLabel = "Subscribe";
                           if (!session) {
@@ -845,9 +845,16 @@ function HomeContent() {
                              buttonLabel = "Current Plan";
                           } else if (isPro) {
                              const planOrder = ['weekly', 'monthly', 'yearly'];
-                             const currentTier = planOrder.indexOf(currentPlan?.type?.toLowerCase() || 'weekly');
+                             const currentTier = planOrder.indexOf(currentPlan?.type?.toLowerCase() || 'premium');
                              const pkgTier = planOrder.indexOf(pkgType);
-                             buttonLabel = pkgTier > currentTier ? "Upgrade Now" : "Switch Plan";
+                             
+                             if (pkgTier > currentTier) {
+                               buttonLabel = "Upgrade Now";
+                             } else if (pkgTier < currentTier) {
+                               buttonLabel = "Switch to Lower Plan";
+                             } else {
+                               buttonLabel = "Switch Plan";
+                             }
                           }
 
                           // Robust naming logic

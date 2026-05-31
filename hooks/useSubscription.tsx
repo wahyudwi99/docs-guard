@@ -178,31 +178,30 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     setActiveEntitlements(activeEnts);
 
     // 2. Identify the primary active subscription (the "Current Plan")
-    const activeSubscriptions = customerInfo.activeSubscriptions;
-    const allPurchaseDates = customerInfo.allPurchaseDates;
-
-    if (activeSubscriptions.length > 0) {
-      // Find the subscription with the latest purchase date to represent the "Current Plan"
-      const latestSubscriptionId = activeSubscriptions
-        .map((id: string) => ({
-          id,
-          date: new Date(allPurchaseDates[id] || 0).getTime()
-        }))
-        .sort((a: any, b: any) => b.date - a.date)[0].id;
-
-      // Match this subscription with its corresponding entitlement info
-      const entitlement = activeEnts.find((e: any) => e.productIdentifier === latestSubscriptionId) || activeEnts[0];
+    // Use the 'pro' entitlement as the source of truth if it exists
+    const proEntitlement = customerInfo.entitlements.active['pro'];
+    
+    if (proEntitlement) {
+      const productId = proEntitlement.productIdentifier;
       
       let type = 'premium';
-      const idLower = latestSubscriptionId.toLowerCase();
+      const idLower = productId.toLowerCase();
       if (idLower.includes('weekly')) type = 'weekly';
       else if (idLower.includes('monthly')) type = 'monthly';
       else if (idLower.includes('yearly')) type = 'yearly';
 
       setLatestPlanInfo({
         type,
-        endDate: (entitlement as any)?.expirationDate || null,
-        productIdentifier: latestSubscriptionId
+        endDate: proEntitlement.expirationDate || null,
+        productIdentifier: productId
+      });
+    } else if (activeEnts.length > 0) {
+      // Fallback to any active entitlement
+      const firstEnt = activeEnts[0] as any;
+      setLatestPlanInfo({
+        type: 'premium',
+        endDate: firstEnt.expirationDate || null,
+        productIdentifier: firstEnt.productIdentifier
       });
     } else {
       setLatestPlanInfo(null);
