@@ -12,9 +12,9 @@ async function getPdfjsLib() {
   // Use the standard build which is more compatible
   const PDFJS = await import("pdfjs-dist");
   
-  // Set the worker source - Using a specific version to ensure consistency
-  const version = "4.10.38";
-  PDFJS.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.worker.min.mjs`;
+  // Set the worker source - Versions MUST match the package.json version
+  const version = "5.6.205";
+  PDFJS.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
   
   return PDFJS;
 }
