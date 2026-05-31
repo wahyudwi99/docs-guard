@@ -125,9 +125,12 @@ export function useFileExport({
       };
 
       const canvas = canvases[0];
-      const targetFps = await detectFps();
+      const detectedFps = await detectFps();
+      // ENFORCE MINIMUM 60Hz: Ensure output is always fluid, even for lower fps inputs
+      const targetFps = Math.max(60, detectedFps);
+      console.log(`[VIDEO] Target export FPS: ${targetFps} (Detected: ${detectedFps})`);
       
-      // Use the detected FPS (or fallback) for a perfectly synced stream
+      // Use the target FPS for a high-frequency stream
       // @ts-ignore
       const stream = canvas.captureStream(targetFps);
       
