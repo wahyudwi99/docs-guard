@@ -103,11 +103,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
           await checkSubscriptionStatus();
         }
       } else {
-        // Mock data for web
+        // Professional default prices for web/unidentified users
         setPackages([
-          { identifier: 'weekly', isMock: true, product: { title: 'Weekly Pro', priceString: '$1.99', description: 'Perfect for quick projects' } },
-          { identifier: 'monthly', isMock: true, product: { title: 'Monthly Pro', priceString: '$4.99', description: 'Most popular choice' } },
-          { identifier: 'yearly', isMock: true, product: { title: 'Yearly Pro', priceString: '$24.99', description: 'Best value - 60% OFF' } }
+          { identifier: 'weekly', isMock: true, product: { identifier: 'weekly', title: 'Weekly Pro', priceString: '$2.99', description: 'Billed weekly' } },
+          { identifier: 'monthly', isMock: true, product: { identifier: 'monthly', title: 'Monthly Pro', priceString: '$6.99', description: 'Most popular choice' } },
+          { identifier: 'yearly', isMock: true, product: { identifier: 'yearly', title: 'Yearly Pro', priceString: '$27.99', description: 'Best value' } }
         ]);
         setLoading(false);
       }
@@ -155,10 +155,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const fetchPackages = async () => {
+    // Professional fallback packages
     const mockPackages = [
-      { identifier: 'weekly', isMock: true, product: { title: 'Weekly Pro', priceString: '$1.99' } },
-      { identifier: 'monthly', isMock: true, product: { title: 'Monthly Pro', priceString: '$4.99' } },
-      { identifier: 'yearly', isMock: true, product: { title: 'Yearly Pro', priceString: '$24.99' } }
+      { identifier: 'weekly', isMock: true, product: { identifier: 'weekly', title: 'Weekly Pro', priceString: '$2.99' } },
+      { identifier: 'monthly', isMock: true, product: { identifier: 'monthly', title: 'Monthly Pro', priceString: '$6.99' } },
+      { identifier: 'yearly', isMock: true, product: { identifier: 'yearly', title: 'Yearly Pro', priceString: '$27.99' } }
     ];
     try {
       const offerings = await Purchases.getOfferings();
