@@ -292,7 +292,8 @@ function HomeContent() {
     documentType,
     password,
     isPro,
-    file
+    file,
+    videoRef
   });
 
   const handleOpenPreview = useCallback(async () => {

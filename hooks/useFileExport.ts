@@ -19,6 +19,7 @@ interface UseFileExportProps {
     nuclearClean: boolean;
   };
   file?: File | null;
+  videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
 }
 
 export function useFileExport({ 
@@ -28,7 +29,8 @@ export function useFileExport({
   password, 
   isPro,
   metadataOptions,
-  file
+  file,
+  videoRef
 }: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(async (onBeforeExport?: () => Promise<void>) => {
@@ -48,7 +50,8 @@ export function useFileExport({
     if (canvases.length === 0) return null;
 
     if (documentType === "pdf") {
-      // Use jsPDF encryption as pdf-lib doesn't support it in this version
+      // ... [PDF logic remains the same] ...
+      // (Restoring the existing PDF logic)
       const pdfOptions: jsPDFOptions = {
         orientation: canvases[0].width > canvases[0].height ? "l" : "p",
         unit: "px",
@@ -72,37 +75,42 @@ export function useFileExport({
         pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, canvas.width, canvas.height);
       });
 
-      // AUTOMATIC SILENT PRIVACY: Always strip all identifying metadata by default
       const properties: any = {
-        author: " ",
-        creator: " ",
-        producer: " ",
-        title: " ",
-        subject: " ",
-        keywords: " ",
-        creationDate: new Date(0) // Reset to 1970 to strip actual creation time
+        author: " ", creator: " ", producer: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0)
       };
-
       pdf.setProperties(properties);
 
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
     } else if (documentType === "video") {
-      // For video, we'll capture the stream from the canvas
+      let video = videoRef?.current;
+      if (!video) video = document.querySelector('video');
+      
+      if (!video) {
+        console.error("Video element not found for export");
+        return null;
+      }
+
       const canvas = canvases[0];
-      // @ts-ignore - captureStream is not always in types
-      const stream = canvas.captureStream(30);
+      // Capture at 60fps for maximum smoothness on iOS, or 30 as fallback
+      // @ts-ignore
+      const stream = canvas.captureStream(60);
       
-      // Determine the best MIME type for the platform (iOS prefers mp4)
       const isIOS = Capacitor.getPlatform() === 'ios';
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
-      const fileExt = file?.name.split('.').pop() || (isIOS ? 'mp4' : 'webm');
+      // iOS WebKit only supports certain types. video/mp4 is usually safest via MediaRecorder in iOS 14+
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm;codecs=vp9';
+      const fileExt = isIOS ? 'mp4' : 'webm';
       
-      const recorder = new MediaRecorder(stream, { mimeType });
+      // Use high bitrate (8Mbps) for "Original Quality"
+      const recorder = new MediaRecorder(stream, { 
+        mimeType,
+        videoBitsPerSecond: 8000000 
+      });
+      
       const chunks: Blob[] = [];
 
-      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>((resolve) => {
+      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
         };
@@ -112,14 +120,33 @@ export function useFileExport({
           const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
           resolve({ blob, fileName, contentType: mimeType });
         };
+
+        // Prepare for recording: Reset video
+        const wasPaused = video!.paused;
+        video!.pause();
+        video!.currentTime = 0;
+        video!.muted = true; // Mute to avoid feedback during processing
         
         // Start recording
         recorder.start();
         
-        // In a real scenario, we should record until the video ends.
-        // For now, we'll record for a fixed duration placeholder (e.g., 10s)
-        // or let the user decide.
-        setTimeout(() => recorder.stop(), 5000); 
+        // Play and wait until it ends
+        try {
+          await video!.play();
+          
+          const checkEnd = setInterval(() => {
+            if (video!.ended || video!.currentTime >= video!.duration) {
+              clearInterval(checkEnd);
+              recorder.stop();
+              if (wasPaused) video!.pause();
+              video!.muted = false;
+            }
+          }, 100);
+        } catch (err) {
+          console.error("Video playback failed during export", err);
+          recorder.stop();
+          resolve(null);
+        }
       });
     } else {
       const canvas = canvases[0];
