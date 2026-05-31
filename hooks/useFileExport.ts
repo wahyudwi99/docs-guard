@@ -41,7 +41,6 @@ export function useFileExport({
   isPro,
   file,
   videoRef,
-  drawWatermark,
   watermarkColor = "#000000",
   watermarkOpacity = 0.3,
   watermarkLayout = "tiled",
@@ -74,24 +73,33 @@ export function useFileExport({
   };
 
   const generateBlobAndFileName = useCallback(async (): Promise<{ blob: Blob, fileName: string, contentType: string } | null> => {
-    if (canvases.length === 0 && documentType !== "pdf") return null;
-
-    if (documentType === "pdf" && pdfDoc) {
-      // --- SEQUENTIAL PDF EXPORT (All Pages) ---
-      console.log(`[EXPORT] Starting sequential PDF export for ${pdfDoc.numPages} pages...`);
+    // If it's a PDF, we process the whole document using pdfDoc regardless of UI canvases
+    if (documentType === "pdf") {
+      if (!pdfDoc) {
+        console.error("[EXPORT] PDF doc is missing");
+        return null;
+      }
       
-      const tempCanvas = document.createElement("canvas");
-      const ctx = tempCanvas.getContext("2d");
-      if (!ctx) throw new Error("Could not create export context");
-
+      console.log(`[EXPORT] Starting sequential export for ${pdfDoc.numPages} pages...`);
       let pdf: jsPDF | null = null;
+      const total = pdfDoc.numPages;
 
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        // 1. Render base PDF page to temp canvas at high res
+      for (let i = 1; i <= total; i++) {
+        console.log(`[EXPORT] Processing page ${i}/${total}...`);
+        
+        // Use a fresh temporary canvas for each page to ensure complete memory isolation
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d", { alpha: false });
+        if (!ctx) throw new Error("Export context failed");
+
+        // Important: set the index so renderPdfPageToCanvas knows which page to fetch
+        tempCanvas.setAttribute('data-page-index', (i - 1).toString());
+        
+        // Render base PDF page
         await renderPdfPageToCanvas(pdfDoc, i, tempCanvas);
 
-        // 2. Apply Blur and Watermark using shared utilities
-        applyBlurToContext(ctx, tempCanvas, i - 1, blurAreas, blurStrength);
+        // Apply shared utilities
+        applyBlurToContext(ctx, tempCanvas, i - 1, blurAreas || [], blurStrength || 10);
         applyWatermarkToContext(ctx, tempCanvas.width, tempCanvas.height, {
           text: watermarkText,
           type: watermarkType,
@@ -105,33 +113,40 @@ export function useFileExport({
           imageScale
         });
 
-        // 3. Initialize or add to jsPDF
-        const imgData = tempCanvas.toDataURL("image/jpeg", 0.92);
-        
+        const imgData = tempCanvas.toDataURL("image/jpeg", 0.9);
+
         if (!pdf) {
-          const pdfOptions: any = {
+          pdf = new jsPDF({
             orientation: tempCanvas.width > tempCanvas.height ? "l" : "p",
             unit: "px",
-            format: [tempCanvas.width, tempCanvas.height]
-          };
+            format: [tempCanvas.width, tempCanvas.height],
+            compress: true
+          });
 
           if (isPro && password) {
-            pdfOptions.encryption = {
+            (pdf as any).setEncryption({
               userPassword: password,
               ownerPassword: password,
               userPermissions: ["print", "modify", "copy", "annot-forms"]
-            };
+            });
           }
-
-          pdf = new jsPDF(pdfOptions);
         } else {
+          // Add a new page matching the current dimensions
           pdf.addPage([tempCanvas.width, tempCanvas.height], tempCanvas.width > tempCanvas.height ? "l" : "p");
         }
 
-        pdf.addImage(imgData, "JPEG", 0, 0, tempCanvas.width, tempCanvas.height);
+        // Always add the image to the CURRENT (last) page
+        pdf.addImage(imgData, "JPEG", 0, 0, tempCanvas.width, tempCanvas.height, undefined, 'FAST');
         
-        // Small delay to let browser breathe
-        if (i % 10 === 0) await new Promise(r => setTimeout(r, 10));
+        // Destroy canvas immediately
+        tempCanvas.width = 0;
+        tempCanvas.height = 0;
+
+        // Periodic breather for high page counts
+        if (i % 10 === 0) {
+          console.log(`[EXPORT] Progress: ${Math.round((i/total)*100)}%`);
+          await new Promise(r => setTimeout(r, 20));
+        }
       }
 
       if (!pdf) return null;
@@ -142,6 +157,7 @@ export function useFileExport({
 
       const pdfBlob = pdf.output("blob");
       const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
+      console.log(`[EXPORT] Done. Final size: ${Math.round(pdfBlob.size/1024)}KB`);
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
 
     } else if (documentType === "video" && file) {
@@ -213,8 +229,9 @@ export function useFileExport({
         saveAndOpenBlob(blob, fileName, contentType);
       } else {
         const isIOS = Capacitor.getPlatform() === 'ios';
-        const base64Data = await blobToBase64(blob);
         
+        // Write file to device
+        const base64Data = await blobToBase64(blob);
         const savedFile = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
