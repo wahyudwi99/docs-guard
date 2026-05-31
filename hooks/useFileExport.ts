@@ -20,6 +20,7 @@ interface UseFileExportProps {
   };
   file?: File | null;
   videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
+  drawWatermark?: (onlyFirstPage?: boolean) => Promise<void>;
 }
 
 export function useFileExport({ 
@@ -30,7 +31,8 @@ export function useFileExport({
   isPro,
   metadataOptions,
   file,
-  videoRef
+  videoRef,
+  drawWatermark
 }: UseFileExportProps) {
   
   const getPreviewUrls = useCallback(async (onBeforeExport?: () => Promise<void>) => {
@@ -50,8 +52,6 @@ export function useFileExport({
     if (canvases.length === 0) return null;
 
     if (documentType === "pdf") {
-      // ... [PDF logic remains the same] ...
-      // (Restoring the existing PDF logic)
       const pdfOptions: jsPDFOptions = {
         orientation: canvases[0].width > canvases[0].height ? "l" : "p",
         unit: "px",
@@ -94,23 +94,26 @@ export function useFileExport({
 
       const canvas = canvases[0];
       
-      // FIXED 60 FPS: Most stable for iOS WebKit to avoid "black screen" or sync issues.
+      // FORCED 60 FPS: Set capture stream to 60fps
       // @ts-ignore
       const stream = canvas.captureStream(60);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
-      // Standard video/mp4 is safest for iOS Gallery compatibility
+      // Standard mp4 for iOS compatibility
       const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
+      // BITRATE: 30Mbps is optimal for mobile hardware stability at 60fps
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 40000000 
+        videoBitsPerSecond: 30000000 
       });
       
       const chunks: Blob[] = [];
 
       return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
+        let isRecording = true;
+
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
         };
@@ -121,12 +124,11 @@ export function useFileExport({
           resolve({ blob, fileName, contentType: mimeType });
         };
 
-        // Initialize: Reset video
+        // Reset video to start
         video!.pause();
         video!.currentTime = 0;
         video!.muted = true; 
         
-        // Wait for first frame seek
         await new Promise(r => {
           const onSeek = () => {
             video!.removeEventListener('seeked', onSeek);
@@ -135,23 +137,35 @@ export function useFileExport({
           video!.addEventListener('seeked', onSeek);
         });
         
-        // Start recording with flushing
-        recorder.start(200);
+        // Start recording
+        recorder.start(100);
 
+        // AGGRESSIVE 60FPS DRAW LOOP during export
+        const exportLoop = async () => {
+          if (!isRecording) return;
+
+          // Manually force a redraw of the watermark on every frame possible
+          if (drawWatermark) {
+            await drawWatermark(true);
+          }
+          
+          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+            isRecording = false;
+            setTimeout(() => {
+              recorder.stop();
+              video!.pause();
+              video!.muted = false;
+            }, 500);
+            return;
+          }
+
+          // Use requestAnimationFrame for high-priority synchronization
+          requestAnimationFrame(exportLoop);
+        };
+        
         try {
           await video!.play();
-          
-          const checkEnd = setInterval(() => {
-            // Check for ending slightly before absolute duration to avoid encoder tail bugs
-            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
-              clearInterval(checkEnd);
-              setTimeout(() => {
-                recorder.stop();
-                video!.pause();
-                video!.muted = false;
-              }, 500);
-            }
-          }, 100);
+          exportLoop();
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
@@ -170,7 +184,7 @@ export function useFileExport({
       });
       return { blob, fileName, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file]);
+  }, [canvases, watermarkText, documentType, password, isPro, metadataOptions, file, videoRef, drawWatermark]);
 
   const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -316,6 +330,3 @@ export function useFileExport({
 
   return { getPreviewUrls, saveToDevice, shareFile };
 }
-
-
-
