@@ -170,44 +170,62 @@ export function useFileExport({
     } else if (documentType === "video" && file) {
       // --- NATIVE INLINE ENGINE FOR VIDEO ---
       try {
-        onProgress?.("Initializing high-speed video engine...");
         const isIOS = Capacitor.getPlatform() === 'ios';
-        if (!isIOS) return null;
+        
+        if (isIOS) {
+          onProgress?.("Initializing high-speed video engine...");
+          const base64Input = await blobToBase64(file);
+          const tempIn = await Filesystem.writeFile({
+            path: `input_${Date.now()}.mp4`,
+            data: base64Input,
+            directory: Directory.Cache
+          });
 
-        const base64Input = await blobToBase64(file);
-        const tempIn = await Filesystem.writeFile({
-          path: `input_${Date.now()}.mp4`,
-          data: base64Input,
-          directory: Directory.Cache
-        });
+          onProgress?.("Applying watermark at original quality...");
+          const result = await VideoWatermark.addTextWatermark({
+            videoUri: tempIn.uri,
+            text: watermarkText,
+            colorHex: watermarkColor || "#FFFFFF",
+            opacity: watermarkOpacity || 0.5,
+            layout: (watermarkLayout as any) || "tiled",
+            fontSize: fontSize || 40
+          });
 
-        onProgress?.("Applying watermark at original quality...");
-        const result = await VideoWatermark.addTextWatermark({
-          videoUri: tempIn.uri,
-          text: watermarkText,
-          colorHex: watermarkColor || "#FFFFFF",
-          opacity: watermarkOpacity || 0.5,
-          layout: (watermarkLayout as any) || "tiled",
-          fontSize: fontSize || 40
-        });
+          onProgress?.("Finalizing video file...");
+          const processed = await Filesystem.readFile({ path: result.uri });
+          const byteCharacters = atob(processed.data as string);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'video/mp4' });
 
-        onProgress?.("Finalizing video file...");
-        const processed = await Filesystem.readFile({ path: result.uri });
-        const byteCharacters = atob(processed.data as string);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          onProgress?.("COMPLETED");
+          await new Promise(r => setTimeout(r, 600));
+
+          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
+          return { blob, fileName, contentType: "video/mp4" };
+        } else {
+          // FALLBACK TO FFMPEG FOR WEB/ANDROID
+          onProgress?.("Loading video processing engine (FFmpeg)...");
+          const { processVideoWithWatermark } = await import("../lib/ffmpeg");
+          const blob = await processVideoWithWatermark(file, watermarkText, {
+            color: watermarkColor,
+            opacity: watermarkOpacity,
+            fontSize: fontSize,
+            layout: watermarkLayout as any
+          });
+
+          onProgress?.("COMPLETED");
+          await new Promise(r => setTimeout(r, 600));
+
+          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
+          return { blob, fileName, contentType: "video/mp4" };
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'video/mp4' });
-
-        onProgress?.("COMPLETED");
-        await new Promise(r => setTimeout(r, 600));
-
-        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
-        return { blob, fileName, contentType: "video/mp4" };
       } catch (err) {
-        console.error("[VIDEO] Native engine failed:", err);
+        console.error("[VIDEO] Engine failed:", err);
+        // If native fails on iOS, we could try FFmpeg as a last resort
         return null;
       }
     } else {
