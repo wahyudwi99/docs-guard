@@ -79,7 +79,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full py-4 px-6 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl mb-4"
+                className="w-full py-4 px-6 rounded-2xl bg-white border border-zinc-200 text-zinc-900 font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-3 shadow-md hover:bg-zinc-50 mb-4"
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                 SIGN IN WITH GOOGLE
