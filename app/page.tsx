@@ -47,6 +47,18 @@ function HomeContent() {
 
   const [showConflictModal, setShowConflictModal] = useState(false);
 
+  // Auto-Login Invitation for non-logged-in users
+  useEffect(() => {
+    const hasSeenInvitation = localStorage.getItem('docsguard_seen_invitation');
+    if (!isLoadingAuth && !session && !hasSeenInvitation) {
+      const timer = setTimeout(() => {
+        setShowLoginModal(true);
+        localStorage.setItem('docsguard_seen_invitation', 'true');
+      }, 1500); // Small delay for better UX
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingAuth, session]);
+
   // AdMob Initialization
   useEffect(() => {
     const initAdMob = async () => {
