@@ -261,7 +261,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
             
             {isAdjusting && (
               <div 
-                className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] z-30"
+                className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] z-[200]"
                 style={{ top: `${rect.top}%`, left: `${rect.left}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
               >
                 {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
@@ -269,20 +269,21 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
                     key={h}
                     onMouseDown={(e) => { e.stopPropagation(); setActiveHandle(h); }}
                     onTouchStart={(e) => { 
-                      e.preventDefault(); // Prevent scrolling/stuck on mobile
+                      e.preventDefault();
                       e.stopPropagation(); 
                       setActiveHandle(h); 
                     }}
                     className={cn(
-                      "absolute h-20 w-20 flex items-center justify-center pointer-events-auto cursor-move",
+                      "absolute h-20 w-20 flex items-center justify-center pointer-events-auto cursor-move z-[210]",
                       h === 'tl' && "-top-10 -left-10",
                       h === 'tr' && "-top-10 -right-10",
                       h === 'bl' && "-bottom-10 -left-10",
                       h === 'br' && "-bottom-10 -right-10"
                     )}
+                    style={{ touchAction: 'none' }}
                   >
                     <div className={cn(
-                      "h-8 w-8 rounded-full border-4 border-white shadow-2xl transition-transform",
+                      "h-10 w-10 rounded-full border-4 border-white shadow-2xl transition-transform",
                       activeHandle === h ? "scale-125 bg-white" : "bg-indigo-500"
                     )}></div>
                   </div>
