@@ -227,90 +227,102 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
   }, [startCamera]);
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300 select-none">
-      <div className="relative w-full max-w-xl bg-slate-900 rounded-[32px] overflow-hidden shadow-2xl flex flex-col aspect-[3/4] md:aspect-video">
-        
-        {/* Header */}
-        <div className="absolute top-6 left-6 right-6 z-20 flex justify-between items-center">
-          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-            {isAdjusting ? <Scissors className="h-4 w-4 text-indigo-400" /> : <Camera className="h-4 w-4 text-emerald-400" />}
-            <span className="text-[10px] font-black uppercase tracking-widest text-white">
-              {isAdjusting ? t('upload_section.crop_title') : t('upload_section.camera')}
-            </span>
-          </div>
-          <button onClick={handleClose} className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-            <X className="h-5 w-5" />
-          </button>
+    <div className="fixed inset-0 z-[300] flex flex-col bg-black select-none animate-in fade-in duration-300">
+      
+      {/* Header - Overlaid */}
+      <div className="absolute top-safe pt-8 left-6 right-6 z-[100] flex justify-between items-center">
+        <div className="flex items-center gap-2 bg-black/30 backdrop-blur-xl px-4 py-2 rounded-2xl border border-white/10 shadow-2xl">
+          {isAdjusting ? <Scissors className="h-4 w-4 text-indigo-400" /> : <Camera className="h-4 w-4 text-emerald-400" />}
+          <span className="text-[11px] font-black uppercase tracking-[0.15em] text-white">
+            {isAdjusting ? t('upload_section.crop_title') : t('upload_section.camera')}
+          </span>
         </div>
+        <button 
+          onClick={handleClose} 
+          className="h-12 w-12 rounded-2xl bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all shadow-2xl"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
 
-        {/* Viewport */}
-        <div ref={containerRef} className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none">
-          {capturedImage ? (
-            <div className="relative w-full h-full flex items-center justify-center">
-              <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-60" />
-              
-              {isAdjusting && (
-                <div 
-                  className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] z-30"
-                  style={{ top: `${rect.top}%`, left: `${rect.left}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
-                >
-                  {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
-                    <div
-                      key={h}
-                      onMouseDown={(e) => { e.stopPropagation(); setActiveHandle(h); }}
-                      onTouchStart={(e) => { e.stopPropagation(); setActiveHandle(h); }}
-                      className={cn(
-                        "absolute h-12 w-12 flex items-center justify-center pointer-events-auto cursor-move",
-                        h === 'tl' && "-top-6 -left-6",
-                        h === 'tr' && "-top-6 -right-6",
-                        h === 'bl' && "-bottom-6 -left-6",
-                        h === 'br' && "-bottom-6 -right-6"
-                      )}
-                    >
-                      <div className={cn(
-                        "h-4 w-4 rounded-full border-2 border-white shadow-xl transition-transform",
-                        activeHandle === h ? "scale-150 bg-white" : "bg-indigo-500"
-                      )}></div>
-                    </div>
-                  ))}
-                  <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-20 pointer-events-none">
-                    <div className="border-r border-b border-white"></div><div className="border-r border-b border-white"></div><div className="border-b border-white"></div>
-                    <div className="border-r border-b border-white"></div><div className="border-r border-b border-white"></div><div className="border-b border-white"></div>
-                    <div className="border-r border-white"></div><div className="border-r border-white"></div><div></div>
+      {/* Viewport - Full screen */}
+      <div ref={containerRef} className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none">
+        {capturedImage ? (
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-60" />
+            
+            {isAdjusting && (
+              <div 
+                className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.8)] z-30"
+                style={{ top: `${rect.top}%`, left: `${rect.left}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
+              >
+                {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
+                  <div
+                    key={h}
+                    onMouseDown={(e) => { e.stopPropagation(); setActiveHandle(h); }}
+                    onTouchStart={(e) => { e.stopPropagation(); setActiveHandle(h); }}
+                    className={cn(
+                      "absolute h-16 w-16 flex items-center justify-center pointer-events-auto cursor-move",
+                      h === 'tl' && "-top-8 -left-8",
+                      h === 'tr' && "-top-8 -right-8",
+                      h === 'bl' && "-bottom-8 -left-8",
+                      h === 'br' && "-bottom-8 -right-8"
+                    )}
+                  >
+                    <div className={cn(
+                      "h-6 w-6 rounded-full border-2 border-white shadow-2xl transition-transform",
+                      activeHandle === h ? "scale-125 bg-white" : "bg-indigo-500"
+                    )}></div>
                   </div>
+                ))}
+                <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-30 pointer-events-none">
+                  <div className="border-r border-b border-white/50"></div><div className="border-r border-b border-white/50"></div><div className="border-b border-white/50"></div>
+                  <div className="border-r border-b border-white/50"></div><div className="border-r border-b border-white/50"></div><div className="border-b border-white/50"></div>
+                  <div className="border-r border-white/50"></div><div className="border-r border-white/50"></div><div></div>
                 </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-              {isStarting && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                  <div className="h-8 w-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                </div>
-              )}
-            </>
-          )}
-          <canvas ref={canvasRef} className="hidden" />
-        </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+            {isStarting && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black">
+                <div className="h-10 w-10 border-4 border-white/10 border-t-white rounded-full animate-spin"></div>
+              </div>
+            )}
+          </>
+        )}
+        <canvas ref={canvasRef} className="hidden" />
+      </div>
 
-        {/* Controls */}
-        <div className="relative z-50 p-8 flex justify-center items-center gap-8 bg-black/40 border-t border-white/10">
-          {capturedImage ? (
-            <>
-              <button onClick={handleRetake} className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all">
-                <RefreshCw className="h-6 w-6" />
-              </button>
-              <button onClick={handleConfirm} className="h-20 w-20 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all scale-110 active:scale-95">
-                <Check className="h-10 w-10" />
-              </button>
-            </>
-          ) : (
-            <button onClick={capturePhoto} disabled={!stream || isStarting} className="group h-20 w-20 rounded-full border-4 border-white p-1 transition-all active:scale-95 disabled:opacity-50">
-              <div className="h-full w-full rounded-full bg-white transition-all group-hover:scale-90"></div>
+      {/* Controls - Floating/Overlaid at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-[100] pb-safe p-10 flex justify-center items-center gap-12 bg-gradient-to-t from-black/80 to-transparent">
+        {capturedImage ? (
+          <>
+            <button 
+              onClick={handleRetake} 
+              className="h-16 w-16 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90"
+            >
+              <RefreshCw className="h-7 w-7" />
             </button>
-          )}
-        </div>
+            <button 
+              onClick={handleConfirm} 
+              className="h-20 w-20 rounded-[2.5rem] bg-indigo-500 flex items-center justify-center text-white shadow-2xl shadow-indigo-500/40 hover:bg-indigo-600 transition-all scale-110 active:scale-95"
+            >
+              <Check className="h-10 w-10 stroke-[3]" />
+            </button>
+          </>
+        ) : (
+          <button 
+            onClick={capturePhoto} 
+            disabled={!stream || isStarting} 
+            className="group relative h-24 w-24 rounded-full border-4 border-white p-1.5 transition-all active:scale-90 disabled:opacity-30"
+          >
+            <div className="h-full w-full rounded-full bg-white transition-all group-hover:scale-95 group-active:scale-90 shadow-2xl shadow-white/20"></div>
+            <div className="absolute -inset-4 border-2 border-white/20 rounded-full animate-pulse pointer-events-none" />
+          </button>
+        )}
       </div>
     </div>
   );
