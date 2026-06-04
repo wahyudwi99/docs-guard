@@ -51,9 +51,20 @@ export async function processVideoWithWatermark(
 
   // --- FONT HANDLING ---
   // FFmpeg.wasm needs an explicit font file for drawtext to work
-  const fontUrl = 'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/Roboto-Bold.ttf';
-  const fontName = 'font.ttf';
-  await ffmpeg.writeFile(fontName, await fetchFile(fontUrl));
+  // Using unpkg to ensure reliable binary delivery with correct CORS headers
+  const fontUrl = 'https://unpkg.com/@fontsource/roboto@5.0.8/files/roboto-latin-700-normal.woff2';
+  let fontName = 'font.woff2';
+  
+  try {
+    console.log("[FFMPEG] Downloading font...");
+    await ffmpeg.writeFile(fontName, await fetchFile(fontUrl));
+  } catch (fontErr) {
+    console.warn("[FFMPEG] Failed to download font, using fallback...");
+    // If woff2 fails, try ttf from another reliable source
+    fontName = 'font.ttf';
+    const fallbackFontUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Bold.ttf';
+    await ffmpeg.writeFile(fontName, await fetchFile(fallbackFontUrl));
+  }
 
   const { color = 'white', opacity = 0.5, fontSize = 24, layout = 'tiled' } = options;
   
