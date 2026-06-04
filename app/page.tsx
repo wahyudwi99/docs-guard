@@ -49,12 +49,12 @@ function HomeContent() {
 
   // Auto-Login Invitation for non-logged-in users
   useEffect(() => {
-    const hasSeenInvitation = localStorage.getItem('docsguard_seen_invitation');
-    if (!isLoadingAuth && !session && !hasSeenInvitation) {
+    // Only trigger if auth is finished loading and no session exists
+    if (!isLoadingAuth && !session) {
+      // Increase delay to 3000ms to ensure splash screen is gone and home page is visible
       const timer = setTimeout(() => {
         setShowLoginModal(true);
-        localStorage.setItem('docsguard_seen_invitation', 'true');
-      }, 1500); // Small delay for better UX
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [isLoadingAuth, session]);
