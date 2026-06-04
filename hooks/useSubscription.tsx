@@ -14,6 +14,7 @@ interface ActivePlan {
 
 interface SubscriptionContextType {
   isPro: boolean;
+  trialActive: boolean;
   loading: boolean;
   packages: any[];
   activeEntitlements: any[];
@@ -58,11 +59,24 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // SOURCE OF TRUTH: PRO if user is logged in AND there is an active entitlement
-  // Note: We remove the 'willRenew' check because users should remain Pro until the expiration date even if they cancel.
+  // 3-day trial logic: Pro status for first 3 days after account creation
+  const trialActive = useMemo(() => {
+    if (!user?.createdAt) return false;
+    try {
+      const createdDate = new Date(user.createdAt);
+      const now = new Date();
+      const diffTime = now.getTime() - createdDate.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      return diffDays >= 0 && diffDays <= 3;
+    } catch (e) {
+      return false;
+    }
+  }, [user?.createdAt]);
+
+  // SOURCE OF TRUTH: PRO if user is logged in AND (active entitlement OR trial active)
   const isPro = useMemo(() => {
-    return !!user?.id && activeEntitlements.length > 0;
-  }, [activeEntitlements, user?.id]);
+    return !!user?.id && (activeEntitlements.length > 0 || trialActive);
+  }, [activeEntitlements, user?.id, trialActive]);
 
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
@@ -288,6 +302,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   return (
     <SubscriptionContext.Provider value={{ 
       isPro, 
+      trialActive,
       loading, 
       packages, 
       activeEntitlements, 

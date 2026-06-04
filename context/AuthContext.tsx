@@ -11,6 +11,7 @@ export type AuthUser = {
   name?: string;
   email?: string;
   image?: string;
+  createdAt?: string;
   loggedIn: boolean;
 };
 
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log(`[AUTH] Fetching profile from database: ${userId}`);
       const { data, error } = await supabase
         .from('users')
-        .select('full_name')
+        .select('full_name, created_at')
         .eq('id', userId)
         .single();
         
@@ -49,7 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {};
       }
       
-      return { name: data.full_name };
+      return { 
+        name: data.full_name,
+        createdAt: data.created_at
+      };
     } catch (err) {
       console.error('[AUTH] Profile fetch exception:', err);
       return {};
@@ -77,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: session.user.email,
           name: profile.name || session.user.user_metadata.full_name,
           image: session.user.user_metadata.avatar_url,
+          createdAt: profile.createdAt || session.user.created_at,
           loggedIn: true
         };
         setUser(currentUser);
@@ -125,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: authData.user.email,
               name: profile.name || authData.user.user_metadata.full_name || "User",
               image: authData.user.user_metadata.avatar_url,
+              createdAt: profile.createdAt || authData.user.created_at,
               loggedIn: true,
             };
             

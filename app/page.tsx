@@ -43,7 +43,7 @@ function HomeContent() {
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
   const { user: session, loading: isLoadingAuth, logout } = useAuth();
-  const { isPro, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
+  const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
 
@@ -437,10 +437,22 @@ function HomeContent() {
                     <div className="flex items-center">
                       <Zap className="w-3.5 h-3.5 fill-amber-600 text-amber-600 mr-1" />
                       <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
-                        PRO
+                        {trialActive ? "TRIAL" : "PRO"}
                       </span>
                     </div>
-                    {currentPlan?.endDate && (
+                    {trialActive && session.createdAt && (
+                      <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
+                        <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
+                          Ends: {(() => {
+                            const created = new Date(session.createdAt);
+                            const end = new Date(created.getTime() + 3 * 24 * 60 * 60 * 1000);
+                            const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                            return end.toLocaleDateString('en-GB', options);
+                          })()}
+                        </span>
+                      </div>
+                    )}
+                    {!trialActive && currentPlan?.endDate && (
                       <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
                         <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
                           Expires: {(() => {
@@ -776,14 +788,29 @@ function HomeContent() {
                         <div className="space-y-4">
                           {isPro ? (
                             <div className="space-y-4">
-                              {currentPlan?.endDate && (
-                                <div className="px-4 py-1.5 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
-                                  {(() => {
+                              <div className="px-4 py-1.5 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
+                                {trialActive ? (
+                                  "Pro (Trial for 3 days)"
+                                ) : currentPlan?.endDate ? (
+                                  (() => {
                                     const end = new Date(currentPlan.endDate);
                                     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
                                     return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
+                                  })()
+                                ) : (
+                                  "Active Subscription"
+                                )}
+                              </div>
+                              
+                              {trialActive && session?.createdAt && (
+                                <p className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest animate-pulse">
+                                  Trial Ends: {(() => {
+                                    const created = new Date(session.createdAt);
+                                    const end = new Date(created.getTime() + 3 * 24 * 60 * 60 * 1000);
+                                    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                    return end.toLocaleDateString('en-GB', options);
                                   })()}
-                                </div>
+                                </p>
                               )}
                               
                               <button 
@@ -791,7 +818,7 @@ function HomeContent() {
                                 className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
                               >
                                 <Settings2 className="h-3.5 w-3.5" />
-                                Cancel Subscription
+                                {trialActive ? "Choose a Plan to Stay Pro" : "Cancel Subscription"}
                               </button>
                             </div>
                           ) : (
