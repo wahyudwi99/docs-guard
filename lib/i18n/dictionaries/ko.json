@@ -35,6 +35,8 @@
     "browse": "라이브러리 찾아보기",
     "take_photo": "사진 찍기",
     "camera": "카메라",
+    "crop_title": "가장자리 조정",
+    "crop_hint": "모서리를 드래그하여 문서를 자릅니다",
     "pdf": "PDF",
     "image": "이미지"
   },
@@ -50,6 +52,7 @@
     "watermark_mode": "워터마크",
     "text_mode": "텍스트",
     "image_mode": "이미지",
+    "blur_mode": "블러",
     "tiled": "바둑판",
     "single": "단일",
     "content_label": "워터마크 내용",
@@ -60,6 +63,10 @@
     "upload_image": "이미지 업로드",
     "select_image_hint": "PNG/JPG 선택",
     "image_scale": "이미지 비율",
+    "blur_instruction": "문서 미리보기 위에서 드래그하여 블러 처리할 영역을 선택하세요.",
+    "blur_strength": "블러 강도",
+    "blur_areas": "블러 영역",
+    "no_blur_areas": "선택된 블러 영역이 없습니다.",
     "orientation": "방향",
     "horizontal": "가로",
     "diagonal": "대각선",
@@ -67,8 +74,8 @@
     "visibility": "투명도",
     "subtle": "희미하게",
     "visible": "선명하게",
-    "pdf_security": "PDF 보안",
-    "password_placeholder": "PDF 열기 암호 설정...",
+    "pdf_password": "PDF 비밀번호",
+    "password_placeholder": "PDF 열기 비밀번호 설정...",
     "metadata_stripper": {
       "title": "메타데이터 제거기",
       "description": "파일에서 제거할 메타데이터를 선택하세요",
@@ -82,17 +89,18 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "프라이버시의 모든 기능 잠금 해제",
+    "days_left": "{days}일 남음",
+    "renew_button": "구독 갱신",
+    "login_required_title": "로그인 필요",
+    "login_required_desc": "Pro 기능을 사용하려면 로그인 후 구독해 주세요.",
+    "login_with_google": "Google로 로그인",
     "features": [
-      "무제한 일괄 처리",
-      "무제한 블러 영역",
-      "커스텀 이미지 워터마크",
-      "프리미엄 폰트 컬렉션",
-      "우선 로컬 처리",
-      "광고 제거 (출시 예정)"
+      "무제한 PDF 워터마크 (3페이지 제한 없음)",
+      "무제한 비디오 워터마크 (100% 원본 품질)",
+      "PDF 잠금 및 암호화 (비밀번호 보안)",
+      "정보 마스킹 (민감한 영역 스마트 블러)",
+      "100% 광고 제거 및 빠른 처리"
     ],
-    "subscribe_now": "지금 구독",
-    "restore": "구매 복원",
-    "active": "프로 구독 활성화됨",
     "plans": {
       "weekly": {
         "title": "주간",
@@ -109,11 +117,22 @@
         "price": "₩39,000",
         "period": "/ 년"
       }
-    }
+    },
+    "subscribe_now": "지금 구독",
+    "restore": "구매 복원",
+    "active": "프로 구독 활성화됨",
+    "paywall_feature_unlimited_pdf": "무제한 PDF 워터마크",
+    "paywall_feature_unlimited_video": "무제한 비디오 워터마크",
+    "paywall_feature_encryption": "PDF 잠금 및 암호화",
+    "paywall_feature_smart_blur": "스마트 블러",
+    "paywall_feature_ad_free": "100% 광고 없는 환경",
+    "paywall_subtitle": "모든 프리미엄 기능을 잠금 해제하고 프로처럼 문서를 보호하세요.",
+    "paywall_restore": "구매 복원"
   },
   "info_card": {
     "how_it_works": "작동 원리",
     "description": "DocsGuard는 브라우저 기반 캔버스 렌더링을 사용하여 워터마크를 적용합니다. 즉, 데이터가 컴퓨터를 떠나지 않아 100% 프라이버시를 보장합니다.",
+    "privacy_notice": "문서는 서버를 사용하지 않고 기기에서 로컬로 처리됩니다. 당사는 귀하의 데이터를 저장하거나 액세스하지 않습니다. 귀하의 개인 정보 보호는 전적으로 귀하의 손에 달려 있습니다.",
     "learn_more": "더 알아보기"
   },
   "preview_modal": {
@@ -124,9 +143,18 @@
     "edit_again": "다시 편집",
     "download_pdf": "PDF 다운로드",
     "download_png": "PNG 다운로드",
+    "share": "공유",
+    "sharing": "공유 중...",
     "saving": "저장 중...",
     "final_verification": "최종 확인",
-    "download_note": "첫 페이지만 샘플로 미리 봅니다. 모든 페이지에 적용하려면 다운로드하세요."
+    "download_note": "첫 페이지만 샘플로 미리 봅니다. 모든 페이지에 적용하려면 다운로드하세요.",
+    "ad_title": "다운로드 잠금 해제",
+    "ad_description": "짧은 광고를 시청하고 무료로 다운로드하거나, 프로로 업그레이드하여 즉시 액세스하세요.",
+    "watch_ad": "광고 시청 후 다운로드",
+    "go_pro_cta": "Pro 액세스 권한 얻기",
+    "success_title": "다운로드 성공!",
+    "success_description": "문서가 기기에 저장되었습니다.",
+    "close": "닫기"
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Exponential Labs",
@@ -166,6 +194,40 @@
     "contact_title": "문의",
     "contact_description": "저희의 '완전 기억상실' 정책에 대해 질문이 있는 경우 보안 팀에 문의할 수 있습니다. 저희는 최고의 온디바이스 프라이버시 표준을 유지하기 위해 최선을 다하고 있습니다.",
     "back_button": "뒤로",
-    "last_updated": "최근 업데이트: {date}"
+    "last_updated": "최근 업데이트: {date}",
+    "premium_title": "프리미엄 혜택",
+    "benefits_details": [
+      {
+        "title": "무제한 문서 보호",
+        "description": "수백 페이지의 PDF에 워터마크를 수초 만에 동시에 추가하세요. 3페이지 제한에서 벗어나 무거운 업무를 즉시 처리할 수 있습니다.",
+        "icon": "zap"
+      },
+      {
+        "title": "무제한 비디오 워터마크 (원본 품질)",
+        "description": "비디오를 시간 제한에서 해방시키세요. 100% 원본 품질을 보장하며 긴 비디오에 워터마크를 넣을 수 있습니다. 해상도 손실이나 압축이 전혀 없습니다.",
+        "icon": "video"
+      },
+      {
+        "title": "고급 PDF 암호화 (PDF Vault)",
+        "description": "보안 로컬 암호화로 민감한 문서를 잠그세요. 계약서, 재무 보고서 및 개인 데이터를 승인된 사람만 액세스할 수 있도록 보장합니다.",
+        "icon": "lock"
+      },
+      {
+        "title": "스마트 블러",
+        "description": "기밀 정보를 숨기세요! 공유하기 전에 문서나 이미지의 특정 영역(은행 계좌나 ID 번호 등)을 영구적으로 블러 처리합니다.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "우선 처리 및 광고 제거",
+        "description": "깨끗하고 집중된 인터페이스를 즐기세요. 성가신 광고가 전혀 없는 더 빠른 온디바이스 처리를 경험해 보세요.",
+        "icon": "shield-check"
+      }
+    ]
+  },
+  "errors": {
+    "unsupported_file": "지원되지 않는 형식: {type}",
+    "failed_to_load": "로드 실패",
+    "page_limit_exceeded": "무료 버전 제한: 최대 3페이지",
+    "page_limit_description": "이 문서는 {count}페이지입니다. 3페이지 이상의 문서를 처리하려면 Pro로 업그레이드하세요."
   }
 }

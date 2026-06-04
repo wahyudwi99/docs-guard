@@ -35,6 +35,8 @@
     "browse": "ライブラリをブラウズ",
     "take_photo": "写真を撮る",
     "camera": "カメラ",
+    "crop_title": "エッジを調整",
+    "crop_hint": "コーナーをドラッグしてドキュメントを切り抜きます",
     "pdf": "PDF",
     "image": "画像"
   },
@@ -50,6 +52,7 @@
     "watermark_mode": "透かし",
     "text_mode": "テキスト",
     "image_mode": "画像",
+    "blur_mode": "ぼかし",
     "tiled": "タイル",
     "single": "シングル",
     "content_label": "ウォーターマークの内容",
@@ -60,6 +63,10 @@
     "upload_image": "画像をアップロード",
     "select_image_hint": "PNG/JPGを選択",
     "image_scale": "画像のスケール",
+    "blur_instruction": "ドキュメントのプレビュー上でドラッグして、ぼかすエリアを選択します。",
+    "blur_strength": "ぼかしの強さ",
+    "blur_areas": "ぼかしエリア",
+    "no_blur_areas": "ぼかしエリアがまだ選択されていません。",
     "orientation": "方向",
     "horizontal": "水平",
     "diagonal": "対角線",
@@ -67,7 +74,7 @@
     "visibility": "透明度",
     "subtle": "控えめ",
     "visible": "はっきり",
-    "pdf_security": "PDFセキュリティ",
+    "pdf_password": "PDFパスワード",
     "password_placeholder": "PDF閲覧パスワードを設定...",
     "metadata_stripper": {
       "title": "メタデータ削除ツール",
@@ -82,17 +89,18 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "プライバシーの全機能を解放",
+    "days_left": "残り {days} 日",
+    "renew_button": "サブスクリプションを更新",
+    "login_required_title": "ログインが必要",
+    "login_required_desc": "Pro機能でドキュメントを保護するには、ログインして購読してください。",
+    "login_with_google": "Googleでログイン",
     "features": [
-      "無制限の一括処理",
-      "無制限のぼかし領域",
-      "カスタム画像の透かし",
-      "プレミアムフォントコレクション",
-      "優先ローカル処理",
-      "広告なし（近日公開）"
+      "無制限のPDF透かし（3ページ制限なし）",
+      "無制限のビデオ透かし（100%オリジナル品質）",
+      "PDFロックと暗号化（パスワードで安全に）",
+      "情報マスキング（機密エリアのスマートぼかし）",
+      "100%広告なし＆高速処理"
     ],
-    "subscribe_now": "今すぐ購読",
-    "restore": "購入を復元",
-    "active": "プロサブスクリプション有効",
     "plans": {
       "weekly": {
         "title": "週間",
@@ -109,24 +117,44 @@
         "price": "¥4,500",
         "period": "/ 年"
       }
-    }
+    },
+    "subscribe_now": "今すぐ購読",
+    "restore": "購入を復元",
+    "active": "プロサブスクリプション有効",
+    "paywall_feature_unlimited_pdf": "無制限のPDF透かし",
+    "paywall_feature_unlimited_video": "無制限のビデオ透かし",
+    "paywall_feature_encryption": "PDFロックと暗号化",
+    "paywall_feature_smart_blur": "スマートぼかし",
+    "paywall_feature_ad_free": "100%広告なしの体験",
+    "paywall_subtitle": "すべてのプレミアム機能を解放し、プロのようにドキュメントを保護します。",
+    "paywall_restore": "購入を復元"
   },
   "info_card": {
     "how_it_works": "仕組み",
     "description": "DocsGuardはブラウザベースのキャンバスレンダリングを使用して透かしを適用します。これにより、データがコンピュータから離れることがなく、100%のプライバシーが保証されます。",
+    "privacy_notice": "ドキュメントはサーバーを使用せずにデバイス上でローカルに処理されます。お客様のデータを保存したりアクセスしたりすることはありません。プライバシーは完全にお客様の手に委ねられています。",
     "learn_more": "詳細はこちら"
   },
   "preview_modal": {
-    "ready_title": "準備完了",
+    "ready_title": "保護の準備完了",
     "preview_note": "プレビュー（最初のページのみ）",
     "sample_page": "サンプルページ",
     "all_pages_note": "ダウンロード時に全{numPages}ページに透かしが適用されます",
     "edit_again": "再度編集",
     "download_pdf": "PDFをダウンロード",
     "download_png": "PNGをダウンロード",
+    "share": "共有",
+    "sharing": "共有中...",
     "saving": "保存中...",
     "final_verification": "最終確認",
-    "download_note": "サンプルとして最初のページをプレビューしています。ダウンロードして全ページに適用します。"
+    "download_note": "サンプルとして最初のページをプレビューしています。ダウンロードして全ページに適用します。",
+    "ad_title": "ダウンロードを解除",
+    "ad_description": "短いビデオを見て無料で透かし入りドキュメントをダウンロードするか、Proにアップグレードして即座にアクセスしてください。",
+    "watch_ad": "広告を見てダウンロード",
+    "go_pro_cta": "Proアクセスを取得",
+    "success_title": "ダウンロード成功！",
+    "success_description": "ドキュメントがデバイスに保存されました。",
+    "close": "閉じる"
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Exponential Labs",
@@ -166,10 +194,40 @@
     "contact_title": "お問い合わせ",
     "contact_description": "「完全アムネシア」ポリシーについてご質問がある場合は、セキュリティチームまでお問い合わせください。私たちは、デバイス上のプライバシーにおいて最高水準を維持することをお約束します。",
     "back_button": "戻る",
-    "last_updated": "最終更新日: {date}"
+    "last_updated": "最終更新日: {date}",
+    "premium_title": "プレミアム特典",
+    "benefits_details": [
+      {
+        "title": "無制限のドキュメント保護",
+        "description": "数百ページのPDFに透かしを数秒で同時追加。3ページの制限から解放され、重いタスクを即座に処理できます。",
+        "icon": "zap"
+      },
+      {
+        "title": "無制限のビデオ透かし（オリジナル品質）",
+        "description": "ビデオを時間制限から解放。100%オリジナル品質を保証して長いビデオに透かしを入れられます。解像度の低下や圧縮はありません。",
+        "icon": "video"
+      },
+      {
+        "title": "高度なPDF暗号化（PDF Vault）",
+        "description": "安全なローカル暗号化で機密ドキュメントをロック。契約書、財務報告書、個人データへのアクセスを許可された人だけに限定できます。",
+        "icon": "lock"
+      },
+      {
+        "title": "スマートぼかし",
+        "description": "機密情報を隠す！共有前に、ドキュメントや画像上の特定のエリア（銀行口座やID番号など）を恒久的にぼかします。",
+        "icon": "eye-off"
+      },
+      {
+        "title": "優先処理＆広告なし",
+        "description": "クリーンで集中できるインターフェース。煩わしい広告が一切ない、より高速なデバイス上での処理を体験してください。",
+        "icon": "shield-check"
+      }
+    ]
   },
   "errors": {
-    "unsupported_file": "サポートされていないファイル形式: {type}",
-    "failed_to_load": "ドキュメントの読み込みに失敗しました"
+    "unsupported_file": "サポートされていない形式: {type}",
+    "failed_to_load": "読み込みに失敗しました",
+    "page_limit_exceeded": "無料版の制限: 最大3ページ",
+    "page_limit_description": "このドキュメントは{count}ページあります。3ページ以上のドキュメントを処理するにはProプランにアップグレードしてください。"
   }
 }

@@ -35,6 +35,8 @@
     "browse": "Explorar Biblioteca",
     "take_photo": "Tomar Foto",
     "camera": "CÁMARA",
+    "crop_title": "Ajustar Bordes",
+    "crop_hint": "Arrastre las esquinas para recortar el documento",
     "pdf": "PDF",
     "image": "IMAGEN"
   },
@@ -72,10 +74,10 @@
     "visibility": "Visibilidad",
     "subtle": "Sutil",
     "visible": "Visible",
-    "pdf_security": "Seguridad de PDF",
+    "pdf_password": "Contraseña de PDF",
     "password_placeholder": "Establecer contraseña para abrir PDF...",
     "metadata_stripper": {
-      "title": "Eliminador de metadatos",
+      "title": "Eliminador de Metadatos",
       "description": "Seleccione los metadatos que desea eliminar del archivo",
       "strip_author": "Eliminar autor / propietario",
       "strip_creation_date": "Eliminar fecha de creación",
@@ -87,63 +89,84 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "Desbloquee todo el poder de la privacidad",
+    "days_left": "{days} días restantes",
+    "renew_button": "Renovar suscripción",
+    "login_required_title": "Inicio de sesión requerido",
+    "login_required_desc": "Inicie sesión para suscribirse y proteger sus documentos con funciones Pro.",
+    "login_with_google": "Iniciar sesión con Google",
     "features": [
-      "Procesamiento por Lotes Ilimitado",
-      "Áreas de desenfoque ilimitadas",
-      "Marcas de Agua de Imagen Personalizadas",
-      "Colección de Fuentes Premium",
-      "Procesamiento Local Prioritario",
-      "Sin Anuncios (Próximamente)"
+      "Marcas de agua PDF ilimitadas (sin límite de 3 páginas)",
+      "Marcas de agua de video ilimitadas (calidad 100% original)",
+      "Bloqueo y cifrado de PDF (seguro con contraseña)",
+      "Enmascaramiento de información (desenfoque inteligente)",
+      "100% libre de anuncios y procesamiento más rápido"
     ],
-    "subscribe_now": "Suscribirse Ahora",
-    "restore": "Restaurar Compras",
-    "active": "Suscripción Pro Activa",
     "plans": {
       "weekly": {
         "title": "Semanal",
         "price": "2,99 €",
-        "period": "/ Semana"
+        "period": "/ semana"
       },
       "monthly": {
         "title": "Mensual",
         "price": "6,99 €",
-        "period": "/ Mes"
+        "period": "/ mes"
       },
       "yearly": {
         "title": "Anual",
         "price": "29,99 €",
-        "period": "/ Año"
+        "period": "/ año"
       }
-    }
+    },
+    "subscribe_now": "Suscribirse ahora",
+    "restore": "Restaurar compras",
+    "active": "Suscripción Pro activa",
+    "paywall_feature_unlimited_pdf": "Marcas de agua PDF ilimitadas",
+    "paywall_feature_unlimited_video": "Marcas de agua de video ilimitadas",
+    "paywall_feature_encryption": "Bloqueo y cifrado de PDF",
+    "paywall_feature_smart_blur": "Desenfoque inteligente",
+    "paywall_feature_ad_free": "Experiencia 100% sin anuncios",
+    "paywall_subtitle": "Desbloquee todas las funciones premium y proteja sus documentos como un profesional.",
+    "paywall_restore": "Restaurar compras"
   },
   "info_card": {
     "how_it_works": "Cómo funciona",
     "description": "DocsGuard utiliza el renderizado en el navegador para aplicar marcas de agua. Esto significa que sus datos nunca salen de su ordenador, garantizando una privacidad del 100%.",
-    "learn_more": "Saber Más"
+    "privacy_notice": "Sus documentos se procesan localmente en su dispositivo sin el uso de servidores. No almacenamos ni accedemos a sus datos. Su privacidad está totalmente en sus manos.",
+    "learn_more": "Saber más"
   },
   "preview_modal": {
-    "ready_title": "Listo para Asegurar",
-    "preview_note": "Vista Previa (Solo Primera Página)",
-    "sample_page": "Página de Ejemplo",
+    "ready_title": "Listo para asegurar",
+    "preview_note": "Vista previa (solo primera página)",
+    "sample_page": "Página de ejemplo",
     "all_pages_note": "La marca de agua se aplicará a todas las {numPages} páginas al descargar",
-    "edit_again": "Editar de Nuevo",
+    "edit_again": "Editar de nuevo",
     "download_pdf": "Descargar PDF",
     "download_png": "Descargar PNG",
+    "share": "Compartir",
+    "sharing": "Compartiendo...",
     "saving": "Guardando...",
-    "final_verification": "Verificación Final",
-    "download_note": "Vista previa de la primera página como ejemplo. Descargar para aplicar a todas las páginas."
+    "final_verification": "Verificación final",
+    "download_note": "Vista previa de la primera página como ejemplo. Descargar para aplicar a todas las páginas.",
+    "ad_title": "Desbloquear descarga",
+    "ad_description": "Vea un video corto para descargar su documento con marca de agua de forma gratuita, o actualice a Pro para acceso instantáneo.",
+    "watch_ad": "Ver anuncio y descargar",
+    "go_pro_cta": "Obtener acceso Pro",
+    "success_title": "¡Descarga exitosa!",
+    "success_description": "Su documento ha sido guardado en su dispositivo.",
+    "close": "Cerrar"
   },
   "footer": {
-    "copyright": "© {year} Built with Privacy by Exponential Labs",
-    "security_protocol": "Protocolo de Seguridad",
+    "copyright": "© {year} Creado con privacidad por Exponential Labs",
+    "security_protocol": "Protocolo de seguridad",
     "local_first": "Local Primero"
   },
   "privacy": {
-    "title": "Política de Privacidad Amnesia Total",
-    "hero_title": "Amnesia Total",
+    "title": "Política de privacidad de amnesia total",
+    "hero_title": "Amnesia total",
     "hero_subtitle": "Diseñamos DocsGuard para que sea la herramienta de documentos más privada del mundo. Literalmente no podemos ver sus archivos.",
     "amnesia": {
-      "title": "Amnesia Total",
+      "title": "Amnesia total",
       "description": "Tan pronto como cierra la aplicación o finaliza una sesión, todos los rastros de sus documentos se borran de la memoria. No guardamos historial, registros ni caché de su contenido privado."
     },
     "on_device": {
@@ -151,14 +174,14 @@
       "description": "Sus archivos nunca salen de su teléfono. Todo el marcado de agua, el desenfoque y el cifrado ocurren localmente utilizando el hardware de su dispositivo."
     },
     "zero_cloud": {
-      "title": "Cero Nube",
+      "title": "Cero nube",
       "description": "No tenemos servidores para almacenar documentos. No hay un botón de 'subir' a nuestra nube porque no hay nube. Sus datos le pertenecen a usted."
     },
     "zero_selling": {
-      "title": "Cero Venta",
+      "title": "Cero venta",
       "description": "Como no recopilamos sus datos, no tenemos nada que vender. Nuestro modelo de negocio se basa en suscripciones, no en su información personal."
     },
-    "commitment_title": "Nuestro Compromiso",
+    "commitment_title": "Nuestro compromiso",
     "commitment_description": "En DocsGuard, creemos que la privacidad es un derecho humano fundamental. Las herramientas de documentos 'gratuitas' tradicionales a menudo procesan sus archivos en sus servidores, entrenando potencialmente modelos de IA o creando perfiles. Nosotros tomamos el enfoque opuesto.",
     "features": [
       "Sin seguimiento del contenido de los archivos",
@@ -166,11 +189,45 @@
       "Sin análisis de terceros en sus archivos privados",
       "Procesamiento abierto y transparente"
     ],
-    "technical_title": "Seguridad Técnica",
+    "technical_title": "Seguridad técnica",
     "technical_description": "Cuando aplica una marca de agua o desenfoca un área, utilizamos la API Canvas del navegador o las API móviles nativas. El archivo resultante se genera en memoria y se ofrece para descargar. Una vez que se cierra la ventana o la aplicación, el sistema operativo libera esa memoria.",
     "contact_title": "Contacto",
-    "contact_description": "Si tiene preguntas sobre nuestra política 'Amnesia Total', puede comunicarse con nuestro equipo de seguridad. Estamos comprometidos a mantener los más altos estándares de privacidad en el dispositivo.",
+    "contact_description": "Si tiene preguntas sobre nuestra política de amnesia total, puede comunicarse con nuestro equipo de seguridad. Estamos comprometidos a mantener los más altos estándares de privacidad en el dispositivo.",
     "back_button": "Atrás",
-    "last_updated": "Última actualización: {date}"
+    "last_updated": "Última actualización: {date}",
+    "premium_title": "Beneficios Premium",
+    "benefits_details": [
+      {
+        "title": "Protección de documentos ilimitada",
+        "description": "Agregue marcas de agua a cientos de páginas PDF simultáneamente en segundos. Libérese del límite de 3 páginas y complete sus tareas pesadas al instante.",
+        "icon": "zap"
+      },
+      {
+        "title": "Marcas de agua de video ilimitadas (calidad original)",
+        "description": "Libere sus videos de los límites de duración. Ponga marcas de agua en videos largos con una garantía de calidad de exportación 100% original. Cero pérdida de resolución, cero compresión.",
+        "icon": "video"
+      },
+      {
+        "title": "Cifrado PDF avanzado (Bóveda PDF)",
+        "description": "Bloquee sus documentos confidenciales con un cifrado local seguro. Asegúrese de que los contratos, informes financieros y datos personales solo puedan ser accedidos por quienes usted autorice.",
+        "icon": "lock"
+      },
+      {
+        "title": "Desenfoque inteligente",
+        "description": "¡Oculte información confidencial! Desenfoque permanentemente áreas específicas en documentos o imágenes (como cuentas bancarias o números de identificación) antes de compartirlos.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "Procesamiento prioritario y sin anuncios",
+        "description": "Disfrute de una interfaz limpia y enfocada. Experimente un procesamiento en el dispositivo más rápido y completamente libre de anuncios molestos.",
+        "icon": "shield-check"
+      }
+    ]
+  },
+  "errors": {
+    "unsupported_file": "Tipo de archivo no compatible: {type}",
+    "failed_to_load": "Error al cargar el documento",
+    "page_limit_exceeded": "Límite del nivel gratuito: Máximo 3 páginas",
+    "page_limit_description": "Este documento tiene {count} páginas. Actualice al plan Pro para poner marcas de agua en documentos con más de 3 páginas."
   }
 }

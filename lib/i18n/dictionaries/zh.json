@@ -28,13 +28,15 @@
   },
   "upload_section": {
     "select_doc": "选择一个文档开始。您的文件在本地处理，绝不会上传到任何服务器。",
-    "privacy_note": "您的文件在本地处理，绝不会上传到 any 服务器。",
+    "privacy_note": "您的文件在本地处理，绝不会上传到任何服务器。",
     "error_no_file": "请先选择一个文件",
     "import_title": "导入文档",
     "drag_drop": "拖放或 {browse}",
     "browse": "浏览库",
     "take_photo": "拍照",
     "camera": "相机",
+    "crop_title": "调整边缘",
+    "crop_hint": "拖动角落以裁剪文档",
     "pdf": "PDF",
     "image": "图像"
   },
@@ -50,6 +52,7 @@
     "watermark_mode": "水印",
     "text_mode": "文本",
     "image_mode": "图像",
+    "blur_mode": "模糊",
     "tiled": "平铺",
     "single": "单个",
     "content_label": "水印内容",
@@ -60,6 +63,10 @@
     "upload_image": "上传水印图像",
     "select_image_hint": "选择 PNG/JPG",
     "image_scale": "图像缩放",
+    "blur_instruction": "在文档预览上拖动以选择要模糊的区域。",
+    "blur_strength": "模糊强度",
+    "blur_areas": "模糊区域",
+    "no_blur_areas": "尚未选择模糊区域。",
     "orientation": "方向",
     "horizontal": "水平",
     "diagonal": "对角线",
@@ -67,7 +74,7 @@
     "visibility": "透明度",
     "subtle": "微弱",
     "visible": "可见",
-    "pdf_security": "PDF 安全",
+    "pdf_password": "PDF 密码",
     "password_placeholder": "设置 PDF 打开密码...",
     "metadata_stripper": {
       "title": "元数据清除器",
@@ -82,17 +89,18 @@
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
     "pro_subtitle": "解锁全部隐私功能",
+    "days_left": "剩余 {days} 天",
+    "renew_button": "续订订阅",
+    "login_required_title": "需要登录",
+    "login_required_desc": "请登录以订阅并使用 Pro 功能保护您的文档。",
+    "login_with_google": "使用 Google 登录",
     "features": [
-      "无限批量处理",
-      "无限模糊区域",
-      "自定义图像水印",
-      "高级字体集合",
-      "优先本地处理",
-      "无广告（即将推出）"
+      "无限 PDF 水印（无 3 页限制）",
+      "无限视频水印（100% 原创质量）",
+      "PDF 锁定与加密（密码保护）",
+      "信息遮蔽（敏感区域智能模糊）",
+      "100% 无广告且处理速度更快"
     ],
-    "subscribe_now": "立即订阅",
-    "restore": "恢复购买",
-    "active": "Pro 订阅已激活",
     "plans": {
       "weekly": {
         "title": "每周",
@@ -109,11 +117,22 @@
         "price": "¥198.00",
         "period": "/ 年"
       }
-    }
+    },
+    "subscribe_now": "立即订阅",
+    "restore": "恢复购买",
+    "active": "Pro 订阅已激活",
+    "paywall_feature_unlimited_pdf": "无限 PDF 水印",
+    "paywall_feature_unlimited_video": "无限视频水印",
+    "paywall_feature_encryption": "PDF 锁定与加密",
+    "paywall_feature_smart_blur": "智能模糊",
+    "paywall_feature_ad_free": "100% 无广告体验",
+    "paywall_subtitle": "解锁所有高级功能，像专业人士一样保护您的文档。",
+    "paywall_restore": "恢复购买"
   },
   "info_card": {
     "how_it_works": "工作原理",
     "description": "DocsGuard 使用基于浏览器的画布渲染来应用水印。这意味着您的数据永远不会离开您的计算机，确保 100% 的隐私。",
+    "privacy_notice": "您的文档在您的设备上本地处理，不使用服务器。我们不存储或访问您的数据。您的隐私完全掌握在您手中。",
     "learn_more": "了解更多"
   },
   "preview_modal": {
@@ -124,9 +143,18 @@
     "edit_again": "再次编辑",
     "download_pdf": "下载 PDF",
     "download_png": "下载 PNG",
+    "share": "分享",
+    "sharing": "分享中...",
     "saving": "保存中...",
     "final_verification": "最终确认",
-    "download_note": "预览第一页作为示例。下载以应用于所有页面。"
+    "download_note": "预览第一页作为示例。下载以应用于所有页面。",
+    "ad_title": "解锁下载",
+    "ad_description": "观看一段短视频以免费下载水印文档，或升级到 Pro 以获得即时访问。",
+    "watch_ad": "观看广告并下载",
+    "go_pro_cta": "获取专业版访问权限",
+    "success_title": "下载成功！",
+    "success_description": "您的文档已保存到设备中。",
+    "close": "关闭"
   },
   "footer": {
     "copyright": "© {year} Built with Privacy by Exponential Labs",
@@ -166,6 +194,40 @@
     "contact_title": "联系我们",
     "contact_description": "如果您对我们的“全面遗忘”政策有任何疑问，可以联系我们的安全团队。我们致力于保持最高标准的设备端隐私保护。",
     "back_button": "返回",
-    "last_updated": "最后更新：{date}"
+    "last_updated": "最后更新：{date}",
+    "premium_title": "专业版优势",
+    "benefits_details": [
+      {
+        "title": "无限文档保护",
+        "description": "在几秒钟内同时为数百页 PDF 添加水印。摆脱 3 页限制，立即处理繁重的工作任务。",
+        "icon": "zap"
+      },
+      {
+        "title": "无限视频水印（原始质量）",
+        "description": "让您的视频摆脱时长限制。为长视频添加水印，并保证 100% 原创导出质量。零分辨率损失，零压缩。",
+        "icon": "video"
+      },
+      {
+        "title": "高级 PDF 加密（PDF 保管库）",
+        "description": "使用安全本地加密锁定您的敏感文档。确保合同、财务报告和个人数据只能由您授权的人员访问。",
+        "icon": "lock"
+      },
+      {
+        "title": "智能模糊",
+        "description": "隐藏机密信息！在共享之前，永久模糊文档或图像上的特定区域（如银行账户或身份证号码）。",
+        "icon": "eye-off"
+      },
+      {
+        "title": "优先处理和无广告",
+        "description": "享受干净、专注的界面。体验更快的设备端处理，完全没有烦人的广告。",
+        "icon": "shield-check"
+      }
+    ]
+  },
+  "errors": {
+    "unsupported_file": "不支持的文件类型: {type}",
+    "failed_to_load": "加载文档失败",
+    "page_limit_exceeded": "免费层级限制：最多 3 页",
+    "page_limit_description": "此文档共有 {count} 页。请升级至专业版计划以为超过 3 页的文档添加水印。"
   }
 }

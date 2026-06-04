@@ -74,8 +74,8 @@
     "visibility": "Visibilitas",
     "subtle": "Halus",
     "visible": "Terlihat",
-    "pdf_password": "PDF Password",
-    "password_placeholder": "Atur Kata Sandi Buka PDF...",
+    "pdf_password": "Kata Sandi PDF",
+    "password_placeholder": "Atur kata sandi buka PDF...",
     "metadata_stripper": {
       "title": "Pembersih Metadata",
       "description": "Pilih metadata yang ingin dihapus dari file",
@@ -105,17 +105,17 @@
       "weekly": {
         "title": "Mingguan",
         "price": "Rp 45.000",
-        "period": "/ Minggu"
+        "period": "/ minggu"
       },
       "monthly": {
         "title": "Bulanan",
         "price": "Rp 109.000",
-        "period": "/ Bulan"
+        "period": "/ bulan"
       },
       "yearly": {
         "title": "Tahunan",
         "price": "Rp 469.000",
-        "period": "/ Tahun"
+        "period": "/ tahun"
       }
     },
     "subscribe_now": "Berlangganan Sekarang",
