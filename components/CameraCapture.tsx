@@ -163,16 +163,19 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
 
       let displayW, displayH, offsetX, offsetY;
 
+      // OBJECT-COVER calculation:
       if (imgRatio > containerRatio) {
-        displayW = containerW;
-        displayH = containerW / imgRatio;
-        offsetX = 0;
-        offsetY = (containerH - displayH) / 2;
-      } else {
+        // Image is wider than container
         displayH = containerH;
         displayW = containerH * imgRatio;
         offsetY = 0;
         offsetX = (containerW - displayW) / 2;
+      } else {
+        // Image is taller than container
+        displayW = containerW;
+        displayH = containerW / imgRatio;
+        offsetX = 0;
+        offsetY = (containerH - displayH) / 2;
       }
 
       // Percentage relative to container -> coordinate relative to image
@@ -248,29 +251,38 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose
       {/* Viewport - Full screen */}
       <div ref={containerRef} className="flex-1 relative bg-black flex items-center justify-center overflow-hidden touch-none">
         {capturedImage ? (
-          <div className="relative w-full h-full flex items-center justify-center">
-            <img src={capturedImage} alt="Captured" className="w-full h-full object-contain pointer-events-none opacity-60" />
+          <div className="relative w-full h-full">
+            {/* Use object-cover to match the video preview and remove black bars */}
+            <img 
+              src={capturedImage} 
+              alt="Captured" 
+              className="w-full h-full object-cover pointer-events-none opacity-80" 
+            />
             
             {isAdjusting && (
               <div 
-                className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.8)] z-30"
+                className="absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] z-30"
                 style={{ top: `${rect.top}%`, left: `${rect.left}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
               >
                 {(['tl', 'tr', 'bl', 'br'] as const).map(h => (
                   <div
                     key={h}
                     onMouseDown={(e) => { e.stopPropagation(); setActiveHandle(h); }}
-                    onTouchStart={(e) => { e.stopPropagation(); setActiveHandle(h); }}
+                    onTouchStart={(e) => { 
+                      e.preventDefault(); // Prevent scrolling/stuck on mobile
+                      e.stopPropagation(); 
+                      setActiveHandle(h); 
+                    }}
                     className={cn(
-                      "absolute h-16 w-16 flex items-center justify-center pointer-events-auto cursor-move",
-                      h === 'tl' && "-top-8 -left-8",
-                      h === 'tr' && "-top-8 -right-8",
-                      h === 'bl' && "-bottom-8 -left-8",
-                      h === 'br' && "-bottom-8 -right-8"
+                      "absolute h-20 w-20 flex items-center justify-center pointer-events-auto cursor-move",
+                      h === 'tl' && "-top-10 -left-10",
+                      h === 'tr' && "-top-10 -right-10",
+                      h === 'bl' && "-bottom-10 -left-10",
+                      h === 'br' && "-bottom-10 -right-10"
                     )}
                   >
                     <div className={cn(
-                      "h-6 w-6 rounded-full border-2 border-white shadow-2xl transition-transform",
+                      "h-8 w-8 rounded-full border-4 border-white shadow-2xl transition-transform",
                       activeHandle === h ? "scale-125 bg-white" : "bg-indigo-500"
                     )}></div>
                   </div>
