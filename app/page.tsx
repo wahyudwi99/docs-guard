@@ -49,11 +49,16 @@ function HomeContent() {
 
   // Auto-Login Invitation for non-logged-in users
   useEffect(() => {
-    // Only trigger if auth is finished loading and no session exists
-    if (!isLoadingAuth && !session) {
+    // Check if invitation was already shown in this session
+    const hasSeenInSession = sessionStorage.getItem('docsguard_session_invitation');
+    
+    // Only trigger if auth is finished loading, no session exists, and not shown in current session
+    if (!isLoadingAuth && !session && !hasSeenInSession) {
       // Increase delay to 3000ms to ensure splash screen is gone and home page is visible
       const timer = setTimeout(() => {
         setShowLoginModal(true);
+        // Mark as shown for THIS session only (cleared when app is closed/killed)
+        sessionStorage.setItem('docsguard_session_invitation', 'true');
       }, 3000); 
       return () => clearTimeout(timer);
     }
