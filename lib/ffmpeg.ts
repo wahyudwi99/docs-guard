@@ -49,6 +49,12 @@ export async function processVideoWithWatermark(
   // Write the file to FFmpeg's virtual filesystem
   await ffmpeg.writeFile(inputName, await fetchFile(videoFile));
 
+  // --- FONT HANDLING ---
+  // FFmpeg.wasm needs an explicit font file for drawtext to work
+  const fontUrl = 'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/Roboto-Bold.ttf';
+  const fontName = 'font.ttf';
+  await ffmpeg.writeFile(fontName, await fetchFile(fontUrl));
+
   const { color = 'white', opacity = 0.5, fontSize = 24, layout = 'tiled' } = options;
   
   // Convert hex color to FFmpeg format (e.g., 0xFFFFFF) and alpha
@@ -57,12 +63,12 @@ export async function processVideoWithWatermark(
   let filter = '';
   if (layout === 'single') {
     // Center single watermark
-    filter = `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=(w-text_w)/2:y=(h-text_h)/2:fix_bounds=true`;
+    filter = `drawtext=fontfile=${fontName}:text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=(w-text_w)/2:y=(h-text_h)/2:fix_bounds=true`;
   } else {
-    // Minimal tiled pattern for better performance on mobile
-    filter = `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.1:y=h*0.1,` +
-             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.5:y=h*0.5,` +
-             `drawtext=text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.8:y=h*0.8`;
+    // Minimal tiled pattern
+    filter = `drawtext=fontfile=${fontName}:text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.1:y=h*0.1,` +
+             `drawtext=fontfile=${fontName}:text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.5:y=h*0.5,` +
+             `drawtext=fontfile=${fontName}:text='${text}':fontcolor=${cleanColor}@${opacity}:fontsize=${fontSize}:x=w*0.8:y=h*0.8`;
   }
 
   // Execute FFmpeg command
