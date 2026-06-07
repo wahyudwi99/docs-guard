@@ -167,31 +167,102 @@ export function useFileExport({
       console.log(`[EXPORT] Done. Final size: ${Math.round(pdfBlob.size/1024)}KB`);
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
 
-    } else if (documentType === "video" && file) {
-      // --- UNIFIED CANVAS/MEDIARECORDER ENGINE FOR VIDEO (Web Viewer Approach) ---
-      try {
-        onProgress?.("Loading video processing engine...");
-        
-        // Dynamically import to keep main bundle small
-        const { processVideoWithCanvas } = await import("../lib/videoProcessor");
-        
-        const result = await processVideoWithCanvas(file, watermarkText, {
-          color: watermarkColor,
-          opacity: watermarkOpacity,
-          fontSize: fontSize,
-          layout: watermarkLayout as any
-        }, onProgress);
-
-        onProgress?.("COMPLETED");
-        await new Promise(r => setTimeout(r, 600));
-
-        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${result.ext}`;
-        return { blob: result.blob, fileName, contentType: result.mimeType };
-
-      } catch (err) {
-        console.error("[VIDEO] Export failed:", err);
+    } else if (documentType === "video") {
+      let video = videoRef?.current;
+      if (!video) video = document.querySelector('video');
+      
+      if (!video) {
+        console.error("Video element not found for export");
         return null;
       }
+
+      const canvas = canvases[0];
+      
+      // EXTREME 120 FPS: High-frequency capture stream
+      // @ts-ignore
+      const stream = canvas.captureStream(120);
+      
+      const isIOS = Capacitor.getPlatform() === 'ios';
+      // Standard mp4 for iOS compatibility
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
+      const fileExt = isIOS ? 'mp4' : 'webm';
+      
+      // OPTIMIZED BITRATE for 120 FPS: 25Mbps
+      // Lowering bitrate slightly helps the hardware encoder stay at high FPS
+      // without throttling due to heat or bandwidth limits.
+      const recorder = new MediaRecorder(stream, { 
+        mimeType,
+        videoBitsPerSecond: 25000000 
+      });
+      
+      const chunks: Blob[] = [];
+
+      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
+        let isRecording = true;
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) chunks.push(e.data);
+        };
+        
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: mimeType });
+          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
+          resolve({ blob, fileName, contentType: mimeType });
+        };
+
+        // Reset video to start
+        video!.pause();
+        video!.currentTime = 0;
+        video!.muted = true; 
+        
+        await new Promise(r => {
+          const onSeek = () => {
+            video!.removeEventListener('seeked', onSeek);
+            r(null);
+          };
+          video!.addEventListener('seeked', onSeek);
+        });
+
+        // Optimization: Disable image smoothing during heavy export to save CPU
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.imageSmoothingEnabled = false;
+        
+        // Start recording with tight flushing
+        recorder.start(100);
+
+        // AGGRESSIVE 120FPS DRAW LOOP during export
+        const exportLoop = async () => {
+          if (!isRecording) return;
+
+          // Manually force a redraw of the watermark on every frame possible
+          if (drawWatermark) {
+            await drawWatermark(true);
+          }
+          
+          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+            isRecording = false;
+            setTimeout(() => {
+              recorder.stop();
+              video!.pause();
+              video!.muted = false;
+              if (ctx) ctx.imageSmoothingEnabled = true; // Restore
+            }, 500);
+            return;
+          }
+
+          // Use requestAnimationFrame which hits 120Hz on ProMotion iPhones
+          requestAnimationFrame(exportLoop);
+        };
+        
+        try {
+          await video!.play();
+          exportLoop();
+        } catch (err) {
+          console.error("Video playback failed during export", err);
+          recorder.stop();
+          resolve(null);
+        }
+      });
     } else {
       // IMAGE EXPORT
       const canvas = canvases[0];
