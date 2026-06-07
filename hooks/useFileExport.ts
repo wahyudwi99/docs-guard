@@ -178,21 +178,19 @@ export function useFileExport({
 
       const canvas = canvases[0];
       
-      // EXTREME 120 FPS: High-frequency capture stream
+      // FORCED 60 FPS: High-frequency capture stream
       // @ts-ignore
-      const stream = canvas.captureStream(120);
+      const stream = canvas.captureStream(60);
       
       const isIOS = Capacitor.getPlatform() === 'ios';
       // Standard mp4 for iOS compatibility
       const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // OPTIMIZED BITRATE for 120 FPS: 25Mbps
-      // Lowering bitrate slightly helps the hardware encoder stay at high FPS
-      // without throttling due to heat or bandwidth limits.
+      // OPTIMIZED BITRATE for 60 FPS: 30Mbps
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 25000000 
+        videoBitsPerSecond: 30000000 
       });
       
       const chunks: Blob[] = [];
@@ -223,18 +221,14 @@ export function useFileExport({
           video!.addEventListener('seeked', onSeek);
         });
 
-        // Optimization: Disable image smoothing during heavy export to save CPU
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.imageSmoothingEnabled = false;
-        
-        // Start recording with tight flushing
-        recorder.start(100);
+        // Start recording
+        recorder.start();
 
-        // AGGRESSIVE 120FPS DRAW LOOP during export
+        // FORCED 60FPS DRAW LOOP
+        // Using both requestAnimationFrame and a fallback interval to ensure 60fps
         const exportLoop = async () => {
           if (!isRecording) return;
 
-          // Manually force a redraw of the watermark on every frame possible
           if (drawWatermark) {
             await drawWatermark(true);
           }
@@ -245,12 +239,10 @@ export function useFileExport({
               recorder.stop();
               video!.pause();
               video!.muted = false;
-              if (ctx) ctx.imageSmoothingEnabled = true; // Restore
             }, 500);
             return;
           }
 
-          // Use requestAnimationFrame which hits 120Hz on ProMotion iPhones
           requestAnimationFrame(exportLoop);
         };
         
