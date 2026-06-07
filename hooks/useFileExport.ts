@@ -168,31 +168,28 @@ export function useFileExport({
       return { blob: pdfBlob, fileName, contentType: "application/pdf" };
 
     } else if (documentType === "video" && file) {
-      // --- UNIFIED FFmpeg ENGINE FOR VIDEO (iOS, Android, Web) ---
+      // --- UNIFIED CANVAS/MEDIARECORDER ENGINE FOR VIDEO (Web Viewer Approach) ---
       try {
         onProgress?.("Loading video processing engine...");
         
-        // Dynamically import FFmpeg to keep main bundle small
-        const { processVideoWithWatermark } = await import("../lib/ffmpeg");
+        // Dynamically import to keep main bundle small
+        const { processVideoWithCanvas } = await import("../lib/videoProcessor");
         
-        onProgress?.("Applying watermark... This may take a moment.");
-        
-        const blob = await processVideoWithWatermark(file, watermarkText, {
+        const result = await processVideoWithCanvas(file, watermarkText, {
           color: watermarkColor,
           opacity: watermarkOpacity,
           fontSize: fontSize,
           layout: watermarkLayout as any
-        });
+        }, onProgress);
 
         onProgress?.("COMPLETED");
         await new Promise(r => setTimeout(r, 600));
 
-        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.mp4`;
-        return { blob, fileName, contentType: "video/mp4" };
+        const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${result.ext}`;
+        return { blob: result.blob, fileName, contentType: result.mimeType };
 
       } catch (err) {
         console.error("[VIDEO] Export failed:", err);
-        // Fallback or error notification could be added here
         return null;
       }
     } else {
