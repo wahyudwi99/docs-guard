@@ -45,8 +45,8 @@ export async function processVideoWithCanvas(
         }
       }
 
-      // Capture the canvas visual stream at 30 FPS
-      const canvasStream = canvas.captureStream(30);
+      // Capture the canvas visual stream at 60 FPS for ultra-smooth output
+      const canvasStream = canvas.captureStream(60);
       const tracks = [canvasStream.getVideoTracks()[0]];
       if (audioTrack) {
         tracks.push(audioTrack);
@@ -67,7 +67,10 @@ export async function processVideoWithCanvas(
         mimeType = "video/webm;codecs=vp8";
       }
       
-      const recorder = new MediaRecorder(combinedStream, { mimeType });
+      const recorder = new MediaRecorder(combinedStream, { 
+        mimeType,
+        videoBitsPerSecond: 30000000 // 30Mbps for 60FPS quality
+      });
       const chunks: Blob[] = [];
       
       recorder.ondataavailable = (e) => {

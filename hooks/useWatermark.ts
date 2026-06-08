@@ -131,7 +131,7 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
         canvas.height = video.videoHeight;
       }
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      // Optimization: No need for clearRect when drawing full-frame video
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       internalApplyWatermark(context, canvas.width, canvas.height);
       return;
@@ -192,18 +192,18 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
     const renderLoop = () => {
       if (!isRunning) return;
       drawWatermark(true);
-      // @ts-ignore
+      // @ts-expect-error - requestVideoFrameCallback is a newer Web API
       if (video?.requestVideoFrameCallback) {
-        // @ts-ignore
+        // @ts-expect-error
         video.requestVideoFrameCallback(renderLoop);
       } else {
         renderRequestRef.current = requestAnimationFrame(renderLoop);
       }
     };
 
-    // @ts-ignore
+    // @ts-expect-error
     if (video.requestVideoFrameCallback) {
-      // @ts-ignore
+      // @ts-expect-error
       video.requestVideoFrameCallback(renderLoop);
     } else {
       renderRequestRef.current = requestAnimationFrame(renderLoop);

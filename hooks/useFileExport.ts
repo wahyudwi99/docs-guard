@@ -176,21 +176,50 @@ export function useFileExport({
         return null;
       }
 
+      const isNative = Capacitor.isNativePlatform();
+      const isIOS = Capacitor.getPlatform() === 'ios';
+
+      // NATIVE PLUGIN OPTIMIZATION: If we are on a native platform, use the high-performance AVFoundation/MediaCodec plugin
+      if (isNative) {
+        onProgress?.("Processing video natively (Ultra-Fast)...");
+        try {
+          // We need the absolute path for the native plugin
+          const videoUri = Capacitor.convertFileSrc(URL.createObjectURL(file!));
+          const result = await VideoWatermark.addTextWatermark({
+            videoUri: videoUri, // Native plugin might need internal path, but we try URI first
+            text: watermarkText,
+            colorHex: watermarkColor,
+            fontSize: fontSize,
+            opacity: watermarkOpacity,
+            layout: watermarkLayout as any
+          });
+          
+          if (result && result.uri) {
+            const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${isIOS ? 'mp4' : 'webm'}`;
+            // Fetch the native file back as a blob for consistent return
+            const response = await fetch(Capacitor.convertFileSrc(result.uri));
+            const blob = await response.blob();
+            return { blob, fileName, contentType: isIOS ? 'video/mp4' : 'video/webm' };
+          }
+        } catch (err) {
+          console.error("Native video watermarking failed, falling back to Canvas method", err);
+        }
+      }
+
       const canvas = canvases[0];
       
       // FORCED 60 FPS: High-frequency capture stream
-      // @ts-ignore
+      // @ts-expect-error - captureStream is not in standard HTMLCanvasElement type
       const stream = canvas.captureStream(60);
       
-      const isIOS = Capacitor.getPlatform() === 'ios';
       // Standard mp4 for iOS compatibility
       const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = isIOS ? 'mp4' : 'webm';
       
-      // OPTIMIZED BITRATE for 60 FPS: 30Mbps
+      // BALANCED BITRATE for 60 FPS: 15Mbps (Prevents encoder lag while maintaining quality)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 30000000 
+        videoBitsPerSecond: 15000000 
       });
       
       const chunks: Blob[] = [];
@@ -225,26 +254,48 @@ export function useFileExport({
         recorder.start();
 
         // FORCED 60FPS DRAW LOOP
-        // Using both requestAnimationFrame and a fallback interval to ensure 60fps
+        // Using a high-precision hybrid loop to ensure 60fps output
+        const FRAME_TIME = 1000 / 60;
+        let lastDraw = performance.now();
+
         const exportLoop = async () => {
           if (!isRecording) return;
 
-          if (drawWatermark) {
-            await drawWatermark(true);
+          const now = performance.now();
+          if (now - lastDraw >= FRAME_TIME - 1) { // -1ms buffer for jitter
+            if (drawWatermark) {
+              await drawWatermark(true);
+            }
+            lastDraw = now;
           }
           
           if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
             isRecording = false;
+            // Add a small buffer to ensure the last frame is captured
             setTimeout(() => {
-              recorder.stop();
+              if (recorder.state !== "inactive") recorder.stop();
               video!.pause();
               video!.muted = false;
             }, 500);
             return;
           }
 
+          // Use requestAnimationFrame for visual sync, but fallback to setTimeout
+          // to maintain 60fps even if the tab is partially throttled.
           requestAnimationFrame(exportLoop);
         };
+        
+        // Start a secondary "heartbeat" interval to force frames if requestAnimationFrame slows down
+        const heartbeat = setInterval(() => {
+          if (!isRecording) {
+            clearInterval(heartbeat);
+            return;
+          }
+          const now = performance.now();
+          if (now - lastDraw > FRAME_TIME * 2) {
+             exportLoop(); // Force a frame if we're lagging
+          }
+        }, FRAME_TIME);
         
         try {
           await video!.play();
