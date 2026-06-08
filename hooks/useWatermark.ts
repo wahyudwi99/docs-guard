@@ -192,18 +192,15 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
     const renderLoop = () => {
       if (!isRunning) return;
       drawWatermark(true);
-      // @ts-expect-error - requestVideoFrameCallback is a newer Web API
+      // requestVideoFrameCallback is a newer Web API
       if (video?.requestVideoFrameCallback) {
-        // @ts-expect-error
         video.requestVideoFrameCallback(renderLoop);
       } else {
         renderRequestRef.current = requestAnimationFrame(renderLoop);
       }
     };
 
-    // @ts-expect-error
     if (video.requestVideoFrameCallback) {
-      // @ts-expect-error
       video.requestVideoFrameCallback(renderLoop);
     } else {
       renderRequestRef.current = requestAnimationFrame(renderLoop);

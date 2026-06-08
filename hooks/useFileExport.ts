@@ -209,7 +209,6 @@ export function useFileExport({
       const canvas = canvases[0];
       
       // FORCED 60 FPS: High-frequency capture stream
-      // @ts-expect-error - captureStream is not in standard HTMLCanvasElement type
       const stream = canvas.captureStream(60);
       
       // Standard mp4 for iOS compatibility
