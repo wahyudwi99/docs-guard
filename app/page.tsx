@@ -383,7 +383,7 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      {/* Hidden Video Source for Watermarking */}
+      {/* Hidden Video Source for Watermarking - Made larger to prevent browser throttling */}
       {documentType === 'video' && videoUrl && (
         <video
           ref={videoRef}
@@ -392,7 +392,7 @@ function HomeContent() {
           loop
           playsInline
           autoPlay
-          className="fixed -top-[1000px] -left-[1000px] w-10 h-10 opacity-0 pointer-events-none"
+          className="fixed top-0 left-0 w-[1280px] h-[720px] opacity-0 pointer-events-none -z-[5000]"
         />
       )}
 

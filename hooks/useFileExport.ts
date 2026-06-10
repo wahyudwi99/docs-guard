@@ -228,9 +228,11 @@ export function useFileExport({
 
       // HIGH-PERFORMANCE REAL-TIME EXPORT (60 FPS)
       const stream = canvas.captureStream(60); 
+      
+      // Balanced bitrate for 60 FPS: 18Mbps (High quality but easier on mobile encoders)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 30000000 
+        videoBitsPerSecond: 18000000 
       });
       
       const chunks: Blob[] = [];
@@ -267,18 +269,14 @@ export function useFileExport({
         const FRAME_TIME = 1000 / 60;
         let lastDraw = performance.now();
 
+        // Use requestVideoFrameCallback for frame-accurate rendering if available
         const exportLoop = async () => {
           if (!isRecording) return;
 
-          const now = performance.now();
-          const elapsed = now - lastDraw;
-
-          if (elapsed >= FRAME_TIME - 1) {
-            if (drawWatermark) {
-              await drawWatermark(true);
-            }
-            lastDraw = now - (elapsed % FRAME_TIME);
+          if (drawWatermark) {
+            await drawWatermark(true);
           }
+          lastDraw = performance.now();
           
           if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
             isRecording = false;
@@ -291,24 +289,32 @@ export function useFileExport({
             return;
           }
 
-          requestAnimationFrame(exportLoop);
+          if ((video as any).requestVideoFrameCallback) {
+            (video as any).requestVideoFrameCallback(exportLoop);
+          } else {
+            requestAnimationFrame(exportLoop);
+          }
         };
 
-        // Use a high-frequency interval to ensure we don't miss frames even if rAF jitter occurs
+        // Aggressive heartbeat to fill gaps and ensure 60 FPS even with jitter
         const heartbeat = setInterval(() => {
           if (!isRecording) {
             clearInterval(heartbeat);
             return;
           }
           const now = performance.now();
-          if (now - lastDraw >= FRAME_TIME * 1.5) {
+          if (now - lastDraw >= FRAME_TIME - 1) {
             exportLoop();
           }
-        }, 8); // 125 FPS check rate
+        }, 8);
 
         try {
           await video!.play();
-          exportLoop();
+          if ((video as any).requestVideoFrameCallback) {
+            (video as any).requestVideoFrameCallback(exportLoop);
+          } else {
+            exportLoop();
+          }
         } catch (err) {
           console.error("Video playback failed during export", err);
           recorder.stop();
