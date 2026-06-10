@@ -44,7 +44,10 @@ public class VideoWatermarkPlugin: CAPPlugin {
         let renderSize = CGSize(width: abs(videoSize.width), height: abs(videoSize.height))
         
         let outputURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("watermarked_\(UUID().uuidString).mp4")
-        
+        if FileManager.default.fileExists(atPath: outputURL.path) {
+            try? FileManager.default.removeItem(at: outputURL)
+        }
+
         let writer = try AVAssetWriter(outputURL: outputURL, fileType: .mp4)
         
         let videoSettings: [String: Any] = [
@@ -52,7 +55,7 @@ public class VideoWatermarkPlugin: CAPPlugin {
             AVVideoWidthKey: renderSize.width,
             AVVideoHeightKey: renderSize.height,
             AVVideoCompressionPropertiesKey: [
-                AVVideoAverageBitRateKey: 8_000_000,
+                AVVideoAverageBitRateKey: 6_000_000, // Balanced for 1080p60
                 AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
                 AVVideoExpectedSourceFrameRateKey: 60
             ]
@@ -65,21 +68,21 @@ public class VideoWatermarkPlugin: CAPPlugin {
         let pixelBufferAttributes: [String: Any] = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
             kCVPixelBufferWidthKey as String: renderSize.width,
-            kCVPixelBufferHeightKey as String: renderSize.height
+            kCVPixelBufferHeightKey as String: renderSize.height,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ]
         
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput, sourcePixelBufferAttributes: pixelBufferAttributes)
-        
         writer.add(writerInput)
         
-        // Audio handling
+        // Audio track setup
         var audioReader: AVAssetReader?
         var audioWriterInput: AVAssetWriterInput?
         if let audioTrack = try await asset.loadTracks(withMediaType: .audio).first {
-            let reader = try AVAssetReader(asset: asset)
-            let output = AVAssetReaderTrackOutput(track: audioTrack, outputSettings: nil)
-            reader.add(output)
-            audioReader = reader
+            let aReader = try AVAssetReader(asset: asset)
+            let aOutput = AVAssetReaderTrackOutput(track: audioTrack, outputSettings: nil)
+            aReader.add(aOutput)
+            audioReader = aReader
             
             audioWriterInput = AVAssetWriterInput(mediaType: .audio, outputSettings: nil)
             audioWriterInput?.expectsMediaDataInRealTime = false
@@ -96,43 +99,47 @@ public class VideoWatermarkPlugin: CAPPlugin {
         
         let textColor = self.hexToColor(colorHex).withAlphaComponent(opacity)
         let watermarkLayer = self.createWatermarkLayer(text: text, size: renderSize, color: textColor, fontSize: fontSize, layout: layout)
-        
+        let ciContext = CIContext(options: nil)
+
         return try await withCheckedThrowingContinuation { continuation in
             let group = DispatchGroup()
             
             group.enter()
-            writerInput.requestMediaDataWhenReady(on: DispatchQueue(label: "videoExport")) {
+            writerInput.requestMediaDataWhenReady(on: DispatchQueue(label: "videoExport", qos: .userInitiated)) {
                 while writerInput.isReadyForMoreMediaData {
-                    if let sampleBuffer = videoOutput.copyNextSampleBuffer() {
-                        let presentationTime = sampleBuffer.presentationTimeStamp
-                        guard let pixelBuffer = sampleBuffer.imageBuffer else { continue }
-                        
-                        CVPixelBufferLockBaseAddress(pixelBuffer, [])
-                        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-                        
-                        let context = CIContext()
-                        let renderer = UIGraphicsImageRenderer(size: renderSize)
-                        let watermarkedImage = renderer.image { _ in
-                            UIImage(ciImage: ciImage).draw(in: CGRect(origin: .zero, size: renderSize))
+                    autoreleasepool {
+                        if let sampleBuffer = videoOutput.copyNextSampleBuffer() {
+                            let presentationTime = sampleBuffer.presentationTimeStamp
+                            guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
                             
-                            // Draw watermark overlay
-                            let ctx = UIGraphicsGetCurrentContext()
-                            watermarkLayer.render(in: ctx!)
+                            var newPixelBuffer: CVPixelBuffer?
+                            let status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, adaptor.pixelBufferPool!, &newPixelBuffer)
+                            
+                            if status == kCVReturnSuccess, let nb = newPixelBuffer {
+                                let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+                                ciContext.render(ciImage, to: nb)
+                                
+                                CVPixelBufferLockBaseAddress(nb, [])
+                                if let context = CGContext(data: CVPixelBufferGetBaseAddress(nb),
+                                                         width: Int(renderSize.width),
+                                                         height: Int(renderSize.height),
+                                                         bitsPerComponent: 8,
+                                                         bytesPerRow: CVPixelBufferGetBytesPerRow(nb),
+                                                         space: CGColorSpaceCreateDeviceRGB(),
+                                                         bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue) {
+                                    
+                                    // Use Core Animation to render watermark on top of the frame
+                                    UIGraphicsPushContext(context)
+                                    watermarkLayer.render(in: context)
+                                    UIGraphicsPopContext()
+                                }
+                                adaptor.append(nb, withPresentationTime: presentationTime)
+                                CVPixelBufferUnlockBaseAddress(nb, [])
+                            }
+                        } else {
+                            writerInput.markAsFinished()
+                            group.leave()
                         }
-                        
-                        var newPixelBuffer: CVPixelBuffer?
-                        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &newPixelBuffer)
-                        
-                        if let nb = newPixelBuffer {
-                            self.drawUIImage(watermarkedImage, to: nb)
-                            adaptor.append(nb, withPresentationTime: presentationTime)
-                        }
-                        
-                        CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
-                    } else {
-                        writerInput.markAsFinished()
-                        group.leave()
-                        break
                     }
                 }
             }
@@ -140,7 +147,7 @@ public class VideoWatermarkPlugin: CAPPlugin {
             if let aReader = audioReader, let aWriterInput = audioWriterInput {
                 group.enter()
                 aReader.startReading()
-                aWriterInput.requestMediaDataWhenReady(on: DispatchQueue(label: "audioExport")) {
+                aWriterInput.requestMediaDataWhenReady(on: DispatchQueue(label: "audioExport", qos: .userInitiated)) {
                     while aWriterInput.isReadyForMoreMediaData {
                         if let output = aReader.outputs.first, let sampleBuffer = output.copyNextSampleBuffer() {
                             aWriterInput.append(sampleBuffer)
@@ -158,7 +165,7 @@ public class VideoWatermarkPlugin: CAPPlugin {
                     if writer.status == .completed {
                         continuation.resume(returning: outputURL)
                     } else {
-                        continuation.resume(throwing: writer.error ?? NSError(domain: "VideoWatermark", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unknown export error"]))
+                        continuation.resume(throwing: writer.error ?? NSError(domain: "VideoWatermark", code: 2, userInfo: [NSLocalizedDescriptionKey: "Export failed"]))
                     }
                 }
             }
@@ -168,8 +175,10 @@ public class VideoWatermarkPlugin: CAPPlugin {
     private func createWatermarkLayer(text: String, size: CGSize, color: UIColor, fontSize: CGFloat, layout: String) -> CALayer {
         let watermarkLayer = CALayer()
         watermarkLayer.frame = CGRect(origin: .zero, size: size)
-        watermarkLayer.contentsScale = UIScreen.main.scale
         
+        // Correcting Y-axis because Core Animation is bottom-left by default in some contexts
+        watermarkLayer.isGeometryFlipped = true 
+
         if layout == "tiled" {
             let cols = 4
             let rows = 8
@@ -182,11 +191,11 @@ public class VideoWatermarkPlugin: CAPPlugin {
                     textLayer.fontSize = fontSize
                     textLayer.foregroundColor = color.cgColor
                     textLayer.alignmentMode = .center
-                    textLayer.contentsScale = UIScreen.main.scale
+                    textLayer.contentsScale = 2.0 // High quality
                     let x = CGFloat(c) * cellWidth
                     let y = CGFloat(r) * cellHeight
                     textLayer.frame = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
-                    textLayer.transform = CATransform3DMakeRotation(-CGFloat.pi / 4, 0, 0, 1)
+                    textLayer.transform = CATransform3DMakeRotation(CGFloat.pi / 4, 0, 0, 1)
                     watermarkLayer.addSublayer(textLayer)
                 }
             }
@@ -196,23 +205,13 @@ public class VideoWatermarkPlugin: CAPPlugin {
             textLayer.fontSize = fontSize * 1.5
             textLayer.foregroundColor = color.cgColor
             textLayer.alignmentMode = .center
-            textLayer.contentsScale = UIScreen.main.scale
+            textLayer.contentsScale = 2.0
             let labelWidth = size.width * 0.8
             let labelHeight = fontSize * 3
             textLayer.frame = CGRect(x: (size.width - labelWidth) / 2, y: (size.height - labelHeight) / 2, width: labelWidth, height: labelHeight)
             watermarkLayer.addSublayer(textLayer)
         }
         return watermarkLayer
-    }
-    
-    private func drawUIImage(_ image: UIImage, to pixelBuffer: CVPixelBuffer) {
-        CVPixelBufferLockBaseAddress(pixelBuffer, [])
-        let data = CVPixelBufferGetBaseAddress(pixelBuffer)
-        let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-        let context = CGContext(data: data, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
-        
-        context?.draw(image.cgImage!, in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
     }
 
     private func hexToColor(_ hex: String) -> UIColor {
