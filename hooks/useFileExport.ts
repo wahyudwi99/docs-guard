@@ -229,16 +229,17 @@ export function useFileExport({
       // HIGH-PERFORMANCE REAL-TIME EXPORT (60 FPS)
       const stream = canvas.captureStream(60); 
       
-      // Balanced bitrate for 60 FPS: 18Mbps (High quality but easier on mobile encoders)
+      // OPTIMIZED BITRATE for mobile stability: 8Mbps (Good for 1080p60 without crashing memory)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 18000000 
+        videoBitsPerSecond: 8000000 
       });
       
       const chunks: Blob[] = [];
 
       return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
         let isRecording = true;
+        let isProcessing = false;
 
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
@@ -269,44 +270,48 @@ export function useFileExport({
         const FRAME_TIME = 1000 / 60;
         let lastDraw = performance.now();
 
-        // Use requestVideoFrameCallback for frame-accurate rendering if available
         const exportLoop = async () => {
-          if (!isRecording) return;
+          if (!isRecording || isProcessing) return;
+          isProcessing = true;
 
-          if (drawWatermark) {
-            await drawWatermark(true);
-          }
-          lastDraw = performance.now();
-          
-          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
-            isRecording = false;
-            setTimeout(() => {
-              if (recorder.state !== "inactive") recorder.stop();
-              video!.pause();
-              video!.muted = false;
-              onProgress?.("COMPLETED");
-            }, 500);
-            return;
-          }
+          try {
+            if (drawWatermark) {
+              await drawWatermark(true);
+            }
+            lastDraw = performance.now();
+            
+            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+              isRecording = false;
+              setTimeout(() => {
+                if (recorder.state !== "inactive") recorder.stop();
+                video!.pause();
+                video!.muted = false;
+                onProgress?.("COMPLETED");
+              }, 500);
+              return;
+            }
 
-          if ((video as any).requestVideoFrameCallback) {
-            (video as any).requestVideoFrameCallback(exportLoop);
-          } else {
-            requestAnimationFrame(exportLoop);
+            if ((video as any).requestVideoFrameCallback) {
+              (video as any).requestVideoFrameCallback(exportLoop);
+            } else {
+              requestAnimationFrame(exportLoop);
+            }
+          } finally {
+            isProcessing = false;
           }
         };
 
-        // Aggressive heartbeat to fill gaps and ensure 60 FPS even with jitter
+        // Safer heartbeat interval
         const heartbeat = setInterval(() => {
           if (!isRecording) {
             clearInterval(heartbeat);
             return;
           }
           const now = performance.now();
-          if (now - lastDraw >= FRAME_TIME - 1) {
+          if (now - lastDraw >= FRAME_TIME * 1.5) {
             exportLoop();
           }
-        }, 8);
+        }, 16);
 
         try {
           await video!.play();

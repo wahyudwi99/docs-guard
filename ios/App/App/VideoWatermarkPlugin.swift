@@ -8,11 +8,14 @@ public class VideoWatermarkPlugin: CAPPlugin {
 
     @objc func addTextWatermark(_ call: CAPPluginCall) {
         guard let videoUriString = call.getString("videoUri"),
-              let text = call.getString("text"),
-              let videoURL = URL(string: videoUriString) else {
+              let text = call.getString("text") else {
             call.reject("Missing required parameters: videoUri or text")
             return
         }
+        
+        // Remove file:// prefix if present for URL construction
+        let sanitizedUri = videoUriString.replacingOccurrences(of: "file://", with: "")
+        let videoURL = URL(fileURLWithPath: sanitizedUri)
 
         let colorHex = call.getString("colorHex") ?? "#FFFFFF"
         let fontSize = CGFloat(call.getFloat("fontSize") ?? 40.0)
@@ -62,7 +65,6 @@ public class VideoWatermarkPlugin: CAPPlugin {
         let textColor = self.hexToColor(colorHex).withAlphaComponent(opacity)
         
         if layout == "tiled" {
-            // Tiled layout: create a pattern or multiple labels
             let cols = 4
             let rows = 8
             let cellWidth = renderSize.width / CGFloat(cols)
@@ -76,26 +78,24 @@ public class VideoWatermarkPlugin: CAPPlugin {
                     textLayer.foregroundColor = textColor.cgColor
                     textLayer.alignmentMode = .center
                     textLayer.opacity = Float(opacity)
+                    textLayer.contentsScale = UIScreen.main.scale
                     
-                    // Rotate and position
                     let x = CGFloat(c) * cellWidth
                     let y = CGFloat(r) * cellHeight
                     textLayer.frame = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
-                    
-                    // Add a slight rotation for style
                     textLayer.transform = CATransform3DMakeRotation(-CGFloat.pi / 4, 0, 0, 1)
                     
                     watermarkLayer.addSublayer(textLayer)
                 }
             }
         } else {
-            // Single layout: center
             let textLayer = CATextLayer()
             textLayer.string = text
             textLayer.fontSize = fontSize * 1.5
             textLayer.foregroundColor = textColor.cgColor
             textLayer.alignmentMode = .center
             textLayer.opacity = Float(opacity)
+            textLayer.contentsScale = UIScreen.main.scale
             
             let labelWidth = renderSize.width * 0.8
             let labelHeight = fontSize * 3
@@ -151,18 +151,10 @@ public class VideoWatermarkPlugin: CAPPlugin {
     
     private func hexToColor(_ hex: String) -> UIColor {
         var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-
-        if cString.hasPrefix("#") {
-            cString.remove(at: cString.startIndex)
-        }
-
-        if cString.count != 6 {
-            return UIColor.white
-        }
-
+        if cString.hasPrefix("#") { cString.remove(at: cString.startIndex) }
+        if cString.count != 6 { return UIColor.white }
         var rgbValue: UInt64 = 0
         Scanner(string: cString).scanHexInt64(&rgbValue)
-
         return UIColor(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
             green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
