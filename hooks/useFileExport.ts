@@ -211,14 +211,23 @@ export function useFileExport({
       // FORCED 60 FPS: High-frequency capture stream
       const stream = canvas.captureStream(60);
       
-      // Standard mp4 for iOS compatibility
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
-      const fileExt = isIOS ? 'mp4' : 'webm';
+      // Robust MimeType detection for best quality and compatibility
+      let mimeType = 'video/webm';
+      let fileExt = 'webm';
+
+      if (isIOS || MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+        fileExt = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+        mimeType = 'video/webm;codecs=vp9';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+        mimeType = 'video/webm;codecs=h264';
+      }
       
-      // BALANCED BITRATE for 60 FPS: 15Mbps (Prevents encoder lag while maintaining quality)
+      // HIGH BITRATE for 60 FPS: 30Mbps (Ensures high quality for 60FPS motion)
       const recorder = new MediaRecorder(stream, { 
         mimeType,
-        videoBitsPerSecond: 15000000 
+        videoBitsPerSecond: 30000000 
       });
       
       const chunks: Blob[] = [];
@@ -253,7 +262,7 @@ export function useFileExport({
         recorder.start();
 
         // FORCED 60FPS DRAW LOOP
-        // Using a high-precision hybrid loop to ensure 60fps output
+        // Using a high-precision loop with a fallback to ensure consistent 60fps output
         const FRAME_TIME = 1000 / 60;
         let lastDraw = performance.now();
 
@@ -261,11 +270,14 @@ export function useFileExport({
           if (!isRecording) return;
 
           const now = performance.now();
-          if (now - lastDraw >= FRAME_TIME - 1) { // -1ms buffer for jitter
+          const elapsed = now - lastDraw;
+
+          if (elapsed >= FRAME_TIME - 1) { // -1ms buffer for jitter
             if (drawWatermark) {
               await drawWatermark(true);
             }
-            lastDraw = now;
+            // Adjust lastDraw to maintain steady rhythm
+            lastDraw = now - (elapsed % FRAME_TIME);
           }
           
           if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
@@ -279,22 +291,21 @@ export function useFileExport({
             return;
           }
 
-          // Use requestAnimationFrame for visual sync, but fallback to setTimeout
-          // to maintain 60fps even if the tab is partially throttled.
+          // Use requestAnimationFrame for visual sync, but spin quickly to avoid missing frames
           requestAnimationFrame(exportLoop);
         };
         
-        // Start a secondary "heartbeat" interval to force frames if requestAnimationFrame slows down
+        // Start a secondary "heartbeat" to ensure frames are captured even if rAF slows down
         const heartbeat = setInterval(() => {
           if (!isRecording) {
             clearInterval(heartbeat);
             return;
           }
           const now = performance.now();
-          if (now - lastDraw > FRAME_TIME * 2) {
+          if (now - lastDraw >= FRAME_TIME * 1.5) {
              exportLoop(); // Force a frame if we're lagging
           }
-        }, FRAME_TIME);
+        }, FRAME_TIME / 2); // Check more frequently
         
         try {
           await video!.play();
