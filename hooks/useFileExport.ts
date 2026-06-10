@@ -201,8 +201,13 @@ export function useFileExport({
             const blob = await response.blob();
             return { blob, fileName, contentType: isIOS ? 'video/mp4' : 'video/webm' };
           }
-        } catch (err) {
-          console.error("Native video watermarking failed, falling back to Canvas method", err);
+        } catch (err: any) {
+          // Only log if it's a real error, UNIMPLEMENTED is a known state for some platforms
+          if (err.code !== 'UNIMPLEMENTED') {
+            console.error("Native video watermarking failed, falling back to Canvas method", err);
+          } else {
+            console.log("Native plugin unavailable, using optimized Canvas fallback.");
+          }
         }
       }
 
@@ -221,8 +226,8 @@ export function useFileExport({
         mimeType = 'video/webm;codecs=h264';
       }
 
-      // Deterministic Frame-by-Frame Export (Guarantees 60 FPS)
-      const stream = canvas.captureStream(0); // Manual frame capture
+      // HIGH-PERFORMANCE REAL-TIME EXPORT (60 FPS)
+      const stream = canvas.captureStream(60); 
       const recorder = new MediaRecorder(stream, { 
         mimeType,
         videoBitsPerSecond: 30000000 
@@ -243,67 +248,69 @@ export function useFileExport({
           resolve({ blob, fileName, contentType: mimeType });
         };
 
-        // Reset video and prepare for frame-by-frame seeking
+        // Reset video to start
         video!.pause();
         video!.currentTime = 0;
         video!.muted = true; 
         
-        const FPS = 60;
-        const frameInterval = 1 / FPS;
-        const totalDuration = video!.duration;
-        let currentTime = 0;
+        await new Promise(r => {
+          const onSeek = () => {
+            video!.removeEventListener('seeked', onSeek);
+            r(null);
+          };
+          video!.addEventListener('seeked', onSeek);
+        });
 
+        // Start recording
         recorder.start();
 
-        const processFrame = async () => {
+        const FRAME_TIME = 1000 / 60;
+        let lastDraw = performance.now();
+
+        const exportLoop = async () => {
           if (!isRecording) return;
 
-          // Seek to the exact timestamp
-          video!.currentTime = currentTime;
+          const now = performance.now();
+          const elapsed = now - lastDraw;
 
-          // Wait for the seek to complete
-          await new Promise(r => {
-            const onSeeked = () => {
-              video!.removeEventListener('seeked', onSeeked);
-              r(null);
-            };
-            video!.addEventListener('seeked', onSeeked);
-          });
-
-          // Draw the frame with watermark
-          if (drawWatermark) {
-            await drawWatermark(true);
+          if (elapsed >= FRAME_TIME - 1) {
+            if (drawWatermark) {
+              await drawWatermark(true);
+            }
+            lastDraw = now - (elapsed % FRAME_TIME);
           }
-
-          // Request the stream to capture the current canvas state
-          if ((stream as any).requestFrame) {
-            (stream as any).requestFrame();
-          }
-
-          currentTime += frameInterval;
           
-          // Update progress
-          const progressPercent = Math.min(100, Math.round((currentTime / totalDuration) * 100));
-          onProgress?.(`Processing Video: ${progressPercent}%`);
-
-          if (currentTime >= totalDuration) {
+          if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
             isRecording = false;
             setTimeout(() => {
               if (recorder.state !== "inactive") recorder.stop();
+              video!.pause();
               video!.muted = false;
               onProgress?.("COMPLETED");
             }, 500);
             return;
           }
 
-          // Continue to next frame
-          requestAnimationFrame(processFrame);
+          requestAnimationFrame(exportLoop);
         };
 
+        // Use a high-frequency interval to ensure we don't miss frames even if rAF jitter occurs
+        const heartbeat = setInterval(() => {
+          if (!isRecording) {
+            clearInterval(heartbeat);
+            return;
+          }
+          const now = performance.now();
+          if (now - lastDraw >= FRAME_TIME * 1.5) {
+            exportLoop();
+          }
+        }, 8); // 125 FPS check rate
+
         try {
-          processFrame();
+          await video!.play();
+          exportLoop();
         } catch (err) {
-          console.error("Frame-by-frame export failed", err);
+          console.error("Video playback failed during export", err);
           recorder.stop();
           resolve(null);
         }
