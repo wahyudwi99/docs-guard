@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import AVFoundation
+import CoreMedia
 import UIKit
 
 @objc(VideoWatermarkPlugin)
@@ -103,15 +104,12 @@ public class VideoWatermarkPlugin: CAPPlugin {
             writerInput.requestMediaDataWhenReady(on: DispatchQueue(label: "videoExport")) {
                 while writerInput.isReadyForMoreMediaData {
                     if let sampleBuffer = videoOutput.copyNextSampleBuffer() {
-                        let presentationTime = CMSampleBufferGetPresentationTime(sampleBuffer)
-                        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { continue }
+                        let presentationTime = sampleBuffer.presentationTimeStamp
+                        guard let pixelBuffer = sampleBuffer.imageBuffer else { continue }
                         
                         CVPixelBufferLockBaseAddress(pixelBuffer, [])
                         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
                         
-                        // We use Core Animation tool for watermarking instead of CIImage for better quality text
-                        // but here we are in a reader/writer loop, so we draw manually or use a layer.
-                        // For simplicity and speed in this loop, let's use a context to draw the watermark.
                         let context = CIContext()
                         let renderer = UIGraphicsImageRenderer(size: renderSize)
                         let watermarkedImage = renderer.image { _ in
