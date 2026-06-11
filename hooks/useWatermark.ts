@@ -7,6 +7,7 @@ interface UseWatermarkProps {
   redrawDocument: (canvases: HTMLCanvasElement[]) => Promise<void>;
   documentType?: "image" | "pdf" | "video" | null;
   videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
+  pause?: boolean;
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
@@ -22,7 +23,7 @@ interface BlurArea {
   pageIndex: number;
 }
 
-export function useWatermark({ canvases, redrawDocument, documentType, videoRef }: UseWatermarkProps) {
+export function useWatermark({ canvases, redrawDocument, documentType, videoRef, pause = false }: UseWatermarkProps) {
   const [designTab, setDesignTab] = useState<WatermarkMode>("watermark");
   const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
@@ -179,7 +180,7 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
   }, [watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   useEffect(() => {
-    if (documentType !== 'video') {
+    if (documentType !== 'video' || pause) {
       if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
       return;
     }

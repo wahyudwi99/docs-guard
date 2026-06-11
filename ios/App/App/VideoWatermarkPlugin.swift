@@ -2,7 +2,6 @@ import Foundation
 import Capacitor
 import AVFoundation
 import UIKit
-
 @objc(VideoWatermarkPlugin)
 public class VideoWatermarkPlugin: CAPPlugin {
 
@@ -12,11 +11,21 @@ public class VideoWatermarkPlugin: CAPPlugin {
             call.reject("Missing required parameters: videoUri or text")
             return
         }
-        
-        let sanitizedUri = videoUriString.replacingOccurrences(of: "file://", with: "")
-        let videoURL = URL(fileURLWithPath: sanitizedUri)
+
+        let videoURL: URL
+        if videoUriString.hasPrefix("file://") {
+            videoURL = URL(string: videoUriString)!
+        } else {
+            videoURL = URL(fileURLWithPath: videoUriString)
+        }
+
+        if !FileManager.default.fileExists(atPath: videoURL.path) {
+            call.reject("Video file does not exist at path: \(videoURL.path)")
+            return
+        }
+
         let asset = AVAsset(url: videoURL)
-        
+
         let colorHex = call.getString("colorHex") ?? "#FFFFFF"
         let fontSize = CGFloat(call.getFloat("fontSize") ?? 40.0)
         let opacity = CGFloat(call.getFloat("opacity") ?? 0.5)

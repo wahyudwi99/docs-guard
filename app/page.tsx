@@ -262,7 +262,7 @@ function HomeContent() {
     setBlurStrength,
     resetWatermark,
     drawWatermark,
-  } = useWatermark({ canvases, redrawDocument, documentType, videoRef });
+  } = useWatermark({ canvases, redrawDocument, documentType, videoRef, pause: isSaving });
 
   const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Renew canvases and state to avoid "canvas already used" error

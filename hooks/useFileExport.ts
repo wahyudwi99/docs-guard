@@ -135,13 +135,30 @@ export function useFileExport({
 
     } else if (documentType === "video") {
       if (isNative) {
-        onProgress?.("Processing video natively (Ultra-Fast)...");
+        onProgress?.("Saving temporary video...");
         try {
-          const videoUri = Capacitor.convertFileSrc(URL.createObjectURL(file!));
+          // CAPACITOR FIX: We must save the video to the filesystem to get a native path
+          // that AVAsset can read. BLOB URLs don't work natively.
+          const tempFileName = `temp_input_${timestamp}.mp4`;
+          const response = await fetch(URL.createObjectURL(file!));
+          const blob = await response.blob();
+          const base64Data = await blobToBase64(blob);
+          
+          const savedFile = await Filesystem.writeFile({
+            path: tempFileName,
+            data: base64Data,
+            directory: Directory.Cache
+          });
+
+          onProgress?.("Processing video natively (Ultra-Fast)...");
           const result = await VideoWatermark.addTextWatermark({
-            videoUri: videoUri, text: watermarkText, colorHex: watermarkColor,
+            videoUri: savedFile.uri, text: watermarkText, colorHex: watermarkColor,
             fontSize: fontSize, opacity: watermarkOpacity, layout: watermarkLayout as any
           });
+
+          // Cleanup temp input
+          await Filesystem.deleteFile({ path: tempFileName, directory: Directory.Cache }).catch(() => {});
+
           if (result && result.uri) {
             onProgress?.("COMPLETED");
             return { 
@@ -151,16 +168,26 @@ export function useFileExport({
             };
           }
         } catch (err: any) {
-          if (err.code !== 'UNIMPLEMENTED') console.error("Native failed", err);
+          console.error("Native failed, falling back to Canvas", err);
         }
       }
 
       // FALLBACK TO CANVAS (For Web or if Native fails)
       const canvas = canvases[0];
+      
+      // GPU STABILITY: Lower resolution on mobile even more if needed
+      if (isNative && canvas.width > 1280) {
+        const scale = 1280 / canvas.width;
+        canvas.width = 1280;
+        canvas.height = canvas.height * scale;
+      }
+
       const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = isIOS ? 'mp4' : 'webm';
       const stream = canvas.captureStream(60); 
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+      
+      // GPU STABILITY: Lower bitrate to 5Mbps for Canvas recording on mobile
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
       const chunks: Blob[] = [];
 
       return new Promise<ExportResult | null>(async (resolve) => {
