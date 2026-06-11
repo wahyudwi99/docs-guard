@@ -34,6 +34,13 @@ interface UseFileExportProps {
   onProgress?: (text: string) => void;
 }
 
+interface ExportResult {
+  blob?: Blob;
+  nativeUri?: string;
+  fileName: string;
+  contentType: string;
+}
+
 export function useFileExport({ 
   canvases, 
   watermarkText, 
@@ -74,325 +81,188 @@ export function useFileExport({
     });
   };
 
-  const generateBlobAndFileName = useCallback(async (): Promise<{ blob: Blob, fileName: string, contentType: string } | null> => {
-    // If it's a PDF, we process the whole document using pdfDoc regardless of UI canvases
+  const generateExportResult = useCallback(async (): Promise<ExportResult | null> => {
+    const isNative = Capacitor.isNativePlatform();
+    const isIOS = Capacitor.getPlatform() === 'ios';
+    const timestamp = Date.now();
+    const safeText = watermarkText.replace(/[^a-z0-9]/gi, "_");
+
     if (documentType === "pdf") {
-      if (!pdfDoc) {
-        console.error("[EXPORT] PDF doc is missing");
-        return null;
-      }
-      
+      if (!pdfDoc) return null;
       onProgress?.(`Preparing document...`);
       let pdf: jsPDF | null = null;
       const total = pdfDoc.numPages;
 
       for (let i = 1; i <= total; i++) {
         onProgress?.(`Preparing ${i}/${total} pages`);
-        
-        // Use a fresh temporary canvas for each page to ensure complete memory isolation
         const tempCanvas = document.createElement("canvas");
         const ctx = tempCanvas.getContext("2d", { alpha: false });
         if (!ctx) throw new Error("Export context failed");
-
-        // Important: set the index so renderPdfPageToCanvas knows which page to fetch
         tempCanvas.setAttribute('data-page-index', (i - 1).toString());
-        
-        // Render base PDF page
         await renderPdfPageToCanvas(pdfDoc, i, tempCanvas);
-
-        // Apply shared utilities
         applyBlurToContext(ctx, tempCanvas, i - 1, blurAreas || [], blurStrength || 10);
         applyWatermarkToContext(ctx, tempCanvas.width, tempCanvas.height, {
-          text: watermarkText,
-          type: watermarkType,
-          layout: watermarkLayout as any,
-          color: watermarkColor,
-          opacity: watermarkOpacity,
-          fontFamily,
-          fontSize,
-          orientation,
-          image: watermarkImage,
-          imageScale
+          text: watermarkText, type: watermarkType, layout: watermarkLayout as any,
+          color: watermarkColor, opacity: watermarkOpacity, fontFamily, fontSize,
+          orientation, image: watermarkImage, imageScale
         });
-
-        // COMPRESSION: Use 0.7 quality for JPEG to significantly reduce PDF file size
         const imgData = tempCanvas.toDataURL("image/jpeg", 0.7);
-
         if (!pdf) {
           pdf = new jsPDF({
             orientation: tempCanvas.width > tempCanvas.height ? "l" : "p",
-            unit: "px",
-            format: [tempCanvas.width, tempCanvas.height],
-            compress: true
+            unit: "px", format: [tempCanvas.width, tempCanvas.height], compress: true
           });
-
           if (isPro && password) {
             (pdf as any).setEncryption({
-              userPassword: password,
-              ownerPassword: password,
+              userPassword: password, ownerPassword: password,
               userPermissions: ["print", "modify", "copy", "annot-forms"]
             });
           }
         } else {
-          // Add a new page matching the current dimensions
           pdf.addPage([tempCanvas.width, tempCanvas.height], tempCanvas.width > tempCanvas.height ? "l" : "p");
         }
-
-        // Always add the image to the CURRENT (last) page
         pdf.addImage(imgData, "JPEG", 0, 0, tempCanvas.width, tempCanvas.height, undefined, 'FAST');
-        
-        // Destroy canvas immediately
-        tempCanvas.width = 0;
-        tempCanvas.height = 0;
-
-        // Periodic breather for high page counts
-        if (i % 10 === 0) {
-          console.log(`[EXPORT] Progress: ${Math.round((i/total)*100)}%`);
-          await new Promise(r => setTimeout(r, 20));
-        }
+        tempCanvas.width = 0; tempCanvas.height = 0;
+        if (i % 10 === 0) await new Promise(r => setTimeout(r, 20));
       }
 
       if (!pdf) return null;
-
-      pdf.setProperties({
-        author: " ", creator: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0)
-      } as any);
-
+      pdf.setProperties({ author: " ", creator: " ", title: " ", subject: " ", keywords: " ", creationDate: new Date(0) } as any);
       onProgress?.("COMPLETED");
-      // Small delay so user can see the checkmark before popup disappears
       await new Promise(r => setTimeout(r, 600));
-
-      const pdfBlob = pdf.output("blob");
-      const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.pdf`;
-      console.log(`[EXPORT] Done. Final size: ${Math.round(pdfBlob.size/1024)}KB`);
-      return { blob: pdfBlob, fileName, contentType: "application/pdf" };
+      const blob = pdf.output("blob");
+      return { blob, fileName: `docsguard-${safeText}-${timestamp}.pdf`, contentType: "application/pdf" };
 
     } else if (documentType === "video") {
-      let video = videoRef?.current;
-      if (!video) video = document.querySelector('video');
-      
-      if (!video) {
-        console.error("Video element not found for export");
-        return null;
-      }
-
-      const isNative = Capacitor.isNativePlatform();
-      const isIOS = Capacitor.getPlatform() === 'ios';
-
-      // NATIVE PLUGIN OPTIMIZATION: If we are on a native platform, use the high-performance AVFoundation/MediaCodec plugin
       if (isNative) {
         onProgress?.("Processing video natively (Ultra-Fast)...");
         try {
-          // We need the absolute path for the native plugin
           const videoUri = Capacitor.convertFileSrc(URL.createObjectURL(file!));
           const result = await VideoWatermark.addTextWatermark({
-            videoUri: videoUri, // Native plugin might need internal path, but we try URI first
-            text: watermarkText,
-            colorHex: watermarkColor,
-            fontSize: fontSize,
-            opacity: watermarkOpacity,
-            layout: watermarkLayout as any
+            videoUri: videoUri, text: watermarkText, colorHex: watermarkColor,
+            fontSize: fontSize, opacity: watermarkOpacity, layout: watermarkLayout as any
           });
-          
           if (result && result.uri) {
-            const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${isIOS ? 'mp4' : 'webm'}`;
-            // Fetch the native file back as a blob for consistent return
-            const response = await fetch(Capacitor.convertFileSrc(result.uri));
-            const blob = await response.blob();
-            return { blob, fileName, contentType: isIOS ? 'video/mp4' : 'video/webm' };
+            onProgress?.("COMPLETED");
+            return { 
+              nativeUri: result.uri, 
+              fileName: `docsguard-${safeText}-${timestamp}.${isIOS ? 'mp4' : 'webm'}`, 
+              contentType: isIOS ? 'video/mp4' : 'video/webm' 
+            };
           }
         } catch (err: any) {
-          // Only log if it's a real error, UNIMPLEMENTED is a known state for some platforms
-          if (err.code !== 'UNIMPLEMENTED') {
-            console.error("Native video watermarking failed, falling back to Canvas method", err);
-          } else {
-            console.log("Native plugin unavailable, using optimized Canvas fallback.");
-          }
+          if (err.code !== 'UNIMPLEMENTED') console.error("Native failed", err);
         }
       }
 
+      // FALLBACK TO CANVAS (For Web or if Native fails)
       const canvas = canvases[0];
-      
-      // OPTIMIZATION: Limit resolution on mobile to ensure 60 FPS stability
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile && canvas.width > 1280) {
-        const scale = 1280 / canvas.width;
-        // We create a temporary scaled canvas for recording to avoid affecting the UI
-        const recordingCanvas = document.createElement('canvas');
-        recordingCanvas.width = 1280;
-        recordingCanvas.height = canvas.height * scale;
-        // In this case, we'd need to modify drawWatermark to accept a target canvas
-        // For simplicity, let's just resize the main canvas temporarily
-        canvas.width = 1280;
-        canvas.height = canvas.height * scale;
-      }
-
-      // Robust MimeType detection for best quality and compatibility
-      let mimeType = 'video/webm';
-      let fileExt = 'webm';
-
-      if (isIOS || MediaRecorder.isTypeSupported('video/mp4')) {
-        mimeType = 'video/mp4';
-        fileExt = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-        mimeType = 'video/webm;codecs=vp9';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
-        mimeType = 'video/webm;codecs=h264';
-      }
-
-      // HIGH-PERFORMANCE REAL-TIME EXPORT (60 FPS)
+      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
+      const fileExt = isIOS ? 'mp4' : 'webm';
       const stream = canvas.captureStream(60); 
-      
-      // OPTIMIZED BITRATE for mobile stability: 8Mbps (Good for 1080p60 without crashing memory)
-      const recorder = new MediaRecorder(stream, { 
-        mimeType,
-        videoBitsPerSecond: 8000000 
-      });
-      
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
       const chunks: Blob[] = [];
 
-      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>(async (resolve) => {
+      return new Promise<ExportResult | null>(async (resolve) => {
         let isRecording = true;
         let isProcessing = false;
+        let lastDraw = performance.now();
+        const FRAME_TIME = 1000 / 60;
 
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) chunks.push(e.data);
-        };
-        
+        recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
         recorder.onstop = () => {
           const blob = new Blob(chunks, { type: mimeType });
-          const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
-          resolve({ blob, fileName, contentType: mimeType });
+          resolve({ blob, fileName: `docsguard-${safeText}-${timestamp}.${fileExt}`, contentType: mimeType });
         };
 
-        // Reset video to start
-        video!.pause();
-        video!.currentTime = 0;
-        video!.muted = true; 
-        
+        const video = videoRef?.current || document.querySelector('video');
+        if (!video) return resolve(null);
+        video.pause(); video.currentTime = 0; video.muted = true;
         await new Promise(r => {
-          const onSeek = () => {
-            video!.removeEventListener('seeked', onSeek);
-            r(null);
-          };
-          video!.addEventListener('seeked', onSeek);
+          const onSeek = () => { video.removeEventListener('seeked', onSeek); r(null); };
+          video.addEventListener('seeked', onSeek);
         });
 
-        // Start recording
         recorder.start();
-
-        const FRAME_TIME = 1000 / 60;
-        let lastDraw = performance.now();
-
         const exportLoop = async () => {
           if (!isRecording || isProcessing) return;
           isProcessing = true;
-
           try {
-            if (drawWatermark) {
-              await drawWatermark(true);
-            }
+            if (drawWatermark) await drawWatermark(true);
             lastDraw = performance.now();
-            
-            if (video!.ended || video!.currentTime >= video!.duration - 0.05) {
+            if (video.ended || video.currentTime >= video.duration - 0.05) {
               isRecording = false;
               setTimeout(() => {
                 if (recorder.state !== "inactive") recorder.stop();
-                video!.pause();
-                video!.muted = false;
+                video.pause(); video.muted = false;
                 onProgress?.("COMPLETED");
               }, 500);
               return;
             }
-
-            if ((video as any).requestVideoFrameCallback) {
-              (video as any).requestVideoFrameCallback(exportLoop);
-            } else {
-              requestAnimationFrame(exportLoop);
-            }
-          } finally {
-            isProcessing = false;
-          }
+            if ((video as any).requestVideoFrameCallback) (video as any).requestVideoFrameCallback(exportLoop);
+            else requestAnimationFrame(exportLoop);
+          } finally { isProcessing = false; }
         };
 
-        // Safer heartbeat interval
         const heartbeat = setInterval(() => {
-          if (!isRecording) {
-            clearInterval(heartbeat);
-            return;
-          }
-          const now = performance.now();
-          if (now - lastDraw >= FRAME_TIME * 1.5) {
-            exportLoop();
-          }
+          if (!isRecording) { clearInterval(heartbeat); return; }
+          if (performance.now() - lastDraw >= FRAME_TIME * 1.5) exportLoop();
         }, 16);
 
         try {
-          await video!.play();
-          if ((video as any).requestVideoFrameCallback) {
-            (video as any).requestVideoFrameCallback(exportLoop);
-          } else {
-            exportLoop();
-          }
-        } catch (err) {
-          console.error("Video playback failed during export", err);
-          recorder.stop();
-          resolve(null);
-        }
+          await video.play();
+          if ((video as any).requestVideoFrameCallback) (video as any).requestVideoFrameCallback(exportLoop);
+          else exportLoop();
+        } catch (err) { recorder.stop(); resolve(null); }
       });
+
     } else {
-      // IMAGE EXPORT
+      // IMAGE
       const canvas = canvases[0];
       if (!canvas) return null;
-      
-      const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg") || file?.name.toLowerCase().endsWith(".jpeg");
+      const isOriginalJpg = file?.type === "image/jpeg" || file?.name.toLowerCase().endsWith(".jpg");
       const exportType = isOriginalJpg ? "image/jpeg" : "image/png";
       const fileExt = isOriginalJpg ? "jpg" : "png";
-      
-      const fileName = `docsguard-${watermarkText.replace(/[^a-z0-9]/gi, "_")}-${Date.now()}.${fileExt}`;
-      const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob((b) => resolve(b), exportType, 0.7);
-      });
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob((b) => resolve(b), exportType, 0.7));
       if (!blob) return null;
-      return { blob, fileName, contentType: exportType };
+      return { blob, fileName: `docsguard-${safeText}-${timestamp}.${fileExt}`, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, file, watermarkColor, watermarkOpacity, watermarkLayout, fontSize, fontFamily, orientation, watermarkType, watermarkImage, imageScale, blurAreas, blurStrength, pdfDoc]);
+  }, [canvases, watermarkText, documentType, password, isPro, file, watermarkColor, watermarkOpacity, watermarkLayout, fontSize, fontFamily, orientation, watermarkType, watermarkImage, imageScale, blurAreas, blurStrength, pdfDoc, videoRef, drawWatermark, onProgress]);
 
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
       if (onBeforeExport) await onBeforeExport();
-      
-      const result = await generateBlobAndFileName();
-      if (!result || !result.blob) return false;
-
-      const { blob, fileName, contentType } = result;
+      const result = await generateExportResult();
+      if (!result) return false;
       const isNative = isCapacitorApp();
 
       if (!isNative) {
-        saveAndOpenBlob(blob, fileName, contentType);
+        if (result.blob) saveAndOpenBlob(result.blob, result.fileName, result.contentType);
       } else {
         const isIOS = Capacitor.getPlatform() === 'ios';
+        let finalUri = result.nativeUri;
+
+        if (!finalUri && result.blob) {
+          const base64Data = await blobToBase64(result.blob);
+          const savedFile = await Filesystem.writeFile({
+            path: result.fileName, data: base64Data, directory: isIOS ? Directory.Documents : Directory.Data,
+          });
+          finalUri = savedFile.uri;
+        }
         
-        // Write file to device
-        const base64Data = await blobToBase64(blob);
-        const savedFile = await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: isIOS ? Directory.Documents : Directory.Data,
-        });
-        
+        if (!finalUri) return false;
         await new Promise(resolve => setTimeout(resolve, 500));
 
         if (documentType === "image") {
-          await Media.savePhoto({ path: savedFile.uri });
+          await Media.savePhoto({ path: finalUri });
         } else if (documentType === "video") {
           try {
-            await Media.saveVideo({ path: savedFile.uri });
+            await Media.saveVideo({ path: finalUri });
           } catch (err) {
-            await Share.share({ title: fileName, url: savedFile.uri });
+            await Share.share({ title: result.fileName, url: finalUri });
           }
         } else if (documentType === "pdf") {
-          await Share.share({ title: fileName, url: savedFile.uri });
+          await Share.share({ title: result.fileName, url: finalUri });
         }
       }
       return true;
@@ -400,44 +270,40 @@ export function useFileExport({
       console.error("Error saving file:", error);
       return false;
     }
-  }, [generateBlobAndFileName, documentType]);
+  }, [generateExportResult, documentType]);
 
   const shareFile = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
       if (onBeforeExport) await onBeforeExport();
-
-      const result = await generateBlobAndFileName();
-      if (!result || !result.blob) return false;
-
-      const { blob, fileName } = result;
+      const result = await generateExportResult();
+      if (!result) return false;
       const isNative = isCapacitorApp();
 
       if (!isNative) {
-        if (navigator.share) {
-          const file = new File([blob], fileName, { type: blob.type });
+        if (navigator.share && result.blob) {
+          const file = new File([result.blob], result.fileName, { type: result.blob.type });
           await navigator.share({ files: [file], title: "Watermarked", text: "DocsGuard" });
-          return true;
-        } else {
-          saveAndOpenBlob(blob, fileName, blob.type);
-          return true;
+        } else if (result.blob) {
+          saveAndOpenBlob(result.blob, result.fileName, result.blob.type);
         }
+        return true;
       } else {
-        const base64Data = await blobToBase64(blob);
-        const tempPath = `share-${Date.now()}-${fileName}`;
-        const resultFile = await Filesystem.writeFile({
-          path: tempPath,
-          data: base64Data,
-          directory: Directory.Cache,
-        });
-
-        await Share.share({ title: fileName, url: resultFile.uri });
+        let finalUri = result.nativeUri;
+        if (!finalUri && result.blob) {
+          const base64Data = await blobToBase64(result.blob);
+          const resultFile = await Filesystem.writeFile({
+            path: `share-${result.fileName}`, data: base64Data, directory: Directory.Cache,
+          });
+          finalUri = resultFile.uri;
+        }
+        if (finalUri) await Share.share({ title: result.fileName, url: finalUri });
         return true;
       }
     } catch (error) {
       console.error("Error sharing file:", error);
       return false;
     }
-  }, [generateBlobAndFileName]);
+  }, [generateExportResult]);
 
   return { saveToDevice, shareFile };
 }
