@@ -107,16 +107,17 @@ export function useFileExport({
         });
         const imgData = tempCanvas.toDataURL("image/jpeg", 0.7);
         if (!pdf) {
-          pdf = new jsPDF({
+          const pdfOptions: any = {
             orientation: tempCanvas.width > tempCanvas.height ? "l" : "p",
             unit: "px", format: [tempCanvas.width, tempCanvas.height], compress: true
-          });
+          };
           if (isPro && password) {
-            (pdf as any).setEncryption({
+            pdfOptions.encryption = {
               userPassword: password, ownerPassword: password,
               userPermissions: ["print", "modify", "copy", "annot-forms"]
-            });
+            };
           }
+          pdf = new jsPDF(pdfOptions);
         } else {
           pdf.addPage([tempCanvas.width, tempCanvas.height], tempCanvas.width > tempCanvas.height ? "l" : "p");
         }
