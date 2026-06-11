@@ -80,7 +80,7 @@ export function useFileExport({
     });
   };
 
-  const generateExportResult = useCallback(async (): Promise<ExportResult | null> => {
+  const generateBlobAndFileName = useCallback(async () => {
     const isNative = Capacitor.isNativePlatform();
     const isIOS = Capacitor.getPlatform() === 'ios';
     const timestamp = Date.now();
@@ -139,14 +139,13 @@ export function useFileExport({
       const stream = canvas.captureStream(30);
       
       // Determine the best MIME type for the platform (iOS prefers mp4)
-      const isIOS = Capacitor.getPlatform() === 'ios';
       const mimeType = isIOS ? 'video/mp4' : 'video/webm';
       const fileExt = file?.name?.split('.').pop() || (isIOS ? 'mp4' : 'webm');
       
       const recorder = new MediaRecorder(stream, { mimeType });
       const chunks: Blob[] = [];
 
-      return new Promise<ExportResult | null>((resolve) => {
+      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>((resolve) => {
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunks.push(e.data);
         };
@@ -181,38 +180,69 @@ export function useFileExport({
 
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
-      if (onBeforeExport) await onBeforeExport();
-      const result = await generateExportResult();
-      if (!result) return false;
+      if (onBeforeExport) {
+        await onBeforeExport();
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+      
+      const result = await generateBlobAndFileName();
+      if (!result || !result.blob) return false;
+
+      const { blob, fileName, contentType } = result;
       const isNative = isCapacitorApp();
 
       if (!isNative) {
-        if (result.blob) saveAndOpenBlob(result.blob, result.fileName, result.contentType);
+        saveAndOpenBlob(blob, fileName, contentType);
       } else {
-        const isIOS = Capacitor.getPlatform() === 'ios';
-        let finalUri = result.nativeUri;
-
-        if (!finalUri && result.blob) {
-          const base64Data = await blobToBase64(result.blob);
-          const savedFile = await Filesystem.writeFile({
-            path: result.fileName, data: base64Data, directory: isIOS ? Directory.Documents : Directory.Data,
-          });
-          finalUri = savedFile.uri;
-        }
+        const base64Data = await blobToBase64(blob);
         
-        if (!finalUri) return false;
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 1. Always save to Filesystem first (Data folder for better visibility to plugins)
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: base64Data,
+          directory: Directory.Data,
+        });
+        
+        console.log("Saved to Filesystem:", savedFile.uri);
 
+        // 2. Additional handling per type
         if (documentType === "image") {
-          await Media.savePhoto({ path: finalUri });
+          try {
+            await Media.savePhoto({
+              path: savedFile.uri
+            });
+            console.log("Saved to Gallery");
+          } catch (err) {
+            console.error("Failed to save to Gallery:", err);
+          }
         } else if (documentType === "video") {
           try {
-            await Media.saveVideo({ path: finalUri });
+            // Ensure the file is treated as a video during gallery save
+            await Media.saveVideo({
+              path: savedFile.uri
+            });
+            console.log("Video saved to Gallery successfully");
           } catch (err) {
-            await Share.share({ title: result.fileName, url: finalUri });
+            console.error("Failed to save video to Gallery:", err);
+            // Fallback: trigger share dialog so user can "Save to Files"
+            await Share.share({
+              title: fileName,
+              url: savedFile.uri
+            });
           }
         } else if (documentType === "pdf") {
-          await Share.share({ title: result.fileName, url: finalUri });
+          // On iOS, sometimes saving to Documents isn't enough to "see" it immediately
+          // Triggering a share dialog for PDF is the standard way to "Save to Files"
+          try {
+             await Share.share({
+               title: fileName,
+               text: "Your watermarked PDF is ready",
+               url: savedFile.uri,
+               dialogTitle: "Save or Share PDF",
+             });
+          } catch (err) {
+            console.error("Failed to trigger share for PDF:", err);
+          }
         }
       }
       return true;
@@ -220,40 +250,58 @@ export function useFileExport({
       console.error("Error saving file:", error);
       return false;
     }
-  }, [generateExportResult, documentType]);
+  }, [generateBlobAndFileName, documentType]);
 
   const shareFile = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
-      if (onBeforeExport) await onBeforeExport();
-      const result = await generateExportResult();
-      if (!result) return false;
+      if (onBeforeExport) {
+        await onBeforeExport();
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+
+      const result = await generateBlobAndFileName();
+      if (!result || !result.blob) return false;
+
+      const { blob, fileName } = result;
       const isNative = isCapacitorApp();
 
       if (!isNative) {
-        if (navigator.share && result.blob) {
-          const file = new File([result.blob], result.fileName, { type: result.blob.type });
-          await navigator.share({ files: [file], title: "Watermarked", text: "DocsGuard" });
-        } else if (result.blob) {
-          saveAndOpenBlob(result.blob, result.fileName, result.blob.type);
-        }
-        return true;
-      } else {
-        let finalUri = result.nativeUri;
-        if (!finalUri && result.blob) {
-          const base64Data = await blobToBase64(result.blob);
-          const resultFile = await Filesystem.writeFile({
-            path: `share-${result.fileName}`, data: base64Data, directory: Directory.Cache,
+        if (navigator.share) {
+          const file = new File([blob], fileName, { type: blob.type });
+          await navigator.share({
+            files: [file],
+            title: "Watermarked Document",
+            text: "Sharing from DocsGuard"
           });
-          finalUri = resultFile.uri;
+          return true;
+        } else {
+          saveAndOpenBlob(blob, fileName, blob.type);
+          return true;
         }
-        if (finalUri) await Share.share({ title: result.fileName, url: finalUri });
+      } else {
+        const base64Data = await blobToBase64(blob);
+        
+        const tempPath = `share-${Date.now()}-${fileName}`;
+        const resultFile = await Filesystem.writeFile({
+          path: tempPath,
+          data: base64Data,
+          directory: Directory.Cache,
+        });
+
+        await Share.share({
+          title: fileName,
+          text: "Watermarked with DocsGuard",
+          url: resultFile.uri,
+          dialogTitle: "Share Document",
+        });
+        
         return true;
       }
     } catch (error) {
       console.error("Error sharing file:", error);
       return false;
     }
-  }, [generateExportResult]);
+  }, [generateBlobAndFileName]);
 
   return { saveToDevice, shareFile };
 }
