@@ -16,7 +16,7 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -1026,6 +1026,25 @@ function HomeContent() {
                 </Link>
              </div>
           </div>
+
+          {/* Contact Us Card */}
+          <Link href="/contact" className="block bg-slate-900 rounded-[32px] p-6 text-white shadow-xl shadow-slate-200 overflow-hidden relative group hover:bg-black transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform duration-700">
+               <Mail className="h-24 w-24" />
+             </div>
+             <div className="relative z-10 space-y-4">
+                <h3 className="font-bold flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Contact Us
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed text-left">
+                  Have a question, feedback, or need support? Reach out to our team directly.
+                </p>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/10 group-hover:bg-white/20 px-4 py-2 rounded-full transition-all w-fit">
+                  Send Message <ChevronRight className="h-3 w-3" />
+                </div>
+             </div>
+          </Link>
         </div>
       </main>
 
