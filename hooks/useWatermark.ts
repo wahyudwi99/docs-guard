@@ -7,7 +7,6 @@ interface UseWatermarkProps {
   redrawDocument: (canvases: HTMLCanvasElement[]) => Promise<void>;
   documentType?: "image" | "pdf" | "video" | null;
   videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
-  pause?: boolean;
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
@@ -23,7 +22,7 @@ interface BlurArea {
   pageIndex: number;
 }
 
-export function useWatermark({ canvases, redrawDocument, documentType, videoRef, pause = false }: UseWatermarkProps) {
+export function useWatermark({ canvases, redrawDocument, documentType, videoRef }: UseWatermarkProps) {
   const [designTab, setDesignTab] = useState<WatermarkMode>("watermark");
   const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
@@ -116,24 +115,47 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef,
 
     if (documentType === "video") {
       let video = videoRef?.current;
-      if (!video) video = document.querySelector('video');
+      
+      // Secondary search: If ref is null, try to find the video element in the DOM
+      if (!video) {
+        video = document.querySelector('video') as HTMLVideoElement | null;
+      }
+
       const canvas = canvases[0];
       const context = canvas?.getContext("2d");
-      if (!video || !context || !canvas) return;
+      
+      if (!video) {
+        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
+          console.log("[VIDEO] No video element found in ref or DOM");
+        }
+        return;
+      }
 
+      if (!context || !canvas) return;
+
+      // Ensure video is playing (iOS sometimes pauses hidden videos)
       if (video.paused && video.readyState >= 2) {
         video.play().catch(e => console.warn("[VIDEO] Auto-play blocked:", e));
       }
 
-      if (video.readyState < 2) return;
+      if (video.readyState < 2) {
+        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
+          console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
+        }
+        return;
+      }
 
+      // Sync canvas dimensions
       if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
       }
 
-      // Optimization: No need for clearRect when drawing full-frame video
+      // Draw the video frame
+      context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Apply watermark (shared logic)
       internalApplyWatermark(context, canvas.width, canvas.height);
       return;
     }
@@ -180,38 +202,21 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef,
   }, [watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   useEffect(() => {
-    if (documentType !== 'video' || pause) {
+    if (documentType !== 'video') {
       if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
       return;
     }
 
-    let video = videoRef?.current;
-    if (!video) video = document.querySelector('video');
-    if (!video) return;
-
-    let isRunning = true;
-    const renderLoop = () => {
-      if (!isRunning) return;
+    const loop = () => {
       drawWatermark(true);
-      // requestVideoFrameCallback is a newer Web API
-      if (video?.requestVideoFrameCallback) {
-        video.requestVideoFrameCallback(renderLoop);
-      } else {
-        renderRequestRef.current = requestAnimationFrame(renderLoop);
-      }
+      renderRequestRef.current = requestAnimationFrame(loop);
     };
 
-    if (video.requestVideoFrameCallback) {
-      video.requestVideoFrameCallback(renderLoop);
-    } else {
-      renderRequestRef.current = requestAnimationFrame(renderLoop);
-    }
-
+    renderRequestRef.current = requestAnimationFrame(loop);
     return () => {
-      isRunning = false;
       if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
     };
-  }, [documentType, drawWatermark, videoRef]);
+  }, [documentType, drawWatermark]);
 
   return {
     designTab,
