@@ -38,15 +38,12 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
   const [latestPlanInfo, setLatestPlanInfo] = useState<ActivePlan | null>(null);
   const [subscriptionConflict, setSubscriptionConflict] = useState(false);
-  const [purchaseSuccess, setPurchaseSuccessState] = useState(false);
-
-  // Persistence for purchaseSuccess so it survives window.location.reload()
-  useEffect(() => {
-    const saved = localStorage.getItem('docsguard_purchase_success');
-    if (saved === 'true') {
-      setPurchaseSuccessState(true);
+  const [purchaseSuccess, setPurchaseSuccessState] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem('docsguard_purchase_success') === 'true';
     }
-  }, []);
+    return false;
+  });
 
   const setPurchaseSuccess = (val: boolean) => {
     setPurchaseSuccessState(val);
@@ -73,6 +70,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } catch (e) {
       return false;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.createdAt, activeEntitlements.length]);
 
   // SOURCE OF TRUTH: PRO if user is logged in AND (active entitlement OR trial active)
@@ -83,19 +81,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
   }, [latestPlanInfo]);
-
-  useEffect(() => {
-    if (!isInitialized.current) {
-      initRevenueCat();
-      isInitialized.current = true;
-    } else if (user?.id) {
-      // If already initialized but user just logged in, sync them
-      loginToRevenueCat(user.id);
-    } else if (!user && isInitialized.current) {
-      // User logged out, clear RevenueCat session
-      logoutFromRevenueCat();
-    }
-  }, [user?.id, user === null]);
 
   const initRevenueCat = async () => {
     try {
@@ -169,6 +154,20 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       console.error("RevenueCat Logout Error:", e);
     }
   };
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      initRevenueCat();
+      isInitialized.current = true;
+    } else if (user?.id) {
+      // If already initialized but user just logged in, sync them
+      loginToRevenueCat(user.id);
+    } else if (!user && isInitialized.current) {
+      // User logged out, clear RevenueCat session
+      logoutFromRevenueCat();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user === null]);
 
   const fetchPackages = async () => {
     // Professional fallback packages

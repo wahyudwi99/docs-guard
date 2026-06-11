@@ -33,8 +33,11 @@ export async function processVideoWithCanvas(
       
       // Attempt to capture the audio track from the original video
       let audioTrack: MediaStreamTrack | undefined;
-      const anyVideo = video as any;
-      const captureStream = anyVideo.captureStream || anyVideo.mozCaptureStream;
+      const customVideo = video as HTMLVideoElement & { 
+        captureStream?: (fps?: number) => MediaStream; 
+        mozCaptureStream?: (fps?: number) => MediaStream; 
+      };
+      const captureStream = customVideo.captureStream || customVideo.mozCaptureStream;
       
       let videoStream: MediaStream | null = null;
       if (captureStream) {

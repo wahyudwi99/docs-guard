@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useState, useCallback, useEffect, useRef } from "react";
 import { applyWatermarkToContext, applyBlurToContext } from "@/lib/watermark_utils";
 
@@ -147,7 +148,9 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
 
       // Sync canvas dimensions
       if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
+        // eslint-disable-next-line react-hooks/immutability
         canvas.width = video.videoWidth;
+        // eslint-disable-next-line react-hooks/immutability
         canvas.height = video.videoHeight;
       }
 
