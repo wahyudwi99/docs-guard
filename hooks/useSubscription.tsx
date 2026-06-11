@@ -61,6 +61,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // 3-day trial logic: Pro status for first 3 days after account creation
   const trialActive = useMemo(() => {
+    if (activeEntitlements.length > 0) return false; // Pro subscription overrides trial
+    
     if (!user?.createdAt) return false;
     try {
       const createdDate = new Date(user.createdAt);
@@ -71,7 +73,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } catch (e) {
       return false;
     }
-  }, [user?.createdAt]);
+  }, [user?.createdAt, activeEntitlements.length]);
 
   // SOURCE OF TRUTH: PRO if user is logged in AND (active entitlement OR trial active)
   const isPro = useMemo(() => {

@@ -808,11 +808,16 @@ function HomeContent() {
                               <div className="px-4 py-1.5 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
                                 {trialActive ? (
                                   "Pro (Trial for 3 days)"
-                                ) : currentPlan?.endDate ? (
+                                ) : currentPlan ? (
                                   (() => {
-                                    const end = new Date(currentPlan.endDate);
-                                    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                    return `Expires: ${end.toLocaleDateString('en-GB', options)}`;
+                                    const planType = currentPlan.type;
+                                    const planName = planType.charAt(0).toUpperCase() + planType.slice(1) + " Pro";
+                                    if (currentPlan.endDate) {
+                                      const end = new Date(currentPlan.endDate);
+                                      const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                                      return `${planName} (Expires: ${end.toLocaleDateString('en-GB', options)})`;
+                                    }
+                                    return `${planName} (Active)`;
                                   })()
                                 ) : (
                                   "Active Subscription"
