@@ -44,19 +44,19 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      <header className="pt-safe px-6 pb-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-50">
-        <div className="flex items-center justify-between mt-4">
-          <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-2xl hover:bg-slate-100 transition-colors text-slate-700">
+      <header className="pt-safe pb-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-50">
+        <div className="px-6 flex items-center justify-between mt-8 mb-2">
+          <Link href="/" className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all text-slate-900 active:scale-95 shadow-sm">
             <ChevronLeft className="h-5 w-5" />
             <span className="text-[11px] font-black uppercase tracking-widest">Back</span>
           </Link>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-2xl bg-indigo-50 flex items-center justify-center">
-              <Mail className="h-4 w-4 text-indigo-600" />
+            <div className="h-9 w-9 rounded-2xl bg-indigo-50 flex items-center justify-center shadow-inner">
+              <Mail className="h-4.5 w-4.5 text-indigo-600" />
             </div>
             <span className="text-sm font-black tracking-tight text-slate-900">Contact Us</span>
           </div>
-          <div className="w-[72px]"></div> {/* Spacer for centering */}
+          <div className="w-[88px]"></div> {/* Adjusted spacer for centering */}
         </div>
       </header>
 
