@@ -3,8 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Send, CheckCircle2, Loader2, Mail } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ContactPage() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -15,19 +18,24 @@ export default function ContactPage() {
 
     setStatus("loading");
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const { error } = await supabase
+        .from("contact_messages")
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            user_id: user?.id || null
+          },
+        ]);
 
-      if (!res.ok) throw new Error("Failed to send email");
+      if (error) throw error;
 
       setStatus("success");
       setShowSuccessPopup(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      console.error(error);
+      console.error("Supabase insert error:", error);
       setStatus("error");
     }
   };

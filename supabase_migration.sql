@@ -27,11 +27,22 @@ CREATE TABLE public.payments (
   created_at timestamptz DEFAULT now()
 );
 
--- 4. AKTIFKAN KEAMANAN (RLS)
+-- 4. TABEL CONTACT MESSAGES
+CREATE TABLE public.contact_messages (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.users(id) ON DELETE SET NULL,
+  name text NOT NULL,
+  email text NOT NULL,
+  message text NOT NULL,
+  sent_at timestamptz DEFAULT now()
+);
+
+-- 5. AKTIFKAN KEAMANAN (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
 
--- 5. KEBIJAKAN AKSES (Policies)
+-- 6. KEBIJAKAN AKSES (Policies)
 CREATE POLICY "Users can manage their own profile" 
 ON public.users FOR ALL
 USING (auth.uid() = id)
@@ -41,6 +52,14 @@ CREATE POLICY "Users can insert and view their own payments"
 ON public.payments FOR ALL
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Anyone can submit contact messages" 
+ON public.contact_messages FOR INSERT 
+WITH CHECK (true);
+
+CREATE POLICY "Only admins can view contact messages" 
+ON public.contact_messages FOR SELECT 
+USING (false); -- Set to false to hide from public/auth users, only accessible via service_role
 
 -- 6. TRIGGER OTOMATIS UNTUK UPDATED_AT
 CREATE OR REPLACE FUNCTION update_updated_at_column()
