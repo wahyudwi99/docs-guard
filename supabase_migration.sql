@@ -33,6 +33,7 @@ CREATE TABLE public.contact_messages (
   name text NOT NULL,
   email text NOT NULL,
   message text NOT NULL,
+  is_processed boolean DEFAULT false,
   sent_at timestamptz DEFAULT now()
 );
 
