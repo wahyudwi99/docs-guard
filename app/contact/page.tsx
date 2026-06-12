@@ -45,7 +45,7 @@ export default function ContactPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <header className="pt-safe pb-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-50">
-        <div className="px-6 flex items-center justify-between mt-8 mb-2">
+        <div className="px-6 flex items-center justify-between mt-14 mb-2">
           <Link href="/" className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all text-slate-900 active:scale-95 shadow-sm">
             <ChevronLeft className="h-5 w-5" />
             <span className="text-[11px] font-black uppercase tracking-widest">Back</span>
