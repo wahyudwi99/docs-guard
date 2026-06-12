@@ -835,13 +835,15 @@ function HomeContent() {
                                 </p>
                               )}
                               
-                              <button 
-                                onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
-                                className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
-                              >
-                                <Settings2 className="h-3.5 w-3.5" />
-                                {trialActive ? "Choose a Plan to Stay Pro" : "Cancel Subscription"}
-                              </button>
+                              {!trialActive && (
+                                <button 
+                                  onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
+                                  className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
+                                >
+                                  <Settings2 className="h-3.5 w-3.5" />
+                                  Cancel Subscription
+                                </button>
+                              )}
                             </div>
                           ) : (
                             <div className="space-y-2">
