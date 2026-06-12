@@ -3,8 +3,9 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP TRIGGER IF EXISTS on_auth_user_login ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP FUNCTION IF EXISTS public.sync_user_profile(uuid, text, jsonb);
-DROP TABLE IF EXISTS public.payments;
-DROP TABLE IF EXISTS public.users;
+DROP TABLE IF EXISTS public.contact_messages CASCADE;
+DROP TABLE IF EXISTS public.payments CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
 
 -- 2. TABEL USERS (Profil Dasar)
 CREATE TABLE public.users (
