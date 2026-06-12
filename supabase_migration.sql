@@ -30,7 +30,6 @@ CREATE TABLE public.payments (
 -- 4. TABEL CONTACT MESSAGES
 CREATE TABLE public.contact_messages (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid REFERENCES public.users(id) ON DELETE SET NULL,
   name text NOT NULL,
   email text NOT NULL,
   message text NOT NULL,
@@ -56,10 +55,6 @@ WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Anyone can submit contact messages" 
 ON public.contact_messages FOR INSERT 
 WITH CHECK (true);
-
-CREATE POLICY "Only admins can view contact messages" 
-ON public.contact_messages FOR SELECT 
-USING (false); -- Set to false to hide from public/auth users, only accessible via service_role
 
 -- 6. TRIGGER OTOMATIS UNTUK UPDATED_AT
 CREATE OR REPLACE FUNCTION update_updated_at_column()

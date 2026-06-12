@@ -4,10 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Send, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function ContactPage() {
-  const { user } = useAuth();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -18,14 +16,14 @@ export default function ContactPage() {
 
     setStatus("loading");
     try {
+      // Strictly inserting ONLY form data
       const { error } = await supabase
         .from("contact_messages")
         .insert([
           {
             name: formData.name,
             email: formData.email,
-            message: formData.message,
-            user_id: user?.id || null
+            message: formData.message
           },
         ]);
 
@@ -35,7 +33,7 @@ export default function ContactPage() {
       setShowSuccessPopup(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      console.error("Supabase insert error:", error);
+      console.error("Database insert error:", error);
       setStatus("error");
     }
   };
@@ -113,7 +111,7 @@ export default function ContactPage() {
             </div>
 
             {status === "error" && (
-              <p className="text-[10px] font-bold text-red-500 text-center">Failed to send message. Please try again or check your SMTP settings.</p>
+              <p className="text-[10px] font-bold text-red-500 text-center">Failed to send message. Please try again later.</p>
             )}
 
             <button
