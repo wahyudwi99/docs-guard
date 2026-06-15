@@ -1006,40 +1006,45 @@ function HomeContent() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
-             <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-125 transition-transform duration-700">
-               <Shield className="h-24 w-24" />
-             </div>
-             <div className="relative z-10 space-y-4">
-                {session && (
-                  <button 
-                    onClick={() => {
-                      if (window.confirm(t('info_card.delete_account_confirm'))) {
-                        deleteAccount();
-                      }
-                    }}
-                    className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] bg-white/10 hover:bg-rose-500/90 hover:text-white px-3 py-1.5 rounded-full transition-all border border-white/10 hover:border-rose-400 group/del"
-                  >
-                    <Trash2 className="h-2.5 w-2.5 group-hover/del:animate-pulse" />
-                    {t('info_card.delete_account')}
-                  </button>
-                )}
-                <h3 className="font-bold flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  {t('info_card.how_it_works')}
-                </h3>
-                <p className="text-xs text-indigo-100 leading-relaxed text-left">
-                  {t('info_card.description')}
-                </p>
-                <div className="pt-2 border-t border-white/20">
-                  <p className="text-[10px] text-indigo-200/90 leading-relaxed italic text-left">
-                    {t('info_card.privacy_notice')}
+          <div className="space-y-4">
+            {session && (
+              <div className="flex justify-end px-2">
+                <button 
+                  onClick={() => {
+                    if (window.confirm(t('info_card.delete_account_confirm'))) {
+                      deleteAccount();
+                    }
+                  }}
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-2xl transition-all border border-rose-200 shadow-sm active:scale-95 group/del"
+                >
+                  <Trash2 className="h-3.5 w-3.5 group-hover/del:animate-bounce" />
+                  {t('info_card.delete_account')}
+                </button>
+              </div>
+            )}
+            
+            <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
+               <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-125 transition-transform duration-700">
+                 <Shield className="h-24 w-24" />
+               </div>
+               <div className="relative z-10 space-y-4">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    {t('info_card.how_it_works')}
+                  </h3>
+                  <p className="text-xs text-indigo-100 leading-relaxed text-left">
+                    {t('info_card.description')}
                   </p>
-                </div>
-                <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
-                  {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
-                </Link>
-             </div>
+                  <div className="pt-2 border-t border-white/20">
+                    <p className="text-[10px] text-indigo-200/90 leading-relaxed italic text-left">
+                      {t('info_card.privacy_notice')}
+                    </p>
+                  </div>
+                  <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
+                    {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
+                  </Link>
+               </div>
+            </div>
           </div>
 
           {/* Contact Us Card */}
