@@ -7,7 +7,7 @@ import { useI18n } from "@/hooks/useI18n";
 export default function PrivacyPolicy() {
   const { t } = useI18n();
 
-  const sections = t('privacy.sections') as any[];
+  const sections = (t('privacy.sections') as any[]) || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">

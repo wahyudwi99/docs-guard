@@ -4,6 +4,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Shield, Lock, X, CheckCircle2, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalProps) {
   const { loginWithGoogle } = useAuth();
+  const router = useRouter();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -21,6 +23,12 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
     } catch (error) {
       console.error("Google Sign-In error:", error);
     }
+  };
+
+  const handlePrivacyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClose();
+    router.push('/privacy');
   };
 
   const benefits = [
@@ -86,7 +94,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               </button>
               
               <p className="text-[10px] text-zinc-400 font-medium">
-                By continuing, you agree to our <a href="/privacy" className="text-indigo-600 font-bold hover:underline">Privacy Policy</a>
+                By continuing, you agree to our <button onClick={handlePrivacyClick} className="text-indigo-600 font-bold hover:underline">Privacy Policy</button>
               </p>
             </div>
           </motion.div>
