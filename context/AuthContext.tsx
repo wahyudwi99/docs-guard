@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('users')
         .select('full_name, created_at')
-        .eq('id', userId)
+        .eq('auth_id', userId)
         .single();
         
       if (error) {
@@ -167,23 +167,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setLoading(true);
       
-      const randomStr = Math.random().toString(36).substring(2, 8);
-      const anonymizedName = `deleted_user_${randomStr}`;
-      const anonymizedEmail = `deleted_${randomStr}_${user.email || 'user'}`;
-      
-      const { error } = await supabase
-        .from('users')
-        .update({
-          full_name: anonymizedName,
-          email: anonymizedEmail,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      // Call the RPC that handles both anonymization and auth user deletion
+      const { error } = await supabase.rpc('delete_user_account');
         
       if (error) throw error;
       
       await logout();
-      console.log('[AUTH] Account successfully anonymized and deleted');
+      console.log('[AUTH] Account successfully anonymized and deleted via RPC');
     } catch (error) {
       console.error('[AUTH] Delete account failed:', error);
       alert('Failed to delete account. Please try again.');
