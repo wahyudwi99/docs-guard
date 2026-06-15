@@ -1011,6 +1011,19 @@ function HomeContent() {
                <Shield className="h-24 w-24" />
              </div>
              <div className="relative z-10 space-y-4">
+                {session && (
+                  <button 
+                    onClick={() => {
+                      if (window.confirm(t('info_card.delete_account_confirm'))) {
+                        deleteAccount();
+                      }
+                    }}
+                    className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] bg-white/10 hover:bg-rose-500/90 hover:text-white px-3 py-1.5 rounded-full transition-all border border-white/10 hover:border-rose-400 group/del"
+                  >
+                    <Trash2 className="h-2.5 w-2.5 group-hover/del:animate-pulse" />
+                    {t('info_card.delete_account')}
+                  </button>
+                )}
                 <h3 className="font-bold flex items-center gap-2">
                   <Info className="h-4 w-4" />
                   {t('info_card.how_it_works')}
@@ -1023,19 +1036,6 @@ function HomeContent() {
                     {t('info_card.privacy_notice')}
                   </p>
                 </div>
-                {session && (
-                  <button 
-                    onClick={() => {
-                      if (window.confirm(t('info_card.delete_account_confirm'))) {
-                        deleteAccount();
-                      }
-                    }}
-                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-rose-500/80 hover:bg-rose-600 px-4 py-2 rounded-full transition-all w-fit group/del"
-                  >
-                    <Trash2 className="h-3 w-3 group-hover/del:animate-bounce" />
-                    {t('info_card.delete_account')}
-                  </button>
-                )}
                 <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
                   {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
                 </Link>
