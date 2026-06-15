@@ -23,6 +23,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginModal } from "@/components/LoginModal";
+import { DeleteAccountModal } from "@/components/DeleteAccountModal";
 import { motion, AnimatePresence } from 'framer-motion';
 import { InAppReview } from '@capacitor-community/in-app-review';
 import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
@@ -39,6 +40,7 @@ function HomeContent() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
@@ -533,6 +535,12 @@ function HomeContent() {
         onClose={() => setShowLoginModal(false)} 
       />
 
+      <DeleteAccountModal 
+        isOpen={showDeleteModal} 
+        onClose={() => setShowDeleteModal(false)} 
+        onConfirm={deleteAccount} 
+      />
+
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
         <div className="w-full space-y-6">
           {/* Top Verified Privacy Banner */}
@@ -1010,11 +1018,7 @@ function HomeContent() {
             {session && (
               <div className="flex justify-center px-2">
                 <button 
-                  onClick={() => {
-                    if (window.confirm(t('info_card.delete_account_confirm'))) {
-                      deleteAccount();
-                    }
-                  }}
+                  onClick={() => setShowDeleteModal(true)}
                   className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-2xl transition-all border border-rose-200 shadow-sm active:scale-95 group/del"
                 >
                   <Trash2 className="h-3.5 w-3.5 group-hover/del:animate-bounce" />
