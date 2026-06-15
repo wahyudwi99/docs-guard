@@ -12,8 +12,8 @@ DROP TABLE IF EXISTS public.users CASCADE;
 -- 2. TABEL USERS (Profil Dasar)
 CREATE TABLE public.users (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY, -- Internal Profile ID
-  auth_id uuid REFERENCES auth.users(id) ON DELETE SET NULL UNIQUE, -- Link to Auth (Null if deleted)
-  email text, -- Tidak UNIQUE agar bisa re-register setelah hapus akun
+  auth_id uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE, -- Hapus baris ini jika user di auth.users dihapus
+  email text,
   full_name text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
@@ -22,7 +22,7 @@ CREATE TABLE public.users (
 -- 3. TABEL PAYMENTS (Append-only Log)
 CREATE TABLE public.payments (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid REFERENCES public.users(id) ON DELETE CASCADE NOT NULL, -- References the Internal Profile ID
+  user_id uuid REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
   transaction_id text NOT NULL, 
   product_id text,
   amount numeric,
@@ -84,7 +84,6 @@ FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 -- 8. FUNGSI SINKRONISASI TOTAL (Database Level Only)
--- Fungsi ini menangani pembuatan dan pemulihan data profil secara otomatis
 CREATE OR REPLACE FUNCTION public.handle_auth_user_sync()
 RETURNS trigger AS $$
 BEGIN
@@ -114,8 +113,7 @@ CREATE TRIGGER on_auth_user_login
   WHEN (old.last_sign_in_at IS DISTINCT FROM new.last_sign_in_at)
   EXECUTE PROCEDURE public.handle_auth_user_sync();
 
--- 11. FUNGSI PENGHAPUSAN AKUN (Anonymize + Delete Auth User)
--- Fungsi ini memungkinkan user untuk menghapus akun mereka sendiri secara total
+-- 11. FUNGSI PENGHAPUSAN AKUN TOTAL (Delete from Auth & Public)
 CREATE OR REPLACE FUNCTION public.delete_user_account()
 RETURNS void AS $$
 DECLARE
@@ -127,16 +125,9 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  -- 1. Anonymize data di public.users dan putus hubungan dengan auth_id
-  UPDATE public.users 
-  SET 
-    email = 'deleted_' || substr(md5(random()::text), 1, 8) || '_' || email,
-    full_name = 'Deleted User ' || substr(md5(random()::text), 1, 4),
-    auth_id = NULL,
-    updated_at = now()
-  WHERE auth_id = target_auth_id;
-
-  -- 2. Hapus user dari auth.users (Tindakan Administratif via SECURITY DEFINER)
+  -- Hapus user dari auth.users. 
+  -- Karena tabel public.users memiliki foreign key dengan ON DELETE CASCADE ke auth_id,
+  -- maka baris terkait di public.users akan otomatis ikut terhapus.
   DELETE FROM auth.users WHERE id = target_auth_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
