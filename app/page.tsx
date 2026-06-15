@@ -1008,7 +1008,7 @@ function HomeContent() {
           {/* Info Card */}
           <div className="space-y-4">
             {session && (
-              <div className="flex justify-end px-2">
+              <div className="flex justify-center px-2">
                 <button 
                   onClick={() => {
                     if (window.confirm(t('info_card.delete_account_confirm'))) {
