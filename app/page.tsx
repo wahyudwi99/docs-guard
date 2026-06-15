@@ -183,6 +183,12 @@ function HomeContent() {
     window.location.reload();
   }, [logout]);
 
+  const handleDeleteAccount = useCallback(async () => {
+    await deleteAccount();
+    // Hard refresh to clear all states and re-trigger splash screen
+    window.location.reload();
+  }, [deleteAccount]);
+
   // Close login modal when session is established
   useEffect(() => {
     if (session && showLoginModal) {
@@ -538,7 +544,7 @@ function HomeContent() {
       <DeleteAccountModal 
         isOpen={showDeleteModal} 
         onClose={() => setShowDeleteModal(false)} 
-        onConfirm={deleteAccount} 
+        onConfirm={handleDeleteAccount} 
       />
 
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
