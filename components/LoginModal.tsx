@@ -86,7 +86,7 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               </button>
               
               <p className="text-[10px] text-zinc-400 font-medium">
-                By continuing, you agree to our Privacy Policy
+                By continuing, you agree to our <a href="/privacy" className="text-indigo-600 font-bold hover:underline">Privacy Policy</a>
               </p>
             </div>
           </motion.div>

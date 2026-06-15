@@ -166,65 +166,78 @@
     "local_first": "Lokal-Utama"
   },
   "privacy": {
-    "title": "Kebijakan Privasi Amnesia Total",
-    "hero_title": "Amnesia Total",
-    "hero_subtitle": "Kami merancang DocsGuard untuk menjadi alat dokumen paling privat di bumi. Kami benar-benar tidak bisa melihat file Anda.",
-    "amnesia": {
-      "title": "Amnesia Total",
-      "description": "Segera setelah Anda menutup aplikasi atau menyelesaikan sesi, semua jejak dokumen Anda dihapus dari memori. Kami tidak menyimpan riwayat, log, atau cache dari konten pribadi Anda."
-    },
-    "on_device": {
-      "title": "100% Di Perangkat",
-      "description": "File Anda tidak pernah meninggalkan ponsel Anda. Semua proses watermark, sensor, dan enkripsi terjadi secara lokal menggunakan perangkat keras Anda."
-    },
-    "zero_cloud": {
-      "title": "Nol Cloud",
-      "description": "Kami tidak memiliki server untuk menyimpan dokumen. Tidak ada tombol 'unggah' ke cloud kami karena memang tidak ada cloud. Data Anda milik Anda."
-    },
-    "zero_selling": {
-      "title": "Nol Penjualan",
-      "description": "Karena kami tidak mengumpulkan data Anda, kami tidak memiliki apa pun untuk dijual. Model bisnis kami didasarkan pada langganan, bukan informasi pribadi Anda."
-    },
-    "commitment_title": "Komitmen Kami",
-    "commitment_description": "Di DocsGuard, kami percaya privasi adalah hak asasi manusia yang mendasar. Alat dokumen 'gratis' tradisional sering kali memproses file Anda di server mereka, berpotensi melatih model AI atau membangun profil. Kami mengambil pendekatan sebaliknya.",
-    "features": [
-      "Tidak ada pelacakan konten file",
-      "Tidak ada pengambilan metadata dokumen",
-      "Tidak ada analitik pihak ketiga pada file pribadi Anda",
-      "Pemrosesan transparan dan terbuka"
-    ],
-    "technical_title": "Keamanan Teknis",
-    "technical_description": "Saat Anda menerapkan watermark atau menyensor area, kami menggunakan Canvas API Browser atau API Native Mobile. File yang dihasilkan dibuat di memori dan ditawarkan untuk diunduh. Setelah jendela atau aplikasi ditutup, memori tersebut dilepaskan oleh sistem operasi.",
-    "contact_title": "Kontak",
-    "contact_description": "Jika Anda memiliki pertanyaan tentang kebijakan 'Amnesia Total' kami, Anda dapat menghubungi tim keamanan kami. Kami berkomitmen untuk menjaga standar tertinggi privasi di perangkat.",
+    "title": "Kebijakan Privasi",
     "back_button": "Kembali",
-    "last_updated": "Terakhir Diperbarui: {date}",
-    "premium_title": "Keuntungan Premium",
-    "benefits_details": [
+    "last_updated": "Terakhir Diperbarui: 12 Juni 2026",
+    "hero_title": "Kebijakan Privasi (Privacy Policy) untuk DocsGuard",
+    "hero_subtitle": "Kami berkomitmen untuk melindungi privasi mutlak Anda dan memastikan keamanan dokumen Anda yang tidak dapat ditembus.",
+    "effective_date": "Tanggal Efektif: 12 Juni 2026",
+    "sections": [
       {
-        "title": "Perlindungan Dokumen Tanpa Batas",
-        "description": "Tambahkan watermark ke ratusan halaman PDF secara bersamaan dalam hitungan detik. Bebas dari limit 3 halaman dan selesaikan pekerjaan berat Anda secara instan.",
-        "icon": "zap"
+        "title": "1. Pendahuluan",
+        "content": "Selamat datang di DocsGuard. Kami berkomitmen untuk melindungi privasi mutlak Anda dan memastikan keamanan dokumen Anda yang tidak dapat ditembus. Kebijakan Privasi ini menjelaskan bagaimana informasi Anda ditangani saat Anda menggunakan aplikasi seluler kami (\"DocsGuard\" atau \"Aplikasi\")."
       },
       {
-        "title": "Watermark Video Tanpa Batas (Kualitas Asli)",
-        "description": "Bebaskan video Anda dari batasan durasi. Beri watermark pada video panjang dengan jaminan kualitas ekspor asli 100%. Tanpa penurunan resolusi, tanpa kompresi.",
-        "icon": "video"
+        "title": "2. Prinsip Utama: Zero-Knowledge & Pemrosesan Lokal",
+        "content": "Filosofi mendasar kami adalah bahwa data Anda adalah milik Anda sepenuhnya. DocsGuard dirancang secara ketat dengan arsitektur pemrosesan lokal.",
+        "list": [
+          "Tidak Ada Server Cloud untuk File: Kami tidak mengunggah, mengirimkan, menyimpan, atau memproses dokumen, foto, atau video Anda di server jarak jauh mana pun.",
+          "Operasi di Perangkat (On-Device): Semua pengeditan dokumen, pemberian watermark, dan fitur keamanan dieksekusi sepenuhnya secara lokal pada perangkat keras Anda.",
+          "Akses Nol (Zero Access): Pengembang, karyawan, dan perusahaan kami sama sekali tidak memiliki akses ke file yang Anda impor atau modifikasi menggunakan DocsGuard."
+        ]
       },
       {
-        "title": "Enkripsi PDF Lanjutan (PDF Vault)",
-        "description": "Kunci dokumen sensitif Anda dengan enkripsi lokal yang aman. Pastikan kontrak, laporan keuangan, dan data pribadi hanya dapat diakses oleh mereka yang Anda izinkan.",
-        "icon": "lock"
+        "title": "3. Informasi yang Kami Kumpulkan untuk Manajemen Akun dan Dukungan",
+        "content": "Meskipun dokumen dan file Anda tetap diproses secara murni di perangkat lokal, kami mengumpulkan informasi minimal yang diperlukan untuk mengelola langganan Pro Anda dan memberikan dukungan pelanggan:",
+        "list": [
+          "Data Autentikasi (Google Sign-In): Jika Anda memilih untuk masuk menggunakan Akun Google Anda untuk mengakses fitur Pro, kami menerima informasi profil dasar yang disediakan oleh Google, khususnya Alamat Email dan Nama Anda.",
+          "Data Dukungan Pelanggan dan Umpan Balik: Jika Anda mengirimkan keluhan, pertanyaan, atau umpan balik melalui Halaman Dukungan Dalam Aplikasi (“Contact us” page) kami, kami mengumpulkan dan menyimpan Nama, Alamat Email, dan isi pesan Anda secara aman di dalam database kami.",
+          "Tujuan Pengumpulan: Data autentikasi digunakan untuk menyinkronkan langganan Pro Anda di berbagai perangkat. Data dukungan disimpan secara eksklusif untuk menganalisis, memproses, dan menanggapi keluhan atau pertanyaan Anda melalui email dukungan resmi kami. Kami tidak menggunakan informasi ini untuk pemasaran pihak ketiga, dan kami tidak pernah menjualnya kepada pialang data (data brokers)."
+        ]
       },
       {
-        "title": "Smart Blur",
-        "description": "Sembunyikan informasi rahasia! Blur area spesifik secara permanen pada dokumen atau gambar (seperti nomor rekening atau nomor ID) sebelum membagikannya.",
-        "icon": "eye-off"
+        "title": "4. Informasi yang Tidak Kami Kumpulkan",
+        "content": "Untuk memastikan kejelasan mutlak, DocsGuard tidak mengumpulkan, menyimpan, atau membagikan:",
+        "list": [
+          "Isi dari dokumen, gambar, PDF, atau video Anda.",
+          "Informasi Identifikasi Pribadi (PII) apa pun di luar data akun dan dukungan eksplisit yang disebutkan pada Bagian 3."
+        ]
       },
       {
-        "title": "Pemrosesan Prioritas & Bebas Iklan",
-        "description": "Nikmati antarmuka yang bersih dan terfokus. Alami pemrosesan di perangkat yang lebih cepat dan sepenuhnya bebas dari iklan yang mengganggu.",
-        "icon": "shield-check"
+        "title": "5. Data yang Dikumpulkan Secara Otomatis (Layanan Pihak Ketiga)",
+        "content": "Kami menggunakan layanan pihak ketiga yang sangat terpercaya untuk mengoperasikan fungsi backend esensial Aplikasi. Layanan ini mungkin mengumpulkan data yang dianonimkan:",
+        "list": [
+          "Manajemen Langganan (misalnya, Apple App Store, RevenueCat): Digunakan untuk memverifikasi riwayat pembelian dan tingkat langganan Anda saat ini.",
+          "Analitik & Laporan Kerusakan (misalnya, Firebase / Apple App Analytics): Jika Anda memberikan izin (opt-in) melalui pengaturan perangkat Anda, kami menerima log kerusakan anonim (model perangkat, versi OS, waktu kerusakan) untuk membantu kami memperbaiki bug dan meningkatkan kinerja Aplikasi."
+        ]
+      },
+      {
+        "title": "6. Langganan dan Pemrosesan Pembayaran",
+        "content": "Semua transaksi keuangan ditangani secara aman dan langsung oleh Apple App Store. DocsGuard tidak memproses, menyimpan, atau memiliki akses ke informasi pembayaran, nomor kartu kredit, atau alamat penagihan Anda. Dengan masuk menggunakan Akun Google Anda, kami menautkan ID pengguna anonim yang aman ke tanda terima pembelian Anda, memungkinkan Anda memulihkan langganan Anda di perangkat baru dengan lancar."
+      },
+      {
+        "title": "7. Retensi Data dan Penghapusan Akun",
+        "content": "Kami menyimpan informasi akun dasar dan riwayat dukungan Anda hanya selama diperlukan untuk memenuhi tujuan yang diuraikan dalam kebijakan ini.",
+        "list": [
+          "Hak Anda untuk Menghapus: Anda memiliki hak untuk sepenuhnya menghapus akun DocsGuard Anda dan semua data terkait (termasuk riwayat dukungan Anda di database kami) kapan saja. Anda dapat melakukannya langsung di dalam Aplikasi dengan menavigasi ke Settings > Account > Delete Account (Pengaturan > Akun > Hapus Akun).",
+          "Konsekuensi Penghapusan: Setelah penghapusan akun, alamat email, catatan autentikasi, dan pesan dukungan yang Anda kirimkan akan dihapus secara permanen dari database kami. Harap dicatat bahwa menghapus akun Anda tidak secara otomatis membatalkan langganan App Store yang aktif; Anda harus mengelola dan membatalkannya secara langsung melalui pengaturan toko (store) di perangkat Anda."
+        ]
+      },
+      {
+        "title": "8. Hak Pengguna (Kepatuhan GDPR & CCPA)",
+        "content": "Berdasarkan General Data Protection Regulation (GDPR) dan California Consumer Privacy Act (CCPA), pengguna memiliki hak untuk meminta akses, modifikasi, atau penghapusan data mereka. Karena DocsGuard beroperasi secara lokal dan tidak menyimpan file Anda di server kami, hak Anda untuk menghapus file sepenuhnya berada di bawah kendali Anda. Untuk menghapus semua dokumen Anda yang terkait dengan DocsGuard, cukup hapus file tersebut dari perangkat Anda atau uninstall (copot pemasangan) Aplikasi. Untuk penghapusan data akun dan dukungan Anda, silakan merujuk ke Bagian 7."
+      },
+      {
+        "title": "9. Privasi Anak-Anak",
+        "content": "Aplikasi kami adalah alat keamanan dokumen profesional dan tidak ditujukan untuk individu di bawah usia 13 tahun (atau usia legal yang berlaku di wilayah Anda). Kami tidak dengan sengaja mengumpulkan informasi pribadi apa pun dari anak-anak. Jika kami menyadari bahwa kami secara tidak sengaja telah mengumpulkan data pribadi dari seorang anak, kami akan mengambil langkah segera untuk menghapus informasi tersebut dari database kami."
+      },
+      {
+        "title": "10. Perubahan pada Kebijakan Privasi Ini",
+        "content": "Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk mencerminkan perubahan pada praktik, teknologi, atau persyaratan hukum kami. Kebijakan yang diperbarui akan dapat diakses melalui menu pengaturan Aplikasi."
+      },
+      {
+        "title": "11. Hubungi Kami",
+        "content": "Jika Anda memiliki pertanyaan, kekhawatiran, atau permintaan mengenai Kebijakan Privasi ini atau bagaimana DocsGuard handles your privacy, silakan hubungi kami secara langsung melalui Halaman Dukungan Dalam Aplikasi (“Contact us” page) yang terletak di dalam menu pengaturan Aplikasi. Setelah Anda mengirimkan pertanyaan Anda, tim dukungan resmi kami akan meninjau kasus Anda dan membalasnya langsung ke alamat email yang Anda berikan di dalam formulir tersebut."
       }
     ]
   },

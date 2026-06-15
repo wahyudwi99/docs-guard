@@ -166,65 +166,78 @@
     "local_first": "Local-First"
   },
   "privacy": {
-    "title": "Amnesia Total Privacy Policy",
-    "hero_title": "Amnesia Total",
-    "hero_subtitle": "We designed DocsGuard to be the most private document tool on earth. We literally cannot see your files.",
-    "amnesia": {
-      "title": "Total Amnesia",
-      "description": "As soon as you close the app or finish a session, all traces of your documents are wiped from memory. We don't keep history, logs, or cache of your private content."
-    },
-    "on_device": {
-      "title": "100% On-Device",
-      "description": "Your files never leave your phone. All watermarking, blurring, and encryption happens locally using your device's hardware."
-    },
-    "zero_cloud": {
-      "title": "Zero Cloud",
-      "description": "We have no servers for storing documents. There is no 'upload' button to our cloud because there is no cloud. Your data belongs to you."
-    },
-    "zero_selling": {
-      "title": "Zero Selling",
-      "description": "Since we don't collect your data, we have nothing to sell. Our business model is based on subscriptions, not your personal information."
-    },
-    "commitment_title": "Our Commitment",
-    "commitment_description": "At DocsGuard, we believe privacy is a fundamental human right. Traditional 'free' document tools often process your files on their servers, potentially training AI models or building profiles. We take the opposite approach.",
-    "features": [
-      "No tracking of file contents",
-      "No document metadata harvesting",
-      "No third-party analytics on your private files",
-      "Open transparent processing"
-    ],
-    "technical_title": "Technical Security",
-    "technical_description": "When you apply a watermark or blur an area, we use the Browser's Canvas API or native Mobile APIs. The resulting file is generated in-memory and offered for download. Once the window or app is closed, that memory is released by the operating system.",
-    "contact_title": "Contact",
-    "contact_description": "If you have questions about our 'Amnesia Total' policy, you can reach out to our security team. We are committed to maintaining the highest standards of on-device privacy.",
+    "title": "Privacy Policy",
     "back_button": "Back",
-    "last_updated": "Last Updated: {date}",
-    "premium_title": "Premium Benefits",
-    "benefits_details": [
+    "last_updated": "Last Updated: June 12, 2026",
+    "hero_title": "Privacy Policy for DocsGuard",
+    "hero_subtitle": "We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents.",
+    "effective_date": "Effective Date: June 12, 2026",
+    "sections": [
       {
-        "title": "Unlimited Document Protection",
-        "description": "Add watermarks to hundreds of PDF pages simultaneously in seconds. Break free from the 3-page limit and crush your heavy workloads instantly.",
-        "icon": "zap"
+        "title": "1. Introduction",
+        "content": "Welcome to DocsGuard. We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents. This Privacy Policy explains how your information is handled when you use our mobile application (\"DocsGuard\" or the \"App\")."
       },
       {
-        "title": "Unlimited Video Watermarking (Original Quality)",
-        "description": "Free your videos from duration limits. Watermark long videos with a 100% original export quality guarantee. Zero resolution loss, zero compression.",
-        "icon": "video"
+        "title": "2. The Core Principle: Zero-Knowledge & Local Processing",
+        "content": "Our fundamental philosophy is that your data belongs exclusively to you. DocsGuard is engineered with a strictly local-processing architecture.",
+        "list": [
+          "No Cloud Servers for Files: We do not upload, transmit, store, or process any of your documents, photos, or videos on any remote servers.",
+          "On-Device Operation: All document editing, watermarking, and security features are executed entirely locally on your device's hardware.",
+          "Zero Access: Our developers, employees, and company have absolutely zero access to the files you import or modify using DocsGuard."
+        ]
       },
       {
-        "title": "Advanced PDF Encryption (PDF Vault)",
-        "description": "Lock your sensitive documents with secure local encryption. Ensure contracts, financial reports, and personal data can only be accessed by those you authorize.",
-        "icon": "lock"
+        "title": "3. Information We Collect for Account and Support Management",
+        "content": "While your documents and files remain strictly local, we collect minimal information necessary to manage your Pro subscription and provide customer support:",
+        "list": [
+          "Authentication Data (Google Sign-In): If you choose to log in using your Google Account to access Pro features, we receive basic profile information provided by Google, specifically your Email Address and Name.",
+          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our “Contact us” Page , we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
+          "Purpose of Collection: Authentication data is used to sync your Pro subscription across multiple devices. Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for third-party marketing, nor do we ever sell it to data brokers."
+        ]
       },
       {
-        "title": "Smart Blur",
-        "description": "Hide confidential information! Permanently blur specific areas on documents or images (like bank accounts or ID numbers) before sharing them.",
-        "icon": "eye-off"
+        "title": "4. Information We Do Not Collect",
+        "content": "To ensure absolute clarity, DocsGuard does not collect, store, or share:",
+        "list": [
+          "The contents of your documents, images, PDFs, or videos.",
+          "Any Personally Identifiable Information (PII) beyond the explicit account and support data mentioned in Section 3."
+        ]
       },
       {
-        "title": "Priority Processing & Ad-Free",
-        "description": "Enjoy a clean, focused interface. Experience faster, on-device processing completely free from any annoying ads.",
-        "icon": "shield-check"
+        "title": "5. Data Collected Automatically (Third-Party Services)",
+        "content": "We use highly trusted third-party services to operate the App's essential backend functions. These services may collect anonymized data:",
+        "list": [
+          "Subscription Management (e.g., Apple App Store, RevenueCat): Used to verify your purchase history and current subscription tier.",
+          "Analytics & Crash Reports (e.g., Firebase / Apple App Analytics): If you opt-in via your device settings, we receive anonymous crash logs (device model, OS version, time of crash) to help us fix bugs and improve App performance."
+        ]
+      },
+      {
+        "title": "6. Subscriptions and Payment Processing",
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing address. By logging in with your Google Account, we link a secure, anonymous user ID to your purchase receipt, allowing you to seamlessly restore your subscription on a new device."
+      },
+      {
+        "title": "7. Data Retention and Account Deletion",
+        "content": "We retain your basic account information and support history only for as long as necessary to fulfill the purposes outlined in this policy.",
+        "list": [
+          "Your Right to Delete: You have the right to completely delete your DocsGuard account and all associated data (including your support history in our database) at any time. You can do this directly within the App by navigating to Settings > Account > Delete Account.",
+          "Consequence of Deletion: Upon account deletion, your email address, authentication records, and submitted support messages will be permanently erased from our databases. Please note that deleting your account does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your device's store settings."
+        ]
+      },
+      {
+        "title": "8. User Rights (GDPR & CCPA Compliance)",
+        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your account and support data deletion, please refer to Section 7."
+      },
+      {
+        "title": "9. Children's Privacy",
+        "content": "Our App is a professional document security tool and is not directed at individuals under the age of 13 (or the applicable legal age in your region). We do not knowingly collect any personal information from children. If we become aware that we have inadvertently collected personal data from a child, we will take immediate steps to delete such information from our databases."
+      },
+      {
+        "title": "10. Changes to This Privacy Policy",
+        "content": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. The updated policy will be accessible within the App settings."
+      },
+      {
+        "title": "11. Contact Us",
+        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our “Contact us” page (located within the App's page). Once you submit your inquiry, our official support team will review your case and respond directly to the email address you provided in the form."
       }
     ]
   },
