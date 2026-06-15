@@ -1014,20 +1014,7 @@ function HomeContent() {
           </div>
 
           {/* Info Card */}
-          <div className="space-y-4">
-            {session && (
-              <div className="flex justify-center px-2">
-                <button 
-                  onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-2xl transition-all border border-rose-200 shadow-sm active:scale-95 group/del"
-                >
-                  <Trash2 className="h-3.5 w-3.5 group-hover/del:animate-bounce" />
-                  {t('info_card.delete_account')}
-                </button>
-              </div>
-            )}
-            
-            <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
+          <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
                <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-125 transition-transform duration-700">
                  <Shield className="h-24 w-24" />
                </div>
@@ -1049,7 +1036,6 @@ function HomeContent() {
                   </Link>
                </div>
             </div>
-          </div>
 
           {/* Contact Us Card */}
           <Link href="/contact" className="block bg-slate-900 rounded-[32px] p-6 text-white shadow-xl shadow-slate-200 overflow-hidden relative group hover:bg-black transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
@@ -1069,6 +1055,17 @@ function HomeContent() {
                 </div>
              </div>
           </Link>
+          {session && (
+            <div className="w-full pt-2">
+               <button 
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-rose-600 bg-rose-50/50 hover:bg-rose-100 py-5 rounded-[2rem] transition-all border border-rose-200 shadow-sm active:scale-[0.98] group/del"
+               >
+                  <Trash2 className="h-4 w-4 group-hover/del:animate-bounce" />
+                  {t('info_card.delete_account')}
+               </button>
+            </div>
+          )}
         </div>
       </main>
 
