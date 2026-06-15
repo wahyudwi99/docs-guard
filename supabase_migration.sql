@@ -86,7 +86,8 @@ BEGIN
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
     full_name = EXCLUDED.full_name,
-    updated_at = now();
+    updated_at = now()
+  WHERE NOT (public.users.email LIKE 'deleted_%');
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
