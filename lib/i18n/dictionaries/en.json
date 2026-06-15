@@ -133,6 +133,8 @@
     "how_it_works": "How it works",
     "description": "DocsGuard uses browser-based canvas rendering to apply watermarks. This means your data never leaves your computer, ensuring 100% privacy.",
     "privacy_notice": "Your documents are processed locally on your device without the use of servers. We do not store or access your data. Your privacy is entirely in your hands.",
+    "delete_account": "Delete Account",
+    "delete_account_confirm": "Are you sure you want to delete your account? Your profile data will be anonymized and you will be logged out. This action cannot be undone.",
     "learn_more": "Learn More"
   },
   "preview_modal": {

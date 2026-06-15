@@ -22,6 +22,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
   restoreSession: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -160,8 +161,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const anonymizedName = `deleted_user_${randomStr}`;
+      const anonymizedEmail = `deleted_${randomStr}_${user.email || 'user'}`;
+      
+      const { error } = await supabase
+        .from('users')
+        .update({
+          full_name: anonymizedName,
+          email: anonymizedEmail,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      await logout();
+      console.log('[AUTH] Account successfully anonymized and deleted');
+    } catch (error) {
+      console.error('[AUTH] Delete account failed:', error);
+      alert('Failed to delete account. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout, restoreSession, refreshProfile }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout, restoreSession, refreshProfile, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

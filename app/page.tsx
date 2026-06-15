@@ -16,7 +16,7 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock, Mail } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock, Mail, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -42,7 +42,7 @@ function HomeContent() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
-  const { user: session, loading: isLoadingAuth, logout } = useAuth();
+  const { user: session, loading: isLoadingAuth, logout, deleteAccount } = useAuth();
   const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
@@ -1023,6 +1023,19 @@ function HomeContent() {
                     {t('info_card.privacy_notice')}
                   </p>
                 </div>
+                {session && (
+                  <button 
+                    onClick={() => {
+                      if (window.confirm(t('info_card.delete_account_confirm'))) {
+                        deleteAccount();
+                      }
+                    }}
+                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-rose-500/80 hover:bg-rose-600 px-4 py-2 rounded-full transition-all w-fit group/del"
+                  >
+                    <Trash2 className="h-3 w-3 group-hover/del:animate-bounce" />
+                    {t('info_card.delete_account')}
+                  </button>
+                )}
                 <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
                   {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
                 </Link>
