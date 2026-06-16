@@ -604,6 +604,7 @@ function HomeContent() {
                   addBlurArea(area);
                 }}
                 blurAreas={blurAreas}
+                documentType={documentType}
               />
             </div>
           )}

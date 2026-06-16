@@ -16,6 +16,7 @@ interface CanvasDisplayProps {
   isSelectionMode?: boolean;
   onAreaSelected?: (area: BlurArea) => void;
   blurAreas?: BlurArea[];
+  documentType?: "image" | "pdf" | "video" | null;
 }
 
 /**
@@ -33,10 +34,12 @@ const CanvasPage: React.FC<{
   onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
   onMouseMove: (e: React.MouseEvent | React.TouchEvent) => void;
   onMouseUp: (e: React.MouseEvent | React.TouchEvent) => void;
+  documentType?: "image" | "pdf" | "video" | null;
 }> = React.memo(({ 
   index, isActive, shouldRender, registerCanvas, 
   isDragging, startPos, currentPos, blurAreas,
-  onMouseDown, onMouseMove, onMouseUp
+  onMouseDown, onMouseMove, onMouseUp,
+  documentType
 }) => {
   const pageRef = useRef<HTMLDivElement>(null);
   
@@ -54,7 +57,8 @@ const CanvasPage: React.FC<{
         "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
         isActive 
           ? "opacity-100 scale-100 z-10 translate-x-0" 
-          : "opacity-0 scale-90 -z-10 pointer-events-none"
+          : "opacity-0 scale-90 -z-10 pointer-events-none",
+        documentType === 'video' && "max-h-[70vh]"
       )}
       onMouseDown={onMouseDown}
       onTouchStart={onMouseDown}
@@ -63,17 +67,15 @@ const CanvasPage: React.FC<{
       onMouseUp={onMouseUp}
       onTouchEnd={onMouseUp}
     >
-      {shouldRender ? (
+      {shouldRender && (
         <canvas
           ref={canvasRef}
-          className="max-w-full h-auto block"
+          className={cn(
+            "max-w-full h-auto block",
+            documentType === 'video' ? "bg-black" : "bg-white"
+          )}
+          style={documentType === 'video' ? { minWidth: '300px', minHeight: '200px' } : {}}
         />
-      ) : (
-        <div className="w-[300px] h-[400px] bg-slate-50 flex items-center justify-center">
-           <div className="animate-pulse flex flex-col items-center gap-2">
-              <div className="w-8 h-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
-           </div>
-        </div>
       )}
 
       {/* Selection Overlay */}
@@ -127,7 +129,8 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   registerCanvas,
   isSelectionMode = false,
   onAreaSelected,
-  blurAreas = []
+  blurAreas = [],
+  documentType
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -306,6 +309,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
+              documentType={documentType}
             />
           );
         })}

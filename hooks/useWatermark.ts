@@ -120,18 +120,25 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
         if (!context) return;
         
         const video = videoRef.current;
-        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        if (video.videoWidth > 0 && (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight)) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            
+            // Set CSS size for consistency
+            const dpr = window.devicePixelRatio || 1;
+            canvas.style.width = `${video.videoWidth / dpr}px`;
+            canvas.style.height = `${video.videoHeight / dpr}px`;
         }
         
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        internalApplyWatermark(context, canvas.width, canvas.height);
-        
-        // If we're in the design tab and it's a video, we want to keep redrawing for preview
-        if (!video.paused && !video.ended) {
-            requestAnimationFrame(() => drawWatermark(onlyFirstPage));
+        if (video.readyState >= 2) { // HAVE_CURRENT_DATA or better
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          internalApplyWatermark(context, canvas.width, canvas.height);
         }
+        
+        // Always request next frame if it's a video to keep preview alive even if paused (to show watermark changes)
+        if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
+        renderRequestRef.current = requestAnimationFrame(() => drawWatermark(onlyFirstPage));
         return;
     }
 
@@ -174,6 +181,9 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
 
   useEffect(() => {
     drawWatermark(false);
+    return () => {
+      if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
+    };
   }, [watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
 
   return {
