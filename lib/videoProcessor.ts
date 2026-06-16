@@ -21,7 +21,6 @@ export async function processVideoWithCanvas(
     try {
       onProgress?.("Utilizing native hardware acceleration...");
       
-      // 1. Save File to temporary storage for native access
       const fileName = `temp_${Date.now()}_${videoFile.name}`;
       const arrayBuffer = await videoFile.arrayBuffer();
       const base64Data = btoa(
@@ -34,7 +33,6 @@ export async function processVideoWithCanvas(
         directory: Directory.Cache
       });
 
-      // 2. Call Native Plugin
       const result = await VideoWatermark.addTextWatermark({
         videoUri: savedFile.uri,
         text: text,
@@ -44,12 +42,10 @@ export async function processVideoWithCanvas(
         layout: options.layout || 'tiled'
       });
 
-      // 3. Read back the result
       const processedFile = await Filesystem.readFile({
         path: result.uri
       });
 
-      // Cleanup temp input
       await Filesystem.deleteFile({
         path: fileName,
         directory: Directory.Cache
@@ -67,7 +63,6 @@ export async function processVideoWithCanvas(
       return { blob, ext: 'mp4', mimeType };
     } catch (err) {
       console.warn("Native video processing failed, falling back to Canvas:", err);
-      // Fall through to Canvas method
     }
   }
 
@@ -77,9 +72,8 @@ export async function processVideoWithCanvas(
     const videoUrl = URL.createObjectURL(videoFile);
     video.src = videoUrl;
     video.crossOrigin = "anonymous";
-    // CRITICAL: Must be unmuted to capture audio track
     video.muted = false; 
-    video.volume = 0; // Keep volume at 0 so user doesn't hear it during export
+    video.volume = 1.0; // Play at full volume to the stream, but we will disconnect it from the output
     video.playsInline = true;
 
     video.onloadedmetadata = () => {
@@ -94,21 +88,20 @@ export async function processVideoWithCanvas(
 
       onProgress?.("Initializing recorder...");
       
-      // Attempt to capture the audio track from the original video
-      let audioTrack: MediaStreamTrack | undefined;
-      const customVideo = video as any;
-      const captureStream = customVideo.captureStream || customVideo.mozCaptureStream;
+      // USE WEB AUDIO API FOR ROBUST AUDIO CAPTURE
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(video);
+      const destination = audioCtx.createMediaStreamDestination();
+      source.connect(destination);
+      // NOTE: We don't connect 'source' to 'audioCtx.destination' so it doesn't play through speakers
       
-      if (captureStream) {
-        const stream = captureStream.call(video);
-        audioTrack = stream.getAudioTracks()[0];
-      }
+      const audioTrack = destination.stream.getAudioTracks()[0];
 
       // Capture the canvas visual stream at 60 FPS for ultra-smooth output
       const canvasStream = canvas.captureStream(60);
       const videoTrack = canvasStream.getVideoTracks()[0];
       
-      // Combine tracks: Canvas Video + Original Audio
+      // Combine tracks: Canvas Video + Captured Audio
       const tracks: MediaStreamTrack[] = [videoTrack];
       if (audioTrack) {
         tracks.push(audioTrack);
@@ -116,11 +109,9 @@ export async function processVideoWithCanvas(
       
       const combinedStream = new MediaStream(tracks);
       
-      // Determine best supported mimeType for MediaRecorder
       let mimeType = "video/webm";
       let ext = "webm";
       if (MediaRecorder.isTypeSupported("video/mp4")) {
-        // iOS Safari supports mp4
         mimeType = "video/mp4";
         ext = "mp4";
       } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
@@ -131,7 +122,7 @@ export async function processVideoWithCanvas(
       
       const recorder = new MediaRecorder(combinedStream, { 
         mimeType,
-        videoBitsPerSecond: 30000000 // 30Mbps for 60FPS quality
+        videoBitsPerSecond: 30000000 
       });
       const chunks: Blob[] = [];
       
@@ -142,27 +133,29 @@ export async function processVideoWithCanvas(
       };
       
       recorder.onstop = () => {
+        audioCtx.close();
         URL.revokeObjectURL(videoUrl);
         const blob = new Blob(chunks, { type: mimeType });
         resolve({ blob, ext, mimeType });
       };
       
       recorder.onerror = (e) => {
+        audioCtx.close();
         URL.revokeObjectURL(videoUrl);
         reject(e);
       };
 
-      video.onplay = () => {
-        onProgress?.("Recording video with watermark in real-time...");
+      video.onplay = async () => {
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+        onProgress?.("Recording video with watermark and audio...");
         recorder.start();
         
         const draw = () => {
           if (video.paused || video.ended) return;
-          
-          // 1. Draw the current video frame
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           
-          // 2. Use unified utility for perfect consistency with preview
           applyWatermarkToContext(ctx, canvas.width, canvas.height, {
             text,
             type: 'text',
@@ -177,7 +170,6 @@ export async function processVideoWithCanvas(
           requestAnimationFrame(draw);
         };
         
-        // Start the rendering loop
         draw();
       };
       
@@ -186,10 +178,11 @@ export async function processVideoWithCanvas(
         recorder.stop();
       };
 
-      // Start playing the video to trigger rendering and recording
       video.play().catch((err) => {
-        URL.revokeObjectURL(videoUrl);
-        reject(err);
+        console.error("Video play failed:", err);
+        // Fallback: try muting if autoplay policy blocks it
+        video.muted = true;
+        video.play().catch(reject);
       });
     };
     
