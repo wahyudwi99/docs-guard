@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { VideoWatermark } from './plugins/VideoWatermark';
+import { applyWatermarkToContext } from './watermark_utils';
 
 export async function processVideoWithCanvas(
   videoFile: File,
@@ -10,6 +11,7 @@ export async function processVideoWithCanvas(
     opacity?: number;
     fontSize?: number;
     layout?: 'single' | 'tiled';
+    orientation?: "horizontal" | "diagonal" | "vertical";
   },
   onProgress?: (msg: string) => void
 ): Promise<{ blob: Blob; ext: string; mimeType: string }> {
@@ -160,38 +162,21 @@ export async function processVideoWithCanvas(
         const draw = () => {
           if (video.paused || video.ended) return;
           
-          // Draw the current video frame
+          // 1. Draw the current video frame
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           
-          // Apply watermark styling
-          ctx.fillStyle = options.color || "#FFFFFF";
-          ctx.globalAlpha = options.opacity || 0.5;
+          // 2. Use unified utility for perfect consistency with preview
+          applyWatermarkToContext(ctx, canvas.width, canvas.height, {
+            text,
+            type: 'text',
+            layout: options.layout || 'tiled',
+            color: options.color || "#FFFFFF",
+            opacity: options.opacity || 0.5,
+            fontFamily: 'sans-serif',
+            fontSize: options.fontSize || 40,
+            orientation: options.orientation || "diagonal"
+          });
           
-          // Make font size responsive to video resolution
-          const baseSize = options.fontSize || 40;
-          const responsiveSize = Math.max(20, (canvas.height / 1080) * baseSize * 2);
-          ctx.font = `bold ${responsiveSize}px sans-serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          
-          if (options.layout === "single") {
-            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-          } else {
-            // Tiled layout pattern
-            const cols = 3;
-            const rows = 5;
-            for (let i = 1; i <= cols; i++) {
-              for (let j = 1; j <= rows; j++) {
-                 ctx.save();
-                 ctx.translate(canvas.width * (i / (cols + 1)), canvas.height * (j / (rows + 1)));
-                 ctx.rotate(-Math.PI / 6); // slight rotation for tiled effect
-                 ctx.fillText(text, 0, 0);
-                 ctx.restore();
-              }
-            }
-          }
-          
-          ctx.globalAlpha = 1.0; // Reset alpha
           requestAnimationFrame(draw);
         };
         
