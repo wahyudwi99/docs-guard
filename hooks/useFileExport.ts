@@ -143,7 +143,10 @@ export function useFileExport({
           opacity: watermarkOpacity,
           fontSize: fontSize,
           layout: watermarkLayout as any,
-          orientation: orientation
+          orientation: orientation,
+          type: watermarkType,
+          image: watermarkImage,
+          imageScale: imageScale
         },
         onProgress
       );

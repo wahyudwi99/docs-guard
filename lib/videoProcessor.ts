@@ -12,6 +12,9 @@ export async function processVideoWithCanvas(
     fontSize?: number;
     layout?: 'single' | 'tiled';
     orientation?: "horizontal" | "diagonal" | "vertical";
+    type?: "text" | "image";
+    image?: HTMLImageElement | null;
+    imageScale?: number;
   },
   onProgress?: (msg: string) => void
 ): Promise<{ blob: Blob; ext: string; mimeType: string }> {
@@ -158,13 +161,15 @@ export async function processVideoWithCanvas(
           
           applyWatermarkToContext(ctx, canvas.width, canvas.height, {
             text,
-            type: 'text',
+            type: options.type || 'text',
             layout: options.layout || 'tiled',
             color: options.color || "#FFFFFF",
             opacity: options.opacity || 0.5,
             fontFamily: 'sans-serif',
             fontSize: options.fontSize || 40,
-            orientation: options.orientation || "diagonal"
+            orientation: options.orientation || "diagonal",
+            image: options.image,
+            imageScale: options.imageScale
           });
           
           requestAnimationFrame(draw);
