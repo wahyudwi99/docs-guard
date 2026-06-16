@@ -16,7 +16,7 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, EyeOff, Lock, Mail, Trash2 } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock, Mail, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
@@ -33,6 +33,7 @@ function HomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const { containerRef, canvases, registerCanvas, clearCanvases } = useCanvas();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'design' | 'subscription'>('upload');
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -223,6 +224,7 @@ function HomeContent() {
     file,
     documentType,
     pdfDoc,
+    videoUrl,
     numPages,
     error,
     limitExceeded,
@@ -234,7 +236,7 @@ function HomeContent() {
   // Callback to redraw the current document (image or PDF pages)
   const redrawDocument = useCallback(async (currentCanvases: HTMLCanvasElement[]) => {
     if (!file || !documentType || currentCanvases.length === 0) return;
-    await drawDocumentOnCanvases(file, currentCanvases);
+    await drawDocumentOnCanvases(file, currentCanvases, videoRef.current);
   }, [file, documentType, drawDocumentOnCanvases]);
 
   // Watermark management
@@ -268,7 +270,7 @@ function HomeContent() {
     setBlurStrength,
     resetWatermark,
     drawWatermark,
-  } = useWatermark({ canvases, redrawDocument, documentType });
+  } = useWatermark({ canvases, redrawDocument, documentType, videoRef });
 
   const handleFileChangeWithReset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Renew canvases and state to avoid "canvas already used" error
@@ -295,8 +297,11 @@ function HomeContent() {
   useEffect(() => {
     if (file) {
       setActiveTab('design');
+      if (documentType === 'video') {
+        setDesignTab('watermark');
+      }
     }
-  }, [file, setActiveTab]);
+  }, [file, documentType, setActiveTab, setDesignTab]);
 
   const handleNewFile = useCallback(() => {
     clearDocument();
@@ -314,6 +319,7 @@ function HomeContent() {
     password,
     isPro,
     file,
+    videoRef,
     drawWatermark,
     watermarkColor,
     watermarkOpacity,
@@ -386,6 +392,19 @@ function HomeContent() {
   return (
     <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
       
+      {/* Hidden Video Source for Watermarking */}
+      {documentType === 'video' && videoUrl && (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          muted
+          loop
+          playsInline
+          autoPlay
+          className="fixed -top-[1000px] -left-[1000px] w-10 h-10 opacity-0 pointer-events-none"
+        />
+      )}
+
       {/* Splash Screen Overlay */}
       {showSplash && (
         <div className={cn(
@@ -759,6 +778,7 @@ function HomeContent() {
                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
                             {isSaving ? t('preview_modal.saving') : 
                               documentType === 'pdf' ? t('preview_modal.download_pdf') : 
+                              documentType === 'video' ? 'Download Video' : 
                               t('preview_modal.download_png')
                             }
                           </button>
@@ -861,6 +881,7 @@ function HomeContent() {
                             <div className="space-y-2 p-5 rounded-3xl bg-slate-50 border border-slate-100 shadow-sm">
                               {[
                                 t('subscription_section.paywall_feature_unlimited_pdf'),
+                                t('subscription_section.paywall_feature_unlimited_video'),
                                 t('subscription_section.paywall_feature_encryption'),
                                 t('subscription_section.paywall_feature_smart_blur'),
                                 t('subscription_section.paywall_feature_ad_free'),
@@ -1189,7 +1210,7 @@ function HomeContent() {
               <div className="space-y-2">
                 <h3 className="text-xl font-black text-slate-900 tracking-tight">Premium Limit Reached</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">
-                  Free users are limited to PDFs up to 3 pages.
+                  Free users are limited to videos up to 15 seconds and PDFs up to 3 pages.
                 </p>
               </div>
 

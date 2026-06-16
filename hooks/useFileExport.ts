@@ -8,14 +8,16 @@ import { jsPDF } from "jspdf";
 import { applyWatermarkToContext, applyBlurToContext } from "@/lib/watermark_utils";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { renderPdfPageToCanvas } from "@/lib/pdf";
+import { processVideoWithCanvas } from "@/lib/videoProcessor";
 
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
   watermarkText: string;
-  documentType: "image" | "pdf" | null;
+  documentType: "image" | "pdf" | "video" | null;
   password?: string;
   isPro?: boolean;
   file?: File | null;
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
   watermarkColor?: string;
   watermarkOpacity?: number;
   watermarkLayout?: string;
@@ -46,6 +48,7 @@ export function useFileExport({
   password, 
   isPro,
   file,
+  videoRef,
   drawWatermark,
   watermarkColor = "#000000",
   watermarkOpacity = 0.3,
@@ -129,6 +132,22 @@ export function useFileExport({
       const blob = pdf.output("blob");
       return { blob, fileName: `docsguard-${safeText}-${timestamp}.pdf`, contentType: "application/pdf" };
 
+    } else if (documentType === "video") {
+      if (!file) return null;
+      onProgress?.("Processing video...");
+      const { blob, ext, mimeType } = await processVideoWithCanvas(
+        file,
+        watermarkText,
+        {
+          color: watermarkColor,
+          opacity: watermarkOpacity,
+          fontSize: fontSize,
+          layout: watermarkLayout as any
+        },
+        onProgress
+      );
+      onProgress?.("COMPLETED");
+      return { blob, fileName: `docsguard-${safeText}-${timestamp}.${ext}`, contentType: mimeType };
     } else {
       // IMAGE
       const canvas = canvases[0];
@@ -178,6 +197,15 @@ export function useFileExport({
             console.log("Saved to Gallery");
           } catch (err) {
             console.error("Failed to save to Gallery:", err);
+          }
+        } else if (documentType === "video") {
+          try {
+            await Media.saveVideo({
+              path: savedFile.uri
+            });
+            console.log("Saved Video to Gallery");
+          } catch (err) {
+            console.error("Failed to save Video to Gallery:", err);
           }
         } else if (documentType === "pdf") {
           // On iOS, sometimes saving to Documents isn't enough to "see" it immediately

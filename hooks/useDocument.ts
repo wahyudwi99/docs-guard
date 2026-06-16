@@ -4,7 +4,7 @@ import { loadPdf, renderPdfPageToCanvas } from "@/lib/pdf";
 import { useI18n } from "@/hooks/useI18n";
 import { useSubscription } from "@/hooks/useSubscription";
 
-type DocumentType = "image" | "pdf" | null;
+type DocumentType = "image" | "pdf" | "video" | null;
 
 interface UseDocumentProps {
   registerCanvas: (el: HTMLCanvasElement | null, index: number) => void;
@@ -19,15 +19,18 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
   const [numPages, setNumPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [limitExceeded, setLimitExceeded] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const clearDocument = useCallback(() => {
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
     setFile(null);
     setDocumentType(null);
     setPdfDoc(null);
     setNumPages(0);
     setError(null);
     setLimitExceeded(false);
-  }, []);
+    setVideoUrl(null);
+  }, [videoUrl]);
 
   const loadImage = useCallback(
     async (imageFile: File, canvas: HTMLCanvasElement) => {
@@ -65,14 +68,58 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
     []
   );
 
+  const loadVideoFrame = useCallback(
+    async (videoFile: File, canvas: HTMLCanvasElement) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.muted = true;
+      video.playsInline = true;
+      const url = URL.createObjectURL(videoFile);
+      video.src = url;
+
+      return new Promise<void>((resolve, reject) => {
+        video.onloadedmetadata = () => {
+          video.currentTime = 0.1; // Seek a bit to get a frame
+        };
+        video.onseeked = () => {
+          const width = video.videoWidth;
+          const height = video.videoHeight;
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext("2d");
+          if (context) {
+            context.drawImage(video, 0, 0, width, height);
+          }
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        video.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Failed to load video"));
+        };
+      });
+    },
+    []
+  );
+
   const drawDocumentOnCanvases = useCallback(
-    async (selectedFile: File, currentCanvases: HTMLCanvasElement[]) => {
+    async (selectedFile: File, currentCanvases: HTMLCanvasElement[], videoElement?: HTMLVideoElement | null) => {
       if (currentCanvases.length === 0) return;
 
       try {
         if (selectedFile.type.startsWith("image/")) {
           // For images, we always target the first canvas provided
           await loadImage(selectedFile, currentCanvases[0]);
+        } else if (selectedFile.type.startsWith("video/")) {
+          if (videoElement) {
+            const canvas = currentCanvases[0];
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const ctx = canvas.getContext("2d");
+            if (ctx) ctx.drawImage(videoElement, 0, 0);
+          } else {
+            await loadVideoFrame(selectedFile, currentCanvases[0]);
+          }
         } else if (selectedFile.type === "application/pdf") {
           let doc = pdfDoc;
           if (!doc) {
@@ -100,7 +147,7 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
         }
       }
     },
-    [loadImage, pdfDoc]
+    [loadImage, loadVideoFrame, pdfDoc]
   );
 
   const handleFileChange = useCallback(
@@ -115,6 +162,10 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
         if (selectedFile.type.startsWith("image/")) {
           setDocumentType("image");
           setNumPages(1);
+        } else if (selectedFile.type.startsWith("video/")) {
+          setDocumentType("video");
+          setNumPages(1);
+          setVideoUrl(URL.createObjectURL(selectedFile));
         } else if (selectedFile.type === "application/pdf") {
           const arrayBuffer = await selectedFile.arrayBuffer();
           const doc = await loadPdf(new Uint8Array(arrayBuffer));
@@ -152,6 +203,7 @@ export function useDocument({ registerCanvas }: UseDocumentProps) {
     numPages,
     error,
     limitExceeded,
+    videoUrl,
     setLimitExceeded,
     handleFileChange,
     clearDocument,

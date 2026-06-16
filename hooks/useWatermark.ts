@@ -6,7 +6,8 @@ interface UseWatermarkProps {
   canvases: HTMLCanvasElement[];
   // Callback to redraw the base document content before applying watermark
   redrawDocument: (canvases: HTMLCanvasElement[]) => Promise<void>;
-  documentType?: "image" | "pdf" | null;
+  documentType?: "image" | "pdf" | "video" | null;
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
@@ -22,7 +23,7 @@ interface BlurArea {
   pageIndex: number;
 }
 
-export function useWatermark({ canvases, redrawDocument, documentType }: UseWatermarkProps) {
+export function useWatermark({ canvases, redrawDocument, documentType, videoRef }: UseWatermarkProps) {
   const [designTab, setDesignTab] = useState<WatermarkMode>("watermark");
   const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
@@ -112,6 +113,27 @@ export function useWatermark({ canvases, redrawDocument, documentType }: UseWate
 
   const drawWatermark = useCallback(async (onlyFirstPage = false) => {
     if (canvases.length === 0) return;
+
+    if (documentType === 'video' && videoRef?.current) {
+        const canvas = canvases[0];
+        const context = canvas.getContext("2d");
+        if (!context) return;
+        
+        const video = videoRef.current;
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        }
+        
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        internalApplyWatermark(context, canvas.width, canvas.height);
+        
+        // If we're in the design tab and it's a video, we want to keep redrawing for preview
+        if (!video.paused && !video.ended) {
+            requestAnimationFrame(() => drawWatermark(onlyFirstPage));
+        }
+        return;
+    }
 
     // MEMORY-SAFE VIRTUAL RENDERING
     const drawPromises = canvases.map(async (canvas) => {
