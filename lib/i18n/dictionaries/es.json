@@ -122,6 +122,11 @@
     "subscribe_now": "Suscribirse ahora",
     "restore": "Restaurar compras",
     "active": "Suscripción Pro activa",
+    "best_value": "Mejor valor",
+    "most_popular": "Más popular",
+    "yearly_description": "Ahorra un 60% con la facturación anual",
+    "monthly_description": "Sin compromiso, cancela en cualquier momento",
+    "auto_renew_notice": "La suscripción se renueva automáticamente a menos que se desactive la renovación automática al menos 24 horas antes del final del período actual.",
     "paywall_feature_unlimited_pdf": "Marcas de agua PDF ilimitadas",
     "paywall_feature_unlimited_video": "Marcas de agua de video ilimitadas",
     "paywall_feature_encryption": "Bloqueo y cifrado de PDF",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "Experiencia 100% sin anuncios",
     "paywall_subtitle": "Desbloquee todas las funciones premium y proteja sus documentos como un profesional.",
     "paywall_restore": "Restaurar compras"
+  },
+  "contact": {
+    "title": "Envíanos un mensaje",
+    "subtitle": "¿Tienes alguna pregunta o necesitas ayuda? Completa el siguiente formulario y nos pondremos en contacto contigo lo antes posible.",
+    "form_name": "Nombre",
+    "form_email": "Correo electrónico",
+    "form_message": "Mensaje",
+    "form_message_placeholder": "¿Cómo podemos ayudarte?",
+    "send_button": "Enviar mensaje",
+    "sending": "Enviando...",
+    "success_title": "¡Mensaje enviado!",
+    "success_description": "Gracias por contactarnos. Hemos recibido tu mensaje y te responderemos pronto.",
+    "error_message": "Error al enviar el mensaje. Por favor, inténtalo de nuevo más tarde."
   },
   "info_card": {
     "how_it_works": "Cómo funciona",

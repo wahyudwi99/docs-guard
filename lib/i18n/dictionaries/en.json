@@ -122,6 +122,11 @@
     "subscribe_now": "Subscribe Now",
     "restore": "Restore Purchases",
     "active": "Pro Subscription Active",
+    "best_value": "Best Value",
+    "most_popular": "Most Popular",
+    "yearly_description": "Save 60% with annual billing",
+    "monthly_description": "No commitment, cancel anytime",
+    "auto_renew_notice": "Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.",
     "paywall_feature_unlimited_pdf": "Unlimited PDF Watermarking",
     "paywall_feature_unlimited_video": "Unlimited Video Watermarking",
     "paywall_feature_encryption": "PDF Lock & Encryption",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "100% Ad-Free Experience",
     "paywall_subtitle": "Unlock all premium features and protect your documents like a pro.",
     "paywall_restore": "Restore Purchases"
+  },
+  "contact": {
+    "title": "Send us a message",
+    "subtitle": "Have a question or need help? Fill out the form below and we'll get back to you as soon as possible.",
+    "form_name": "Name",
+    "form_email": "Email",
+    "form_message": "Message",
+    "form_message_placeholder": "How can we help you?",
+    "send_button": "Send Message",
+    "sending": "Sending...",
+    "success_title": "Message Sent!",
+    "success_description": "Thank you for reaching out. We have received your message and will get back to you shortly.",
+    "error_message": "Failed to send message. Please try again later."
   },
   "info_card": {
     "how_it_works": "How it works",

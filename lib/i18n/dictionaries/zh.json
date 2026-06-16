@@ -122,6 +122,11 @@
     "subscribe_now": "立即订阅",
     "restore": "恢复购买",
     "active": "Pro 订阅已激活",
+    "best_value": "最超值",
+    "most_popular": "最受欢迎",
+    "yearly_description": "年度计费可节省 60%",
+    "monthly_description": "无合约，随时取消",
+    "auto_renew_notice": "除非在当前周期结束前至少 24 小时关闭自动续订，否则订阅将自动续订。",
     "paywall_feature_unlimited_pdf": "无限 PDF 水印",
     "paywall_feature_unlimited_video": "无限视频水印",
     "paywall_feature_encryption": "PDF 锁定与加密",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "100% 无广告体验",
     "paywall_subtitle": "解锁所有高级功能，像专业人士一样保护您的文档。",
     "paywall_restore": "恢复购买"
+  },
+  "contact": {
+    "title": "向我们发送消息",
+    "subtitle": "有问题或需要帮助吗？填写下面的表格，我们会尽快回复您。",
+    "form_name": "姓名",
+    "form_email": "电子邮件",
+    "form_message": "消息",
+    "form_message_placeholder": "我们能为您提供什么帮助？",
+    "send_button": "发送消息",
+    "sending": "发送中...",
+    "success_title": "消息已发送！",
+    "success_description": "感谢您的联络。我们已收到您的消息，会尽快回复您。",
+    "error_message": "发送消息失败。请稍后再试。"
   },
   "info_card": {
     "how_it_works": "工作原理",

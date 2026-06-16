@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Send, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useI18n } from "@/hooks/useI18n";
 
 export default function ContactPage() {
+  const { t } = useI18n();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -48,7 +50,7 @@ export default function ContactPage() {
         <div className="px-6 flex items-center mt-14 mb-2">
           <Link href="/" className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-all text-slate-900 active:scale-95 shadow-sm">
             <ChevronLeft className="h-5 w-5" />
-            <span className="text-[11px] font-black uppercase tracking-widest">Back</span>
+            <span className="text-[11px] font-black uppercase tracking-widest">{t('privacy.back_button')}</span>
           </Link>
         </div>
       </header>
@@ -56,15 +58,15 @@ export default function ContactPage() {
       <main className="flex-1 p-6 flex flex-col max-w-lg mx-auto w-full mt-4">
         <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-slate-200/50 space-y-6">
           <div className="space-y-2">
-            <h1 className="text-xl font-black tracking-tight text-slate-900">Send us a message</h1>
+            <h1 className="text-xl font-black tracking-tight text-slate-900">{t('contact.title')}</h1>
             <p className="text-xs font-medium text-slate-500 leading-relaxed">
-              Have a question or need help? Fill out the form below and we'll get back to you as soon as possible.
+              {t('contact.subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Name</label>
+              <label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">{t('contact.form_name')}</label>
               <input
                 type="text"
                 id="name"
@@ -77,7 +79,7 @@ export default function ContactPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Email</label>
+              <label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">{t('contact.form_email')}</label>
               <input
                 type="email"
                 id="email"
@@ -90,7 +92,7 @@ export default function ContactPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="message" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Message</label>
+              <label htmlFor="message" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">{t('contact.form_message')}</label>
               <textarea
                 id="message"
                 name="message"
@@ -98,13 +100,13 @@ export default function ContactPage() {
                 rows={5}
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="How can we help you?"
+                placeholder={t('contact.form_message_placeholder')}
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
               />
             </div>
 
             {status === "error" && (
-              <p className="text-[10px] font-bold text-red-500 text-center">Failed to send message. Please try again later.</p>
+              <p className="text-[10px] font-bold text-red-500 text-center">{t('contact.error_message')}</p>
             )}
 
             <button
@@ -115,12 +117,12 @@ export default function ContactPage() {
               {status === "loading" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Sending...
+                  {t('contact.sending')}
                 </>
               ) : (
                 <>
                   <Send className="h-4 w-4" />
-                  Send Message
+                  {t('contact.send_button')}
                 </>
               )}
             </button>
@@ -140,16 +142,16 @@ export default function ContactPage() {
               <CheckCircle2 className="h-10 w-10" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-black tracking-tight text-slate-900">Message Sent!</h2>
+              <h2 className="text-xl font-black tracking-tight text-slate-900">{t('contact.success_title')}</h2>
               <p className="text-xs font-medium text-slate-500 leading-relaxed">
-                Thank you for reaching out. We have received your message and will get back to you shortly.
+                {t('contact.success_description')}
               </p>
             </div>
             <button 
               onClick={() => setShowSuccessPopup(false)}
               className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-2xl px-4 py-3 text-[11px] font-black uppercase tracking-widest transition-colors"
             >
-              Close
+              {t('preview_modal.close')}
             </button>
           </div>
         </div>

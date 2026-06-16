@@ -122,6 +122,11 @@
     "subscribe_now": "今すぐ購読",
     "restore": "購入を復元",
     "active": "プロサブスクリプション有効",
+    "best_value": "一番お得",
+    "most_popular": "一番人気",
+    "yearly_description": "年額プランで60%節約",
+    "monthly_description": "縛りなし、いつでもキャンセル可能",
+    "auto_renew_notice": "現在の期間が終了する少なくとも24時間前に自動更新をオフにしない限り、サブスクリプションは自動的に更新されます。",
     "paywall_feature_unlimited_pdf": "無制限のPDF透かし",
     "paywall_feature_unlimited_video": "無制限のビデオ透かし",
     "paywall_feature_encryption": "PDFロックと暗号化",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "100%広告なしの体験",
     "paywall_subtitle": "すべてのプレミアム機能を解放し、プロのようにドキュメントを保護します。",
     "paywall_restore": "購入を復元"
+  },
+  "contact": {
+    "title": "メッセージを送信",
+    "subtitle": "ご質問やサポートが必要ですか？以下のフォームにご記入いただければ、できるだけ早く返信いたします。",
+    "form_name": "お名前",
+    "form_email": "メールアドレス",
+    "form_message": "メッセージ",
+    "form_message_placeholder": "どのようなご用件でしょうか？",
+    "send_button": "メッセージを送信",
+    "sending": "送信中...",
+    "success_title": "メッセージを送信しました！",
+    "success_description": "お問い合わせいただきありがとうございます。メッセージを受け取りました。まもなく返信いたします。",
+    "error_message": "メッセージの送信に失敗しました。後でもう一度お試しください。"
   },
   "info_card": {
     "how_it_works": "仕組み",

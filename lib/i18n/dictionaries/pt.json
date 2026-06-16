@@ -122,6 +122,11 @@
     "subscribe_now": "Assinar agora",
     "restore": "Restaurar compras",
     "active": "Assinatura Pro ativa",
+    "best_value": "Melhor valor",
+    "most_popular": "Mais popular",
+    "yearly_description": "Economize 60% com faturamento anual",
+    "monthly_description": "Sem compromisso, cancele a qualquer momento",
+    "auto_renew_notice": "A assinatura é renovada automaticamente, a menos que a renovação automática seja desativada pelo menos 24 horas antes do final do período atual.",
     "paywall_feature_unlimited_pdf": "Marca d'água em PDF ilimitada",
     "paywall_feature_unlimited_video": "Marca d'água em vídeo ilimitada",
     "paywall_feature_encryption": "Bloqueio e criptografia de PDF",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "Experiência 100% sem anúncios",
     "paywall_subtitle": "Desbloqueie todos os recursos premium e proteja seus documentos como um profissional.",
     "paywall_restore": "Restaurar compras"
+  },
+  "contact": {
+    "title": "Envie-nos uma mensagem",
+    "subtitle": "Tem alguma dúvida ou precisa de ajuda? Preencha o formulário abaixo e entraremos em contato o mais rápido possível.",
+    "form_name": "Nome",
+    "form_email": "E-mail",
+    "form_message": "Mensagem",
+    "form_message_placeholder": "Como podemos ajudar?",
+    "send_button": "Enviar mensagem",
+    "sending": "Enviando...",
+    "success_title": "Mensagem enviada!",
+    "success_description": "Obrigado por entrar em contato. Recebemos sua mensagem e retornaremos em breve.",
+    "error_message": "Falha ao enviar mensagem. Tente novamente mais tarde."
   },
   "info_card": {
     "how_it_works": "Como funciona",
@@ -192,7 +210,7 @@
         "title": "3. Informações que coletamos para gerenciamento de conta e suporte",
         "content": "Embora seus documentos e arquivos permaneçam estritamente locais, coletamos informações mínimas necessárias para gerenciar sua assinatura Pro e fornecer suporte ao cliente:",
         "list": [
-          "Dados de autenticação (Google Sign-In): Se você optar por fazer login usando sua Conta do Google para acessar recursos Pro, receberemos informações básicas de perfil fornecidas pelo Google, especificamente seu endereço de e-mail e nome.",
+          "Dados de autenticação (Google Sign-In): Se você optar por fazer login usando sua Conta do Google para acessar recursos Pro, receberemos informações básicas de perfil provided pelo Google, especificamente seu endereço de e-mail e nome.",
           "Dados de suporte ao cliente e feedback: Se você enviar uma reclamação, dúvida ou feedback por meio da nossa página “Fale conosco”, coletaremos e armazenaremos com segurança seu Nome, Endereço de e-mail e o conteúdo da sua mensagem em nosso banco de dados seguro.",
           "Finalidade da coleta: Os dados de autenticação são usados para sincronizar sua assinatura Pro em vários dispositivos. Os dados de suporte são armazenados exclusivamente para analisar, processar e responder às suas reclamações ou dúvidas por meio do nosso e-mail de suporte oficial. Não usamos essas informações para marketing de terceiros, nem as vendemos a corretores de dados."
         ]
@@ -227,7 +245,7 @@
       },
       {
         "title": "8. Direitos do usuário (conformidade com GDPR e CCPA)",
-        "content": "De acordo com o Regulamento Geral de Proteção de Dados (GDPR) e a Lei de Privacidade do Consumidor da Califórnia (CCPA), os usuários têm o direito de solicitar acesso, modificação ou exclusão de seus dados. Como o DocsGuard opera localmente e não armazena seus arquivos em nossos servidores, seu direito à exclusão de seus arquivos está totalmente sob seu controle. Para excluir todos os seus documentos associados ao DocsGuard, basta excluir os arquivos do seu dispositivo ou desinstalar o aplicativo. Para a exclusão dos dados da sua conta e suporte, consulte a Seção 7."
+        "content": "De acordo com o Regulamento Geral de Proteção de Dados (GDPR) e a Lei de Privacidade do Consumidor da Califórnia (CCPA), os usuários têm o direito de solicitar acesso, modificação ou exclusão de seus datos. Como o DocsGuard opera localmente e não armazena seus arquivos em nossos servidores, seu direito à exclusão de seus arquivos está totalmente sob seu controle. Para excluir todos os seus documentos associados ao DocsGuard, basta excluir os arquivos do seu dispositivo ou desinstalar o aplicativo. Para a exclusão dos dados da sua conta e suporte, consulte a Seção 7."
       },
       {
         "title": "9. Privacidade de crianças",

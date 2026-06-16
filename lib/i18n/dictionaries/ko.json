@@ -122,6 +122,11 @@
     "subscribe_now": "지금 구독",
     "restore": "구매 복원",
     "active": "프로 구독 활성화됨",
+    "best_value": "최고의 가치",
+    "most_popular": "가장 인기 있음",
+    "yearly_description": "연간 결제 시 60% 절약",
+    "monthly_description": "약정 없음, 언제든지 취소 가능",
+    "auto_renew_notice": "현재 기간이 끝나기 최소 24시간 전에 자동 갱신을 끄지 않으면 구독이 자동으로 갱신됩니다.",
     "paywall_feature_unlimited_pdf": "무제한 PDF 워터마크",
     "paywall_feature_unlimited_video": "무제한 비디오 워터마크",
     "paywall_feature_encryption": "PDF 잠금 및 암호화",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "100% 광고 없는 환경",
     "paywall_subtitle": "모든 프리미엄 기능을 잠금 해제하고 프로처럼 문서를 보호하세요.",
     "paywall_restore": "구매 복원"
+  },
+  "contact": {
+    "title": "메시지 보내기",
+    "subtitle": "질문이 있거나 도움이 필요하신가요? 아래 양식을 작성해 주시면 최대한 빨리 답변해 드리겠습니다.",
+    "form_name": "이름",
+    "form_email": "이메일",
+    "form_message": "메시지",
+    "form_message_placeholder": "무엇을 도와드릴까요?",
+    "send_button": "메시지 보내기",
+    "sending": "보내는 중...",
+    "success_title": "메시지 전송 완료!",
+    "success_description": "문의해 주셔서 감사합니다. 메시지가 접수되었으며 곧 답변해 드리겠습니다.",
+    "error_message": "메시지 전송에 실패했습니다. 나중에 다시 시도해 주세요."
   },
   "info_card": {
     "how_it_works": "작동 원리",

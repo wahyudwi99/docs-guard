@@ -122,6 +122,11 @@
     "subscribe_now": "Berlangganan Sekarang",
     "restore": "Pulihkan Pembelian",
     "active": "Langganan Pro Aktif",
+    "best_value": "Nilai Terbaik",
+    "most_popular": "Terpopuler",
+    "yearly_description": "Hemat 60% dengan penagihan tahunan",
+    "monthly_description": "Tanpa komitmen, batalkan kapan saja",
+    "auto_renew_notice": "Langganan diperpanjang secara otomatis kecuali perpanjangan otomatis dimatikan setidaknya 24 jam sebelum akhir periode berjalan.",
     "paywall_feature_unlimited_pdf": "Watermark PDF Tanpa Batas",
     "paywall_feature_unlimited_video": "Watermark Video Tanpa Batas",
     "paywall_feature_encryption": "Kunci & Enkripsi PDF",
@@ -129,6 +134,19 @@
     "paywall_feature_ad_free": "100% Bebas Iklan",
     "paywall_subtitle": "Buka semua fitur premium dan lindungi dokumen Anda seperti profesional.",
     "paywall_restore": "Pulihkan Pembelian"
+  },
+  "contact": {
+    "title": "Kirimkan kami pesan",
+    "subtitle": "Punya pertanyaan atau butuh bantuan? Isi formulir di bawah ini dan kami akan menghubungi Anda sesegera mungkin.",
+    "form_name": "Nama",
+    "form_email": "Email",
+    "form_message": "Pesan",
+    "form_message_placeholder": "Bagaimana kami bisa membantu Anda?",
+    "send_button": "Kirim Pesan",
+    "sending": "Mengirim...",
+    "success_title": "Pesan Terkirim!",
+    "success_description": "Terima kasih telah menghubungi kami. Kami telah menerima pesan Anda dan akan segera membalasnya.",
+    "error_message": "Gagal mengirim pesan. Silakan coba lagi nanti."
   },
   "info_card": {
     "how_it_works": "Cara kerjanya",

@@ -20,6 +20,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
 
   const features = [
     t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
+    t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
     t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
     t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur',
     t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
@@ -53,10 +54,10 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
           </div>
           
           <h2 className="text-3xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-            DocsGuard Pro
+            {t('subscription_section.pro_title') || 'DocsGuard Pro'}
           </h2>
           <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-medium">
-            {t('paywall_subtitle') || 'Unlock all premium features and protect your documents like a pro.'}
+            {t('subscription_section.paywall_subtitle') || 'Unlock all premium features and protect your documents like a pro.'}
           </p>
           
           <div className="space-y-2.5 mb-10 text-left bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800">
@@ -99,12 +100,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                   >
                     {isYearly && (
                       <div className="absolute -top-3 right-6 px-3 py-1 bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-md">
-                        Best Value
+                        {t('subscription_section.best_value') || 'Best Value'}
                       </div>
                     )}
                     {isMonthly && (
                       <div className="absolute -top-3 right-6 px-3 py-1 bg-indigo-100 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-full border border-indigo-200">
-                        Most Popular
+                        {t('subscription_section.most_popular') || 'Most Popular'}
                       </div>
                     )}
                     
@@ -117,7 +118,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                       </span>
                     </div>
                     <p className={cn("text-xs font-medium", isYearly ? "text-indigo-100" : "text-slate-400")}>
-                      {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                      {pkg.product.description || (isYearly ? t('subscription_section.yearly_description') : t('subscription_section.monthly_description'))}
                     </p>
                   </button>
                 );
@@ -143,11 +144,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
             disabled={loading}
             className="mt-6 text-sm text-zinc-500 underline underline-offset-4"
           >
-            {t('paywall_restore') || 'Restore Purchases'}
+            {t('subscription_section.paywall_restore') || 'Restore Purchases'}
           </button>
           
           <p className="mt-4 text-[10px] text-zinc-400 leading-tight">
-            Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.
+            {t('subscription_section.auto_renew_notice')}
           </p>
         </div>
       </div>
