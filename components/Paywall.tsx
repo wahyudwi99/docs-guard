@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
-import { Check, X, Shield, Zap, Lock, FileText, Video, EyeOff, Star } from 'lucide-react';
+import { Check, X, Shield, Zap, Lock, FileText, EyeOff, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
@@ -20,7 +20,6 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
 
   const features = [
     t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
-    t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
     t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
     t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur',
     t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
@@ -91,7 +90,8 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                         window.location.reload();
                       }
                     }}
-                    className={cn(                      "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
+                    className={cn(
+                      "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
                       isYearly 
                         ? "bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-200" 
                         : "bg-white border-slate-100 hover:border-indigo-200 text-slate-900"

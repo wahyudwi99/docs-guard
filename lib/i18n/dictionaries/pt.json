@@ -96,7 +96,6 @@
     "login_with_google": "Fazer login com Google",
     "features": [
       "Marca d'água em PDF ilimitada (sem limite de 3 páginas)",
-      "Marca d'água em vídeo ilimitada (qualidade 100% original)",
       "Bloqueio e criptografia de PDF (seguro com senha)",
       "Mascaramento de informações (desfoque inteligente)",
       "100% livre de anúncios e processamento mais rápido"
@@ -122,7 +121,6 @@
     "restore": "Restaurar compras",
     "active": "Assinatura Pro ativa",
     "paywall_feature_unlimited_pdf": "Marca d'água em PDF ilimitada",
-    "paywall_feature_unlimited_video": "Marca d'água em vídeo ilimitada",
     "paywall_feature_encryption": "Bloqueio e criptografia de PDF",
     "paywall_feature_smart_blur": "Desfoque inteligente",
     "paywall_feature_ad_free": "Experiência 100% sem anúncios",
@@ -201,11 +199,6 @@
         "title": "Proteção ilimitada de documentos",
         "description": "Adicione marcas d'água a centenas de páginas PDF simultaneamente em segundos. Livre-se do limite de 3 páginas e agilize seus fluxos de trabalho pesados instantaneamente.",
         "icon": "zap"
-      },
-      {
-        "title": "Marcas d'água em vídeo ilimitadas (qualidade original)",
-        "description": "Livre seus vídeos de limites de duração. Coloque marcas d'água em vídeos longos com garantia de qualidade de exportação 100% original. Zero perda de resolução, zero compressão.",
-        "icon": "video"
       },
       {
         "title": "Criptografia avançada de PDF (PDF Vault)",

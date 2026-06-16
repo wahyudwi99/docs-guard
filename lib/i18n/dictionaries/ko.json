@@ -96,7 +96,6 @@
     "login_with_google": "Google로 로그인",
     "features": [
       "무제한 PDF 워터마크 (3페이지 제한 없음)",
-      "무제한 비디오 워터마크 (100% 원본 품질)",
       "PDF 잠금 및 암호화 (비밀번호 보안)",
       "정보 마스킹 (민감한 영역 스마트 블러)",
       "100% 광고 제거 및 빠른 처리"
@@ -122,7 +121,6 @@
     "restore": "구매 복원",
     "active": "프로 구독 활성화됨",
     "paywall_feature_unlimited_pdf": "무제한 PDF 워터마크",
-    "paywall_feature_unlimited_video": "무제한 비디오 워터마크",
     "paywall_feature_encryption": "PDF 잠금 및 암호화",
     "paywall_feature_smart_blur": "스마트 블러",
     "paywall_feature_ad_free": "100% 광고 없는 환경",
@@ -201,11 +199,6 @@
         "title": "무제한 문서 보호",
         "description": "수백 페이지의 PDF에 워터마크를 수초 만에 동시에 추가하세요. 3페이지 제한에서 벗어나 무거운 업무를 즉시 처리할 수 있습니다.",
         "icon": "zap"
-      },
-      {
-        "title": "무제한 비디오 워터마크 (원본 품질)",
-        "description": "비디오를 시간 제한에서 해방시키세요. 100% 원본 품질을 보장하며 긴 비디오에 워터마크를 넣을 수 있습니다. 해상도 손실이나 압축이 전혀 없습니다.",
-        "icon": "video"
       },
       {
         "title": "고급 PDF 암호화 (PDF Vault)",

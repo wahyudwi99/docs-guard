@@ -96,7 +96,6 @@
     "login_with_google": "Iniciar sesión con Google",
     "features": [
       "Marcas de agua PDF ilimitadas (sin límite de 3 páginas)",
-      "Marcas de agua de video ilimitadas (calidad 100% original)",
       "Bloqueo y cifrado de PDF (seguro con contraseña)",
       "Enmascaramiento de información (desenfoque inteligente)",
       "100% libre de anuncios y procesamiento más rápido"
@@ -122,7 +121,6 @@
     "restore": "Restaurar compras",
     "active": "Suscripción Pro activa",
     "paywall_feature_unlimited_pdf": "Marcas de agua PDF ilimitadas",
-    "paywall_feature_unlimited_video": "Marcas de agua de video ilimitadas",
     "paywall_feature_encryption": "Bloqueo y cifrado de PDF",
     "paywall_feature_smart_blur": "Desenfoque inteligente",
     "paywall_feature_ad_free": "Experiencia 100% sin anuncios",
@@ -201,11 +199,6 @@
         "title": "Protección de documentos ilimitada",
         "description": "Agregue marcas de agua a cientos de páginas PDF simultáneamente en segundos. Libérese del límite de 3 páginas y complete sus tareas pesadas al instante.",
         "icon": "zap"
-      },
-      {
-        "title": "Marcas de agua de video ilimitadas (calidad original)",
-        "description": "Libere sus videos de los límites de duración. Ponga marcas de agua en videos largos con una garantía de calidad de exportación 100% original. Cero pérdida de resolución, cero compresión.",
-        "icon": "video"
       },
       {
         "title": "Cifrado PDF avanzado (Bóveda PDF)",

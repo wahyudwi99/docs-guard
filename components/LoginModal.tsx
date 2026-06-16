@@ -33,7 +33,6 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
 
   const benefits = [
     "Unlimited PDF Watermarking",
-    "Unlimited Video Watermarking",
     "PDF lock & encryption",
     "Smart Blur",
     "100% Ad-Free & Faster Processing"

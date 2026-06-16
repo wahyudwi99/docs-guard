@@ -96,7 +96,6 @@
     "login_with_google": "Googleでログイン",
     "features": [
       "無制限のPDF透かし（3ページ制限なし）",
-      "無制限のビデオ透かし（100%オリジナル品質）",
       "PDFロックと暗号化（パスワードで安全に）",
       "情報マスキング（機密エリアのスマートぼかし）",
       "100%広告なし＆高速処理"
@@ -122,7 +121,6 @@
     "restore": "購入を復元",
     "active": "プロサブスクリプション有効",
     "paywall_feature_unlimited_pdf": "無制限のPDF透かし",
-    "paywall_feature_unlimited_video": "無制限のビデオ透かし",
     "paywall_feature_encryption": "PDFロックと暗号化",
     "paywall_feature_smart_blur": "スマートぼかし",
     "paywall_feature_ad_free": "100%広告なしの体験",
@@ -201,11 +199,6 @@
         "title": "無制限のドキュメント保護",
         "description": "数百ページのPDFに透かしを数秒で同時追加。3ページの制限から解放され、重いタスクを即座に処理できます。",
         "icon": "zap"
-      },
-      {
-        "title": "無制限のビデオ透かし（オリジナル品質）",
-        "description": "ビデオを時間制限から解放。100%オリジナル品質を保証して長いビデオに透かしを入れられます。解像度の低下や圧縮はありません。",
-        "icon": "video"
       },
       {
         "title": "高度なPDF暗号化（PDF Vault）",

@@ -12,11 +12,10 @@ import { renderPdfPageToCanvas } from "@/lib/pdf";
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
   watermarkText: string;
-  documentType: "image" | "pdf" | "video" | null;
+  documentType: "image" | "pdf" | null;
   password?: string;
   isPro?: boolean;
   file?: File | null;
-  videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
   watermarkColor?: string;
   watermarkOpacity?: number;
   watermarkLayout?: string;
@@ -47,7 +46,6 @@ export function useFileExport({
   password, 
   isPro,
   file,
-  videoRef,
   drawWatermark,
   watermarkColor = "#000000",
   watermarkOpacity = 0.3,
@@ -81,8 +79,6 @@ export function useFileExport({
   };
 
   const generateBlobAndFileName = useCallback(async () => {
-    const isNative = Capacitor.isNativePlatform();
-    const isIOS = Capacitor.getPlatform() === 'ios';
     const timestamp = Date.now();
     const safeText = watermarkText.replace(/[^a-z0-9]/gi, "_");
 
@@ -133,39 +129,6 @@ export function useFileExport({
       const blob = pdf.output("blob");
       return { blob, fileName: `docsguard-${safeText}-${timestamp}.pdf`, contentType: "application/pdf" };
 
-    } else if (documentType === "video") {
-      // For video, we'll capture the stream from the canvas
-      const canvas = canvases[0];
-      // @ts-ignore - captureStream is not always in types
-      const stream = canvas.captureStream(30);
-      
-      // Determine the best MIME type for the platform (iOS prefers mp4)
-      const mimeType = isIOS ? 'video/mp4' : 'video/webm';
-      const fileExt = file?.name?.split('.').pop() || (isIOS ? 'mp4' : 'webm');
-      
-      const recorder = new MediaRecorder(stream, { mimeType });
-      const chunks: Blob[] = [];
-
-      return new Promise<{ blob: Blob, fileName: string, contentType: string } | null>((resolve) => {
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) chunks.push(e.data);
-        };
-        
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: mimeType });
-          const fileName = `docsguard-${safeText}-${timestamp}.${fileExt}`;
-          resolve({ blob, fileName, contentType: mimeType });
-        };
-        
-        // Start recording
-        recorder.start();
-        
-        // In a real scenario, we should record until the video ends.
-        // For now, we'll record for a fixed duration placeholder (e.g., 10s)
-        // or let the user decide.
-        setTimeout(() => recorder.stop(), 5000); 
-      });
-
     } else {
       // IMAGE
       const canvas = canvases[0];
@@ -177,7 +140,7 @@ export function useFileExport({
       if (!blob) return null;
       return { blob, fileName: `docsguard-${safeText}-${timestamp}.${fileExt}`, contentType: exportType };
     }
-  }, [canvases, watermarkText, documentType, password, isPro, file, watermarkColor, watermarkOpacity, watermarkLayout, fontSize, fontFamily, orientation, watermarkType, watermarkImage, imageScale, blurAreas, blurStrength, pdfDoc, videoRef, drawWatermark, onProgress]);
+  }, [canvases, watermarkText, documentType, password, isPro, file, watermarkColor, watermarkOpacity, watermarkLayout, fontSize, fontFamily, orientation, watermarkType, watermarkImage, imageScale, blurAreas, blurStrength, pdfDoc, drawWatermark, onProgress]);
 
   const saveToDevice = useCallback(async (onBeforeExport?: () => Promise<void>) => {
     try {
@@ -215,21 +178,6 @@ export function useFileExport({
             console.log("Saved to Gallery");
           } catch (err) {
             console.error("Failed to save to Gallery:", err);
-          }
-        } else if (documentType === "video") {
-          try {
-            // Ensure the file is treated as a video during gallery save
-            await Media.saveVideo({
-              path: savedFile.uri
-            });
-            console.log("Video saved to Gallery successfully");
-          } catch (err) {
-            console.error("Failed to save video to Gallery:", err);
-            // Fallback: trigger share dialog so user can "Save to Files"
-            await Share.share({
-              title: fileName,
-              url: savedFile.uri
-            });
           }
         } else if (documentType === "pdf") {
           // On iOS, sometimes saving to Documents isn't enough to "see" it immediately

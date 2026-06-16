@@ -96,7 +96,6 @@
     "login_with_google": "Masuk dengan Google",
     "features": [
       "Watermark PDF Tanpa Batas (Bebas limit 3 halaman)",
-      "Watermark Video Durasi Bebas (Kualitas visual 100% asli)",
       "Kunci & Enkripsi PDF (Amankan file dengan sandi)",
       "Sensor Informasi (Smart Blur) (Blur area rahasia)",
       "100% Bebas Iklan & Proses Lebih Cepat"
@@ -122,7 +121,6 @@
     "restore": "Pulihkan Pembelian",
     "active": "Langganan Pro Aktif",
     "paywall_feature_unlimited_pdf": "Watermark PDF Tanpa Batas",
-    "paywall_feature_unlimited_video": "Watermark Video Durasi Bebas",
     "paywall_feature_encryption": "Kunci & Enkripsi PDF",
     "paywall_feature_smart_blur": "Sensor Informasi (Smart Blur)",
     "paywall_feature_ad_free": "100% Bebas Iklan",
@@ -135,7 +133,7 @@
     "privacy_notice": "Dokumen Anda diproses secara lokal di perangkat Anda tanpa menggunakan server. Kami tidak menyimpan atau mengakses data Anda. Privasi Anda sepenuhnya ada di tangan Anda.",
     "delete_account": "Hapus Akun",
     "delete_account_title": "Hapus Akun Anda?",
-    "delete_account_confirm": "Apakah Anda yakin ingin menghapus akun? Seluruh data profil Anda akan dianonimkan dan Anda akan keluar. Tindakan ini tidak dapat dibatalkan.",
+    "delete_account_confirm": "Apakah Anda yakin ingin menghapus akun? Seluruh data profil Anda akan dihapus secara permanen dari database kami dan Anda akan keluar. Tindakan ini tidak dapat dibatalkan.",
     "cancel": "Batalkan",
     "learn_more": "Pelajari Lebih Lanjut"
   },

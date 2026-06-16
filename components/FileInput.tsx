@@ -28,7 +28,7 @@ export const FileInput: React.FC<FileInputProps> = ({ onFileChange, className })
       <input
         id="file-upload"
         type="file"
-        accept="image/png, image/jpeg, application/pdf, video/*"
+        accept="image/png, image/jpeg, application/pdf"
         onChange={onFileChange}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
       />
@@ -57,7 +57,6 @@ export const FileInput: React.FC<FileInputProps> = ({ onFileChange, className })
         <div className="flex gap-2 pt-2 scale-90 opacity-60 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500">
           <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">{t('upload_section.pdf')}</span>
           <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">{t('upload_section.image')}</span>
-          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest shadow-sm">VIDEO</span>
         </div>
       </div>
       

@@ -6,8 +6,7 @@ interface UseWatermarkProps {
   canvases: HTMLCanvasElement[];
   // Callback to redraw the base document content before applying watermark
   redrawDocument: (canvases: HTMLCanvasElement[]) => Promise<void>;
-  documentType?: "image" | "pdf" | "video" | null;
-  videoRef?: React.MutableRefObject<HTMLVideoElement | null>;
+  documentType?: "image" | "pdf" | null;
 }
 
 type Orientation = "horizontal" | "diagonal" | "vertical";
@@ -23,7 +22,7 @@ interface BlurArea {
   pageIndex: number;
 }
 
-export function useWatermark({ canvases, redrawDocument, documentType, videoRef }: UseWatermarkProps) {
+export function useWatermark({ canvases, redrawDocument, documentType }: UseWatermarkProps) {
   const [designTab, setDesignTab] = useState<WatermarkMode>("watermark");
   const [watermarkType, setWatermarkType] = useState<WatermarkType>("text");
   const [watermarkLayout, setWatermarkLayout] = useState<WatermarkLayout>("tiled");
@@ -114,55 +113,6 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
   const drawWatermark = useCallback(async (onlyFirstPage = false) => {
     if (canvases.length === 0) return;
 
-    if (documentType === "video") {
-      let video = videoRef?.current;
-      
-      // Secondary search: If ref is null, try to find the video element in the DOM
-      if (!video) {
-        video = document.querySelector('video') as HTMLVideoElement | null;
-      }
-
-      const canvas = canvases[0];
-      const context = canvas?.getContext("2d");
-      
-      if (!video) {
-        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
-          console.log("[VIDEO] No video element found in ref or DOM");
-        }
-        return;
-      }
-
-      if (!context || !canvas) return;
-
-      // Ensure video is playing (iOS sometimes pauses hidden videos)
-      if (video.paused && video.readyState >= 2) {
-        video.play().catch(e => console.warn("[VIDEO] Auto-play blocked:", e));
-      }
-
-      if (video.readyState < 2) {
-        if (renderRequestRef.current !== null && renderRequestRef.current % 120 === 0) {
-          console.log(`[VIDEO] Video not ready. readyState: ${video.readyState}`);
-        }
-        return;
-      }
-
-      // Sync canvas dimensions
-      if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
-        // eslint-disable-next-line react-hooks/immutability
-        canvas.width = video.videoWidth;
-        // eslint-disable-next-line react-hooks/immutability
-        canvas.height = video.videoHeight;
-      }
-
-      // Draw the video frame
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Apply watermark (shared logic)
-      internalApplyWatermark(context, canvas.width, canvas.height);
-      return;
-    }
-
     // MEMORY-SAFE VIRTUAL RENDERING
     const drawPromises = canvases.map(async (canvas) => {
       const idxAttr = canvas.getAttribute('data-page-index');
@@ -198,28 +148,11 @@ export function useWatermark({ canvases, redrawDocument, documentType, videoRef 
     });
 
     await Promise.all(drawPromises);
-  }, [canvases, documentType, videoRef, internalApplyWatermark, redrawDocument, blurAreas, blurStrength]);
+  }, [canvases, documentType, internalApplyWatermark, redrawDocument, blurAreas, blurStrength]);
 
   useEffect(() => {
     drawWatermark(false);
   }, [watermarkType, watermarkLayout, watermarkText, watermarkColor, watermarkOpacity, fontFamily, fontSize, orientation, watermarkImage, imageScale, blurAreas, blurStrength, drawWatermark]);
-
-  useEffect(() => {
-    if (documentType !== 'video') {
-      if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
-      return;
-    }
-
-    const loop = () => {
-      drawWatermark(true);
-      renderRequestRef.current = requestAnimationFrame(loop);
-    };
-
-    renderRequestRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (renderRequestRef.current) cancelAnimationFrame(renderRequestRef.current);
-    };
-  }, [documentType, drawWatermark]);
 
   return {
     designTab,

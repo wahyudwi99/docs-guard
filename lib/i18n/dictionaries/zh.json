@@ -96,7 +96,6 @@
     "login_with_google": "使用 Google 登录",
     "features": [
       "无限 PDF 水印（无 3 页限制）",
-      "无限视频水印（100% 原创质量）",
       "PDF 锁定与加密（密码保护）",
       "信息遮蔽（敏感区域智能模糊）",
       "100% 无广告且处理速度更快"
@@ -122,7 +121,6 @@
     "restore": "恢复购买",
     "active": "Pro 订阅已激活",
     "paywall_feature_unlimited_pdf": "无限 PDF 水印",
-    "paywall_feature_unlimited_video": "无限视频水印",
     "paywall_feature_encryption": "PDF 锁定与加密",
     "paywall_feature_smart_blur": "智能模糊",
     "paywall_feature_ad_free": "100% 无广告体验",
@@ -201,11 +199,6 @@
         "title": "无限文档保护",
         "description": "在几秒钟内同时为数百页 PDF 添加水印。摆脱 3 页限制，立即处理繁重的工作任务。",
         "icon": "zap"
-      },
-      {
-        "title": "无限视频水印（原始质量）",
-        "description": "让您的视频摆脱时长限制。为长视频添加水印，并保证 100% 原创导出质量。零分辨率损失，零压缩。",
-        "icon": "video"
       },
       {
         "title": "高级 PDF 加密（PDF 保管库）",

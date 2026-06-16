@@ -13,7 +13,7 @@
     "design": "Design",
     "subscription": "Subscription",
     "pro_active": "Pro Active",
-    "go_pro": "Go Pro"
+    "go_pro": "Get Pro"
   },
   "login": {
     "title": "Welcome Back",
@@ -21,7 +21,7 @@
     "google_button": "Continue with Google",
     "apple_button": "Continue with Apple",
     "secure_badge": "Secure Access",
-    "privacy_note": "Your credentials are never stored. We only use Google for identification.",
+    "privacy_note": "Your credentials are never stored. we only use Google for identification.",
     "footer_privacy": "By signing in, you agree to our Privacy Policy",
     "footer_version": "DocsGuard Privacy Protocol v1.0",
     "footer_processing": "Secure Local-First Processing"
@@ -32,11 +32,11 @@
     "error_no_file": "Please select a file first",
     "import_title": "Import Document",
     "drag_drop": "Drag & Drop or {browse}",
-    "browse": "Browse Library",
+    "browse": "Browse Files",
     "take_photo": "Take Photo",
     "camera": "CAMERA",
     "crop_title": "Adjust Edges",
-    "crop_hint": "Drag corners to crop the document",
+    "crop_hint": "Drag corners to crop your document",
     "pdf": "PDF",
     "image": "IMAGE"
   },
@@ -56,7 +56,7 @@
     "tiled": "Tiled",
     "single": "Single",
     "content_label": "Watermark Content",
-    "content_placeholder": "Type protected text...",
+    "content_placeholder": "Type protective text...",
     "typeface": "Typeface",
     "scale": "Scale",
     "color_profile": "Color Profile",
@@ -64,7 +64,7 @@
     "select_image_hint": "Select PNG/JPG",
     "image_scale": "Image Scale",
     "blur_instruction": "Drag on the document preview to select areas to blur.",
-    "blur_strength": "Blur Strength",
+    "blur_strength": "Blur Intensity",
     "blur_areas": "Blur Areas",
     "no_blur_areas": "No blur areas selected yet.",
     "orientation": "Orientation",
@@ -75,14 +75,14 @@
     "subtle": "Subtle",
     "visible": "Visible",
     "pdf_password": "PDF Password",
-    "password_placeholder": "Set PDF Open Password...",
+    "password_placeholder": "Set PDF opening password...",
     "metadata_stripper": {
       "title": "Metadata Stripper",
-      "description": "Select metadata to remove from file",
+      "description": "Select metadata to remove from the file",
       "strip_author": "Remove Author / Owner",
       "strip_creation_date": "Remove Creation Date",
       "strip_gps": "Remove GPS / Location",
-      "nuclear_clean": "Nuclear Clean (All)",
+      "nuclear_clean": "Force Cleanup (All)",
       "pro_only": "Pro Only"
     }
   },
@@ -96,7 +96,6 @@
     "login_with_google": "Login with Google",
     "features": [
       "Unlimited PDF Watermarking (No 3-page limit)",
-      "Unlimited Video Watermarking (100% Original Quality)",
       "PDF Lock & Encryption (Secure with password)",
       "Information Masking (Smart Blur for sensitive areas)",
       "100% Ad-Free & Faster Processing"
@@ -105,24 +104,23 @@
       "weekly": {
         "title": "Weekly",
         "price": "$2.99",
-        "period": "/ Week"
+        "period": "/ week"
       },
       "monthly": {
         "title": "Monthly",
-        "price": "$6.99",
-        "period": "/ Month"
+        "price": "$9.99",
+        "period": "/ month"
       },
       "yearly": {
         "title": "Yearly",
-        "price": "$29.99",
-        "period": "/ Year"
+        "price": "$39.99",
+        "period": "/ year"
       }
     },
     "subscribe_now": "Subscribe Now",
     "restore": "Restore Purchases",
     "active": "Pro Subscription Active",
     "paywall_feature_unlimited_pdf": "Unlimited PDF Watermarking",
-    "paywall_feature_unlimited_video": "Unlimited Video Watermarking",
     "paywall_feature_encryption": "PDF Lock & Encryption",
     "paywall_feature_smart_blur": "Smart Blur",
     "paywall_feature_ad_free": "100% Ad-Free Experience",
@@ -135,7 +133,7 @@
     "privacy_notice": "Your documents are processed locally on your device without the use of servers. We do not store or access your data. Your privacy is entirely in your hands.",
     "delete_account": "Delete Account",
     "delete_account_title": "Delete Your Account?",
-    "delete_account_confirm": "Are you sure you want to delete your account? Your profile data will be anonymized and you will be logged out. This action cannot be undone.",
+    "delete_account_confirm": "Are you sure you want to delete your account? Your profile data will be permanently erased from our database and you will be logged out. This action cannot be undone.",
     "cancel": "Cancel",
     "learn_more": "Learn More"
   },
