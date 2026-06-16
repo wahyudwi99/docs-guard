@@ -77,8 +77,9 @@ export async function processVideoWithCanvas(
     const videoUrl = URL.createObjectURL(videoFile);
     video.src = videoUrl;
     video.crossOrigin = "anonymous";
-    // Mute is often required for programmatic playback without user interaction constraints
-    video.muted = true;
+    // CRITICAL: Must be unmuted to capture audio track
+    video.muted = false; 
+    video.volume = 0; // Keep volume at 0 so user doesn't hear it during export
     video.playsInline = true;
 
     video.onloadedmetadata = () => {
@@ -95,24 +96,20 @@ export async function processVideoWithCanvas(
       
       // Attempt to capture the audio track from the original video
       let audioTrack: MediaStreamTrack | undefined;
-      const customVideo = video as HTMLVideoElement & { 
-        captureStream?: (fps?: number) => MediaStream; 
-        mozCaptureStream?: (fps?: number) => MediaStream; 
-      };
+      const customVideo = video as any;
       const captureStream = customVideo.captureStream || customVideo.mozCaptureStream;
       
-      let videoStream: MediaStream | null = null;
       if (captureStream) {
-        videoStream = captureStream.call(video);
-        const audioTracks = videoStream?.getAudioTracks();
-        if (audioTracks && audioTracks.length > 0) {
-          audioTrack = audioTracks[0];
-        }
+        const stream = captureStream.call(video);
+        audioTrack = stream.getAudioTracks()[0];
       }
 
       // Capture the canvas visual stream at 60 FPS for ultra-smooth output
       const canvasStream = canvas.captureStream(60);
-      const tracks = [canvasStream.getVideoTracks()[0]];
+      const videoTrack = canvasStream.getVideoTracks()[0];
+      
+      // Combine tracks: Canvas Video + Original Audio
+      const tracks: MediaStreamTrack[] = [videoTrack];
       if (audioTrack) {
         tracks.push(audioTrack);
       }
