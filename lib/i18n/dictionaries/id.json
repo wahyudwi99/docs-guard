@@ -96,6 +96,7 @@
     "login_with_google": "Masuk dengan Google",
     "features": [
       "Watermark PDF Tanpa Batas (Bebas limit 3 halaman)",
+      "Watermark Video Tanpa Batas (Kualitas ekspor asli)",
       "Kunci & Enkripsi PDF (Amankan file dengan sandi)",
       "Sensor Informasi (Smart Blur) (Blur area rahasia)",
       "100% Bebas Iklan & Proses Lebih Cepat"
@@ -121,6 +122,7 @@
     "restore": "Pulihkan Pembelian",
     "active": "Langganan Pro Aktif",
     "paywall_feature_unlimited_pdf": "Watermark PDF Tanpa Batas",
+    "paywall_feature_unlimited_video": "Watermark Video Tanpa Batas",
     "paywall_feature_encryption": "Kunci & Enkripsi PDF",
     "paywall_feature_smart_blur": "Sensor Informasi (Smart Blur)",
     "paywall_feature_ad_free": "100% Bebas Iklan",

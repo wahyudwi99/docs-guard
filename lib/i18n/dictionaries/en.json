@@ -96,6 +96,7 @@
     "login_with_google": "Login with Google",
     "features": [
       "Unlimited PDF Watermarking (No 3-page limit)",
+      "Unlimited Video Watermarking (High quality export)",
       "PDF Lock & Encryption (Secure with password)",
       "Information Masking (Smart Blur for sensitive areas)",
       "100% Ad-Free & Faster Processing"
@@ -121,6 +122,7 @@
     "restore": "Restore Purchases",
     "active": "Pro Subscription Active",
     "paywall_feature_unlimited_pdf": "Unlimited PDF Watermarking",
+    "paywall_feature_unlimited_video": "Unlimited Video Watermarking",
     "paywall_feature_encryption": "PDF Lock & Encryption",
     "paywall_feature_smart_blur": "Smart Blur",
     "paywall_feature_ad_free": "100% Ad-Free Experience",
