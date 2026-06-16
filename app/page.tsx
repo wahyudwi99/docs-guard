@@ -823,7 +823,7 @@ function HomeContent() {
                             <div className="space-y-4">
                               <div className="px-4 py-1.5 bg-black/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
                                 {trialActive ? (
-                                  "Pro (Trial for 3 days)"
+                                  t('subscription_section.trial_days')
                                 ) : currentPlan ? (
                                   (() => {
                                     const planType = currentPlan.type;
@@ -831,22 +831,24 @@ function HomeContent() {
                                     if (currentPlan.endDate) {
                                       const end = new Date(currentPlan.endDate);
                                       const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                      return `${planName} (Expires: ${end.toLocaleDateString('en-GB', options)})`;
+                                      const formattedDate = end.toLocaleDateString(locale === 'en' ? 'en-GB' : locale, options);
+                                      return t('subscription_section.expires_label', { date: formattedDate });
                                     }
-                                    return `${planName} (Active)`;
+                                    return `${planName} (${t('subscription_section.active_status')})`;
                                   })()
                                 ) : (
-                                  "Active Subscription"
+                                  t('subscription_section.active_subscription')
                                 )}
                               </div>
                               
                               {trialActive && session?.createdAt && (
                                 <p className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest animate-pulse">
-                                  Trial Ends: {(() => {
+                                  {(() => {
                                     const created = new Date(session.createdAt);
                                     const end = new Date(created.getTime() + 3 * 24 * 60 * 60 * 1000);
                                     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                                    return end.toLocaleDateString('en-GB', options);
+                                    const formattedDate = end.toLocaleDateString(locale === 'en' ? 'en-GB' : locale, options);
+                                    return t('subscription_section.trial_ends', { date: formattedDate });
                                   })()}
                                 </p>
                               )}
@@ -857,15 +859,15 @@ function HomeContent() {
                                   className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
                                 >
                                   <Settings2 className="h-3.5 w-3.5" />
-                                  Cancel Subscription
+                                  {t('subscription_section.cancel_subscription')}
                                 </button>
                               )}
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              <h3 className="text-2xl font-black tracking-tight leading-none uppercase">Go Pro Today</h3>
+                              <h3 className="text-2xl font-black tracking-tight leading-none uppercase">{t('subscription_section.go_pro_today')}</h3>
                               <p className="text-xs font-medium text-indigo-100/80 leading-relaxed max-w-[240px] mx-auto">
-                                Unlock privacy-first professional tools and process documents without limits.
+                                {t('subscription_section.go_pro_description')}
                               </p>
                             </div>
                           )}
@@ -877,7 +879,7 @@ function HomeContent() {
                        {!isPro && (
                          <div className="mb-4">
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">
-                              Exclusive Pro Benefits
+                              {t('subscription_section.exclusive_benefits')}
                             </p>
                             <div className="space-y-2 p-5 rounded-3xl bg-slate-50 border border-slate-100 shadow-sm">
                               {[
@@ -899,7 +901,7 @@ function HomeContent() {
                        )}
 
                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
-                         {isPro ? "Upgrade or Switch Plan" : "Choose Your Plan"}
+                         {isPro ? t('subscription_section.upgrade_switch_plan') : t('subscription_section.choose_plan')}
                        </p>
                        
                        {/* Always show Plan Cards - Sorted by duration */}
@@ -917,22 +919,22 @@ function HomeContent() {
                           // Logic for precise plan matching using productIdentifier
                           const isActive = isPro && currentPlan?.productIdentifier === pkg.product.identifier;
                           
-                          let buttonLabel = "Subscribe";
+                          let buttonLabel = t('subscription_section.subscribe_button');
                           if (!session) {
-                             buttonLabel = "Login to Subscribe";
+                             buttonLabel = t('subscription_section.login_to_subscribe');
                           } else if (isActive) {
-                             buttonLabel = "Current Plan";
+                             buttonLabel = t('subscription_section.current_plan');
                           } else if (isPro) {
                              const planOrder = ['weekly', 'monthly', 'yearly'];
                              const currentTier = planOrder.indexOf(currentPlan?.type?.toLowerCase() || 'premium');
                              const pkgTier = planOrder.indexOf(pkgType);
                              
                              if (pkgTier > currentTier) {
-                               buttonLabel = "Upgrade Now";
+                               buttonLabel = t('subscription_section.upgrade_now');
                              } else if (pkgTier < currentTier) {
-                               buttonLabel = "Switch to Lower Plan";
+                               buttonLabel = t('subscription_section.switch_lower_plan');
                              } else {
-                               buttonLabel = "Switch Plan";
+                               buttonLabel = t('subscription_section.switch_plan');
                              }
                           }
 
@@ -970,12 +972,12 @@ function HomeContent() {
                               >
                                 {isYearly && !isActive && (
                                   <div className="absolute top-2 right-4 px-2 py-0.5 bg-amber-400 text-black text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20">
-                                    Best Value
+                                    {t('subscription_section.best_value')}
                                   </div>
                                 )}
                                 {isActive && (
                                   <div className="absolute top-2 right-4 px-2 py-0.5 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm z-20 flex items-center gap-1">
-                                    <CheckCircle2 className="h-2 w-2" /> Active
+                                    <CheckCircle2 className="h-2 w-2" /> {t('subscription_section.active_status')}
                                   </div>
                                 )}
                                 
@@ -984,7 +986,7 @@ function HomeContent() {
                                   <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
                                 </div>
                                 <p className="text-[10px] font-medium text-slate-400 mb-4">
-                                  {pkg.product.description || (isYearly ? "Save 60% with annual billing" : "No commitment, cancel anytime")}
+                                  {pkg.product.description || (isYearly ? t('subscription_section.yearly_description') : t('subscription_section.monthly_description'))}
                                 </p>
                                 
                                 <div className={cn(
@@ -1007,9 +1009,9 @@ function HomeContent() {
                              <Info className="h-4 w-4 text-amber-600" />
                            </div>
                            <div className="space-y-1">
-                             <p className="text-[11px] font-bold text-amber-900">Subscription Status Note</p>
+                             <p className="text-[11px] font-bold text-amber-900">{t('subscription_section.status_note_title')}</p>
                              <p className="text-[10px] font-medium text-amber-800/80 leading-relaxed">
-                               Your auto-renewal status has been updated. If you've switched plans, please note that you will continue to have full access to your previous plan's benefits until the current billing period expires on the date shown above.
+                               {t('subscription_section.status_note_description')}
                              </p>
                            </div>
                          </div>
@@ -1055,13 +1057,13 @@ function HomeContent() {
              <div className="relative z-10 space-y-4">
                 <h3 className="font-bold flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  Contact Us
+                  {t('contact.card_title')}
                 </h3>
                 <p className="text-xs text-slate-300 leading-relaxed text-left">
-                  Have a question, feedback, or need support? Reach out to our team directly.
+                  {t('contact.card_description')}
                 </p>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/10 group-hover:bg-white/20 px-4 py-2 rounded-full transition-all w-fit">
-                  Send Message <ChevronRight className="h-3 w-3" />
+                  {t('contact.send_button')} <ChevronRight className="h-3 w-3" />
                 </div>
              </div>
           </Link>
