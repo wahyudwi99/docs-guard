@@ -38,7 +38,8 @@
     "crop_title": "Adjust Edges",
     "crop_hint": "Drag corners to crop your document",
     "pdf": "PDF",
-    "image": "IMAGE"
+    "image": "IMAGE",
+    "video": "VIDEO"
   },
   "design_section": {
     "appearance": "Appearance",
@@ -147,6 +148,7 @@
     "edit_again": "Edit Again",
     "download_pdf": "Download PDF",
     "download_png": "Download PNG",
+    "download_video": "Download Video",
     "share": "Share",
     "sharing": "Sharing...",
     "saving": "Saving...",
@@ -245,6 +247,7 @@
     "unsupported_file": "Unsupported file type: {type}",
     "failed_to_load": "Failed to load document",
     "page_limit_exceeded": "Free Tier Limit: Max 3 Pages",
-    "page_limit_description": "This document has {count} pages. Please upgrade to Pro Plan to watermark documents with more than 3 pages."
+    "page_limit_description": "This document has {count} pages. Please upgrade to Pro Plan to watermark documents with more than 3 pages.",
+    "video_limit_description": "Free users are limited to videos up to 15 seconds and PDFs up to 3 pages."
   }
 }

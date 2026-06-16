@@ -779,7 +779,7 @@ function HomeContent() {
                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
                             {isSaving ? t('preview_modal.saving') : 
                               documentType === 'pdf' ? t('preview_modal.download_pdf') : 
-                              documentType === 'video' ? 'Download Video' : 
+                              documentType === 'video' ? t('preview_modal.download_video') : 
                               t('preview_modal.download_png')
                             }
                           </button>
@@ -1209,9 +1209,9 @@ function HomeContent() {
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">Premium Limit Reached</h3>
+                <h3 className="text-xl font-black text-slate-900 tracking-tight">{t('errors.page_limit_exceeded')}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">
-                  Free users are limited to videos up to 15 seconds and PDFs up to 3 pages.
+                  {t('errors.video_limit_description')}
                 </p>
               </div>
 

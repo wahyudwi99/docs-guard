@@ -38,7 +38,8 @@
     "crop_title": "Sesuaikan Sudut",
     "crop_hint": "Geser sudut untuk memotong dokumen",
     "pdf": "PDF",
-    "image": "GAMBAR"
+    "image": "GAMBAR",
+    "video": "VIDEO"
   },
   "design_section": {
     "appearance": "Tampilan",
@@ -147,6 +148,7 @@
     "edit_again": "Edit Lagi",
     "download_pdf": "Unduh PDF",
     "download_png": "Unduh PNG",
+    "download_video": "Unduh Video",
     "share": "Bagikan",
     "sharing": "Membagikan...",
     "saving": "Menyimpan...",
@@ -245,6 +247,7 @@
     "unsupported_file": "Tipe file tidak didukung: {type}",
     "failed_to_load": "Gagal memuat dokumen",
     "page_limit_exceeded": "Batas Gratis: Maks 3 Halaman",
-    "page_limit_description": "Dokumen ini memiliki {count} halaman. Silakan tingkatkan ke Pro Plan untuk memberikan watermark pada dokumen lebih dari 3 halaman."
+    "page_limit_description": "Dokumen ini memiliki {count} halaman. Silakan tingkatkan ke Pro Plan untuk memberikan watermark pada dokumen lebih dari 3 halaman.",
+    "video_limit_description": "Pengguna gratis dibatasi untuk video hingga 15 detik dan PDF hingga 3 halaman."
   }
 }

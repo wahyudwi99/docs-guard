@@ -38,7 +38,8 @@
     "crop_title": "Ajustar Bordas",
     "crop_hint": "Arraste os cantos para cortar o documento",
     "pdf": "PDF",
-    "image": "IMAGEM"
+    "image": "IMAGEM",
+    "video": "VÍDEO"
   },
   "design_section": {
     "appearance": "Aparência",
@@ -88,7 +89,7 @@
   },
   "subscription_section": {
     "pro_title": "DocsGuard Pro",
-    "pro_subtitle": "Desbloqueie todo o poder da privacidade",
+    "pro_subtitle": "Desbloqueie todo o poder de la privacidade",
     "days_left": "{days} dias restantes",
     "renew_button": "Renovar assinatura",
     "login_required_title": "Login necessário",
@@ -96,6 +97,7 @@
     "login_with_google": "Fazer login com Google",
     "features": [
       "Marca d'água em PDF ilimitada (sem limite de 3 páginas)",
+      "Marca d'água em vídeo ilimitada (exportação de alta qualidade)",
       "Bloqueio e criptografia de PDF (seguro com senha)",
       "Mascaramento de informações (desfoque inteligente)",
       "100% livre de anúncios e processamento mais rápido"
@@ -121,6 +123,7 @@
     "restore": "Restaurar compras",
     "active": "Assinatura Pro ativa",
     "paywall_feature_unlimited_pdf": "Marca d'água em PDF ilimitada",
+    "paywall_feature_unlimited_video": "Marca d'água em vídeo ilimitada",
     "paywall_feature_encryption": "Bloqueio e criptografia de PDF",
     "paywall_feature_smart_blur": "Desfoque inteligente",
     "paywall_feature_ad_free": "Experiência 100% sem anúncios",
@@ -131,6 +134,10 @@
     "how_it_works": "Como funciona",
     "description": "O DocsGuard usa renderização em tela no navegador para aplicar marcas d'água. Isso significa que seus dados nunca saem do seu computador, garantindo 100% de privacidade.",
     "privacy_notice": "Seus documentos são processados localmente no seu dispositivo sem o uso de servidores. Não armazenamos nem acessamos seus dados. Sua privacidade está inteiramente em suas mãos.",
+    "delete_account": "Excluir conta",
+    "delete_account_title": "Excluir sua conta?",
+    "delete_account_confirm": "Tem certeza de que deseja excluir sua conta? Seus dados de perfil serão permanentemente apagados do nosso banco de dados e você será desconectado. Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
     "learn_more": "Saiba mais"
   },
   "preview_modal": {
@@ -141,6 +148,7 @@
     "edit_again": "Editar novamente",
     "download_pdf": "Baixar PDF",
     "download_png": "Baixar PNG",
+    "download_video": "Baixar Vídeo",
     "share": "Compartilhar",
     "sharing": "Compartilhando...",
     "saving": "Salvando...",
@@ -155,65 +163,83 @@
     "close": "Fechar"
   },
   "footer": {
-    "copyright": "© {year} Criado com privacidade pela Exponential Labs",
+    "copyright": "© {year} Build with Privacy by Exponential Labs",
     "security_protocol": "Protocolo de segurança",
     "local_first": "Local em Primeiro Lugar"
   },
   "privacy": {
-    "title": "Política de privacidade de amnésia total",
-    "hero_title": "Amnésia total",
-    "hero_subtitle": "Projetamos o DocsGuard para ser a ferramenta de documentos mais privada do mundo. Literalmente não podemos ver seus arquivos.",
-    "amnesia": {
-      "title": "Amnésia total",
-      "description": "Assim que você fecha o aplicativo ou termina uma sessão, todos os vestígios de seus documentos são apagados da memória. Não guardamos histórico, registros ou cache de seu conteúdo privado."
-    },
-    "on_device": {
-      "title": "100% no dispositivo",
-      "description": "Seus arquivos nunca saem do seu telefone. Toda a marca d'água, desfoque e criptografia ocorrem localmente usando o hardware do seu dispositivo."
-    },
-    "zero_cloud": {
-      "title": "Zero nuvem",
-      "description": "Não temos servidores para armazenar documentos. Não existe um botão de 'upload' para a nossa nuvem porque não existe nuvem. Seus dados pertencem a você."
-    },
-    "zero_selling": {
-      "title": "Zero venda",
-      "description": "Como não coletamos seus dados, não temos nada para vender. Nosso modelo de negócio é baseado em assinaturas, não em suas informações pessoais."
-    },
-    "commitment_title": "Nosso compromisso",
-    "commitment_description": "No DocsGuard, acreditamos que a privacidade é um direito humano fundamental. Ferramentas de documentos 'gratuitas' tradicionais costumam processar seus arquivos em seus servidores, potencialmente treinando modelos de IA ou construindo perfis. Nós adotamos a abordagem oposta.",
-    "features": [
-      "Sem rastreamento de conteúdo de arquivo",
-      "Sem coleta de metadados de documentos",
-      "Sem análises de terceiros em seus arquivos privados",
-      "Processamento aberto e transparente"
-    ],
-    "technical_title": "Segurança técnica",
-    "technical_description": "Quando você aplica uma marca d'água ou desfoca uma área, usamos a API Canvas do navegador ou as APIs móveis nativas. O arquivo resultante é gerado na memória e oferecido para download. Assim que a janela ou o aplicativo é fechado, essa memória é liberada pelo sistema operacional.",
-    "contact_title": "Contato",
-    "contact_description": "Se você tiver dúvidas sobre nossa política de amnésia total, entre em contato com nossa equipe de segurança. Estamos comprometidos em manter os mais altos padrões de privacidade no dispositivo.",
+    "title": "Política de Privacidade",
     "back_button": "Voltar",
-    "last_updated": "Última atualização: {date}",
-    "premium_title": "Benefícios Premium",
-    "benefits_details": [
+    "last_updated": "Última atualização: 12 de junho de 2026",
+    "hero_title": "Política de Privacidade do DocsGuard",
+    "hero_subtitle": "Estamos comprometidos em proteger sua privacidade absoluta e garantir a segurança inabalável de seus documentos.",
+    "effective_date": "Data de vigência: 12 de junho de 2026",
+    "sections": [
       {
-        "title": "Proteção ilimitada de documentos",
-        "description": "Adicione marcas d'água a centenas de páginas PDF simultaneamente em segundos. Livre-se do limite de 3 páginas e agilize seus fluxos de trabalho pesados instantaneamente.",
-        "icon": "zap"
+        "title": "1. Introdução",
+        "content": "Bem-vindo ao DocsGuard. Estamos comprometidos em proteger sua privacidade absoluta e garantir a segurança inabalável de seus documentos. Esta Política de Privacidade explica como suas informações são tratadas quando você usa nosso aplicativo móvel (\"DocsGuard\" ou o \"App\")."
       },
       {
-        "title": "Criptografia avançada de PDF (PDF Vault)",
-        "description": "Bloqueie seus documentos confidenciais com criptografia local segura. Garanta que contratos, relatórios financeiros e dados pessoais só possam ser acessados por quem você autorizar.",
-        "icon": "lock"
+        "title": "2. O Princípio Fundamental: Conhecimento Zero e Processamento Local",
+        "content": "Nossa filosofia fundamental é que seus dados pertencem exclusivamente a você. O DocsGuard é projetado com uma arquitetura de processamento estritamente local.",
+        "list": [
+          "Sem servidores em nuvem para arquivos: Não fazemos upload, transmitimos, armazenamos ou processamos nenhum de seus documentos, fotos ou vídeos em nenhum servidor remoto.",
+          "Operação no dispositivo: Todas as funções de edição de documentos, marca d'água e segurança são executadas inteiramente localmente no hardware do seu dispositivo.",
+          "Acesso Zero: Nossos desenvolvedores, funcionários e empresa têm absolutamente zero acesso aos arquivos que você importa ou modifica usando o DocsGuard."
+        ]
       },
       {
-        "title": "Desfoque inteligente",
-        "description": "Oculte informações confidenciais! Desfoque permanentemente áreas específicas em documentos ou imagens (como contas bancárias ou números de identidade) antes de compartilhá-los.",
-        "icon": "eye-off"
+        "title": "3. Informações que coletamos para gerenciamento de conta e suporte",
+        "content": "Embora seus documentos e arquivos permaneçam estritamente locais, coletamos informações mínimas necessárias para gerenciar sua assinatura Pro e fornecer suporte ao cliente:",
+        "list": [
+          "Dados de autenticação (Google Sign-In): Se você optar por fazer login usando sua Conta do Google para acessar recursos Pro, receberemos informações básicas de perfil fornecidas pelo Google, especificamente seu endereço de e-mail e nome.",
+          "Dados de suporte ao cliente e feedback: Se você enviar uma reclamação, dúvida ou feedback por meio da nossa página “Fale conosco”, coletaremos e armazenaremos com segurança seu Nome, Endereço de e-mail e o conteúdo da sua mensagem em nosso banco de dados seguro.",
+          "Finalidade da coleta: Os dados de autenticação são usados para sincronizar sua assinatura Pro em vários dispositivos. Os dados de suporte são armazenados exclusivamente para analisar, processar e responder às suas reclamações ou dúvidas por meio do nosso e-mail de suporte oficial. Não usamos essas informações para marketing de terceiros, nem as vendemos a corretores de dados."
+        ]
       },
       {
-        "title": "Processamento prioritário e livre de anúncios",
-        "description": "Desfrute de uma interface limpa e focada. Experimente um processamento no dispositivo mais rápido e completamente livre de anúncios irritantes.",
-        "icon": "shield-check"
+        "title": "4. Informações que não coletamos",
+        "content": "Para garantir clareza absoluta, o DocsGuard não coleta, armazena ou compartilha:",
+        "list": [
+          "O conteúdo de seus documentos, imagens, PDFs ou vídeos.",
+          "Quaisquer informações de identificação pessoal (PII) além dos dados explícitos de conta e suporte mencionados na Seção 3."
+        ]
+      },
+      {
+        "title": "5. Dados coletados automaticamente (serviços de terceiros)",
+        "content": "Usamos serviços de terceiros altamente confiáveis para operar as funções essenciais de back-end do aplicativo. Esses serviços podem coletar dados anonimizados:",
+        "list": [
+          "Gerenciamento de assinatura (por exemplo, Apple App Store, RevenueCat): usado para verificar seu histórico de compras e o nível de assinatura atual.",
+          "Análise e relatórios de falhas (por exemplo, Firebase / Apple App Analytics): Se você optar por participar por meio das configurações do seu dispositivo, receberemos logs de falhas anônimos (modelo do dispositivo, versão do sistema operacional, hora da falha) para nos ajudar a corrigir bugs e melhorar o desempenho do aplicativo."
+        ]
+      },
+      {
+        "title": "6. Assinaturas e Processamento de Pagamento",
+        "content": "Todas as transações financeiras são tratadas de forma segura e direta pela Apple App Store. O DocsGuard não processa, armazena ou tem acesso às suas informações de pagamento, números de cartão de crédito ou endereço de cobrança. Ao fazer login com sua Conta do Google, vinculamos um ID de usuário seguro e anônimo ao seu recibo de compra, permitindo que você restaure perfeitamente sua assinatura em um novo dispositivo."
+      },
+      {
+        "title": "7. Retenção de dados e exclusão de conta",
+        "content": "Retemos suas informações básicas de conta e histórico de suporte apenas pelo tempo necessário para cumprir os propósitos descritos nesta política.",
+        "list": [
+          "Seu direito de excluir: você tem o direito de excluir completamente sua conta do DocsGuard e todos os dados associados (incluindo seu histórico de suporte em nosso banco de dados) a qualquer momento. Você pode fazer isso diretamente no aplicativo navegando em Configurações > Conta > Excluir conta.",
+          "Consequência da exclusão: após a exclusão da conta, seu endereço de e-mail, registros de autenticação e mensagens de suporte enviadas serão permanentemente apagados de nossos bancos de dados. Observe que a exclusão da sua conta não cancela automaticamente as assinaturas ativas da App Store; você deve gerenciar e cancelar essas assinaturas diretamente nas configurações da loja do seu dispositivo."
+        ]
+      },
+      {
+        "title": "8. Direitos do usuário (conformidade com GDPR e CCPA)",
+        "content": "De acordo com o Regulamento Geral de Proteção de Dados (GDPR) e a Lei de Privacidade do Consumidor da Califórnia (CCPA), os usuários têm o direito de solicitar acesso, modificação ou exclusão de seus dados. Como o DocsGuard opera localmente e não armazena seus arquivos em nossos servidores, seu direito à exclusão de seus arquivos está totalmente sob seu controle. Para excluir todos os seus documentos associados ao DocsGuard, basta excluir os arquivos do seu dispositivo ou desinstalar o aplicativo. Para a exclusão dos dados da sua conta e suporte, consulte a Seção 7."
+      },
+      {
+        "title": "9. Privacidade de crianças",
+        "content": "Nosso aplicativo é uma ferramenta profissional de segurança de documentos e não é direcionado a indivíduos com menos de 13 anos (ou a idade legal aplicável em sua região). Não coletamos intencionalmente nenhuma informação pessoal de crianças. Se tomarmos conhecimento de que coletamos inadvertidamente dados pessoais de uma criança, tomaremos medidas imediatas para excluir tais informações de nossos bancos de dados."
+      },
+      {
+        "title": "10. Alterações nesta Política de Privacidade",
+        "content": "Podemos atualizar esta Política de Privacidade de tempos em tempos para refletir mudanças em nossas práticas, tecnologia ou requisitos legais. A política atualizada estará acessível nas configurações do aplicativo."
+      },
+      {
+        "title": "11. Fale conosco",
+        "content": "Se você tiver dúvidas, preocupações ou solicitações em relação a esta Política de Privacidade ou como o DocsGuard lida com sua privacidade, entre em contato conosco diretamente por meio da nossa página “Fale conosco” (localizada na página do aplicativo). Assim que você enviar sua dúvida, nossa equipe de suporte oficial revisará seu caso e responderá diretamente ao endereço de e-mail fornecido no formulário."
       }
     ]
   },
@@ -221,6 +247,7 @@
     "unsupported_file": "Tipo de arquivo não suportado: {type}",
     "failed_to_load": "Falha ao carregar o documento",
     "page_limit_exceeded": "Limite do nível gratuito: máximo de 3 páginas",
-    "page_limit_description": "Este documento tem {count} páginas. Atualize para o plano Pro para colocar marcas d'água em documentos com mais de 3 páginas."
+    "page_limit_description": "Este documento tem {count} páginas. Atualize para o plano Pro para colocar marcas d'água em documentos com mais de 3 páginas.",
+    "video_limit_description": "Usuários gratuitos estão limitados a vídeos de até 15 segundos e PDFs de até 3 páginas."
   }
 }
