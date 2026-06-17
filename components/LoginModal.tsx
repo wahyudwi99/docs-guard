@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Shield, Lock, X, CheckCircle2, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/hooks/useI18n';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface LoginModalProps {
 export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalProps) {
   const { loginWithGoogle } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -32,10 +34,11 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
   };
 
   const benefits = [
-    "Unlimited PDF Watermarking",
-    "PDF lock & encryption",
-    "Smart Blur",
-    "100% Ad-Free & Faster Processing"
+    t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
+    t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
+    t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
+    t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur',
+    t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
   ];
 
   return (
