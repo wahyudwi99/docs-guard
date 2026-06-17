@@ -78,9 +78,16 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
           ) : authenticated ? (
             <div className="grid grid-cols-1 gap-4 mb-8">
               {packages.map((pkg) => {
-                const isYearly = pkg.identifier.toLowerCase().includes('yearly');
-                const isMonthly = pkg.identifier.toLowerCase().includes('monthly');
+                const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
+                const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
+                const isWeekly = pkg.identifier.toLowerCase().includes('weekly') || pkg.packageType === 'WEEKLY';
+                const pkgType = isWeekly ? 'weekly' : isMonthly ? 'monthly' : 'yearly';
                 
+                let displayName = t(`subscription_section.plans.${pkgType}.title`);
+                if (!displayName || displayName === `subscription_section.plans.${pkgType}.title`) {
+                  displayName = pkg.product.title;
+                }
+
                 return (
                   <button
                     key={pkg.identifier}
@@ -111,14 +118,18 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                     
                     <div className="flex justify-between items-center mb-1">
                       <span className={cn("font-bold text-lg", isYearly ? "text-white" : "text-slate-900")}>
-                        {pkg.product.title}
+                        {displayName}
                       </span>
                       <span className={cn("font-black text-xl", isYearly ? "text-amber-300" : "text-indigo-600")}>
                         {pkg.product.priceString}
                       </span>
                     </div>
                     <p className={cn("text-xs font-medium", isYearly ? "text-indigo-100" : "text-slate-400")}>
-                      {pkg.product.description || (isYearly ? t('subscription_section.yearly_description') : t('subscription_section.monthly_description'))}
+                      {pkg.product.description || (
+                        isYearly ? t('subscription_section.yearly_description') : 
+                        isMonthly ? t('subscription_section.monthly_description') : 
+                        t('subscription_section.weekly_description')
+                      )}
                     </p>
                   </button>
                 );

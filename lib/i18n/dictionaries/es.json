@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "Desenfoque inteligente",
     "paywall_feature_ad_free": "Experiencia 100% sin anuncios",
     "paywall_subtitle": "Desbloquee todas las funciones premium y proteja sus documentos como un profesional.",
-    "paywall_restore": "Restaurar compras"
+    "paywall_restore": "Restaurar compras",
+    "weekly_description": "Facturado semanalmente, cancela en cualquier momento"
   },
   "contact": {
     "title": "Envíanos un mensaje",

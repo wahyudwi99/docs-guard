@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "스마트 블러",
     "paywall_feature_ad_free": "100% 광고 없는 환경",
     "paywall_subtitle": "모든 프리미엄 기능을 잠금 해제하고 프로처럼 문서를 보호하세요.",
-    "paywall_restore": "구매 복원"
+    "paywall_restore": "구매 복원",
+    "weekly_description": "매주 청구, 언제든 취소 가능"
   },
   "contact": {
     "title": "메시지 보내기",

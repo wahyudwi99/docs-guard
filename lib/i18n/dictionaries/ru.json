@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "Умное размытие",
     "paywall_feature_ad_free": "100% без рекламы",
     "paywall_subtitle": "Разблокируйте все премиум-функции и защищайте свои документы как профессионал.",
-    "paywall_restore": "Восстановить покупки"
+    "paywall_restore": "Восстановить покупки",
+    "weekly_description": "Еженедельная оплата, отмена в любое время"
   },
   "contact": {
     "title": "Отправьте нам сообщение",

@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "Smart Blur",
     "paywall_feature_ad_free": "100% Ad-Free Experience",
     "paywall_subtitle": "Unlock all premium features and protect your documents like a pro.",
-    "paywall_restore": "Restore Purchases"
+    "paywall_restore": "Restore Purchases",
+    "weekly_description": "Billed weekly, cancel anytime"
   },
   "contact": {
     "title": "Send us a message",

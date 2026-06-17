@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "スマートぼかし",
     "paywall_feature_ad_free": "100%広告なしの体験",
     "paywall_subtitle": "すべてのプレミアム機能を解放し、プロのようにドキュメントを保護します。",
-    "paywall_restore": "購入を復元"
+    "paywall_restore": "購入を復元",
+    "weekly_description": "毎週請求、いつでもキャンセル可能"
   },
   "contact": {
     "title": "メッセージを送信",

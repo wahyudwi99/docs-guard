@@ -826,8 +826,13 @@ function HomeContent() {
                                   t('subscription_section.trial_days')
                                 ) : currentPlan ? (
                                   (() => {
-                                    const planType = currentPlan.type;
-                                    const planName = planType.charAt(0).toUpperCase() + planType.slice(1) + " Pro";
+                                    const planType = currentPlan.type?.toLowerCase() || 'premium';
+                                    let planName = t(`subscription_section.plans.${planType}.title`);
+                                    
+                                    if (!planName || planName === `subscription_section.plans.${planType}.title`) {
+                                      planName = planType.charAt(0).toUpperCase() + planType.slice(1) + " Pro";
+                                    }
+                                    
                                     if (currentPlan.endDate) {
                                       const end = new Date(currentPlan.endDate);
                                       const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
@@ -938,8 +943,12 @@ function HomeContent() {
                              }
                           }
 
-                          // Robust naming logic
-                          let displayName = pkg.product.title;
+                          // Robust naming logic - Prioritize i18n translations
+                          let displayName = t(`subscription_section.plans.${pkgType}.title`);
+                          if (!displayName || displayName === `subscription_section.plans.${pkgType}.title`) {
+                            displayName = pkg.product.title;
+                          }
+                          
                           if (!displayName || displayName.trim() === "") {
                             if (isYearly) displayName = "Yearly Pro";
                             else if (isMonthly) displayName = "Monthly Pro";
@@ -986,7 +995,11 @@ function HomeContent() {
                                   <span className="font-black text-lg text-indigo-600 shrink-0">{pkg.product.priceString}</span>
                                 </div>
                                 <p className="text-[10px] font-medium text-slate-400 mb-4">
-                                  {pkg.product.description || (isYearly ? t('subscription_section.yearly_description') : t('subscription_section.monthly_description'))}
+                                  {pkg.product.description || (
+                                    isYearly ? t('subscription_section.yearly_description') : 
+                                    isMonthly ? t('subscription_section.monthly_description') : 
+                                    t('subscription_section.weekly_description')
+                                  )}
                                 </p>
                                 
                                 <div className={cn(

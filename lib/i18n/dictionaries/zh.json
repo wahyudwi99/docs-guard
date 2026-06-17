@@ -152,7 +152,8 @@
     "paywall_feature_smart_blur": "智能模糊",
     "paywall_feature_ad_free": "100% 无广告体验",
     "paywall_subtitle": "解锁所有高级功能，像专业人士一样保护您的文档。",
-    "paywall_restore": "恢复购买"
+    "paywall_restore": "恢复购买",
+    "weekly_description": "每周计费，随时取消"
   },
   "contact": {
     "title": "向我们发送消息",
