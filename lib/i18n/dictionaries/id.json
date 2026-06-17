@@ -288,5 +288,68 @@
     "page_limit_exceeded": "Batas Gratis: Maks 3 Halaman",
     "page_limit_description": "Dokumen ini memiliki {count} halaman. Silakan tingkatkan ke Pro Plan untuk memberikan watermark pada dokumen lebih dari 3 halaman.",
     "video_limit_description": "Pengguna gratis dibatasi untuk video hingga 15 detik dan PDF hingga 3 halaman."
+  },
+  "learn_more": {
+    "title": "Kebijakan Privasi Amnesia Total",
+    "hero_title": "Amnesia Total",
+    "hero_subtitle": "Kami merancang DocsGuard untuk menjadi alat dokumen paling privat di bumi. Kami benar-benar tidak bisa melihat file Anda.",
+    "amnesia": {
+      "title": "Amnesia Total",
+      "description": "Segera setelah Anda menutup aplikasi atau menyelesaikan sesi, semua jejak dokumen Anda dihapus dari memori. Kami tidak menyimpan riwayat, log, atau cache dari konten pribadi Anda."
+    },
+    "on_device": {
+      "title": "100% Di Perangkat",
+      "description": "File Anda tidak pernah meninggalkan ponsel Anda. Semua proses watermark, sensor, dan enkripsi terjadi secara lokal menggunakan perangkat keras Anda."
+    },
+    "zero_cloud": {
+      "title": "Nol Cloud",
+      "description": "Kami tidak memiliki server untuk menyimpan dokumen. Tidak ada tombol 'unggah' ke cloud kami karena memang tidak ada cloud. Data Anda milik Anda."
+    },
+    "zero_selling": {
+      "title": "Nol Penjualan",
+      "description": "Karena kami tidak mengumpulkan data Anda, kami tidak memiliki apa pun untuk dijual. Model bisnis kami didasarkan pada langganan, bukan informasi pribadi Anda."
+    },
+    "commitment_title": "Komitmen Kami",
+    "commitment_description": "Di DocsGuard, kami percaya privasi adalah hak asasi manusia yang mendasar. Alat dokumen 'gratis' tradisional sering kali memproses file Anda di server mereka, berpotensi melatih model AI atau membangun profil. Kami mengambil pendekatan sebaliknya.",
+    "features": [
+      "Tidak ada pelacakan konten file",
+      "Tidak ada pengambilan metadata dokumen",
+      "Tidak ada analitik pihak ketiga pada file pribadi Anda",
+      "Pemrosesan transparan dan terbuka"
+    ],
+    "technical_title": "Keamanan Teknis",
+    "technical_description": "Saat Anda menerapkan watermark atau menyensor area, kami menggunakan Canvas API Browser atau API Native Mobile. File yang dihasilkan dibuat di memori dan ditawarkan untuk diunduh. Setelah jendela atau aplikasi ditutup, memori tersebut dilepaskan oleh sistem operasi.",
+    "contact_title": "Kontak",
+    "contact_description": "Jika Anda memiliki pertanyaan tentang kebijakan 'Amnesia Total' kami, Anda dapat menghubungi tim keamanan kami. Kami berkomitmen untuk menjaga standar tertinggi privasi di perangkat.",
+    "back_button": "Kembali",
+    "last_updated": "Terakhir Diperbarui: {date}",
+    "premium_title": "Keuntungan Premium",
+    "benefits_details": [
+      {
+        "title": "Perlindungan Dokumen Tanpa Batas",
+        "description": "Tambahkan watermark ke ratusan halaman PDF secara bersamaan dalam hitungan detik. Bebas dari limit 3 halaman dan selesaikan pekerjaan berat Anda secara instan.",
+        "icon": "zap"
+      },
+      {
+        "title": "Watermark Video Tanpa Batas (Kualitas Asli)",
+        "description": "Bebaskan video Anda dari batasan durasi. Beri watermark pada video panjang dengan jaminan kualitas ekspor asli 100%. Tanpa penurunan resolusi, tanpa kompresi.",
+        "icon": "video"
+      },
+      {
+        "title": "Enkripsi PDF Lanjutan (PDF Vault)",
+        "description": "Kunci dokumen sensitif Anda dengan enkripsi lokal yang aman. Pastikan kontrak, laporan keuangan, dan data pribadi hanya dapat diakses oleh mereka yang Anda izinkan.",
+        "icon": "lock"
+      },
+      {
+        "title": "Smart Blur",
+        "description": "Sembunyikan informasi rahasia! Blur area spesifik secara permanen pada dokumen atau gambar (seperti nomor rekening atau nomor ID) sebelum membagikannya.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "Pemrosesan Prioritas & Bebas Iklan",
+        "description": "Nikmati antarmuka yang bersih dan terfokus. Alami pemrosesan di perangkat yang lebih cepat dan sepenuhnya bebas dari iklan yang mengganggu.",
+        "icon": "shield-check"
+      }
+    ]
   }
 }

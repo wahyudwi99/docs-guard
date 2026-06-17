@@ -1,0 +1,163 @@
+"use client";
+
+import { Shield, Lock, EyeOff, ServerOff, Database, CheckCircle2, ChevronLeft, Zap, Video, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { useI18n } from "@/hooks/useI18n";
+
+export default function LearnMore() {
+  const { t, locale } = useI18n();
+
+  const features = (t('learn_more.features') as string[]) || [];
+  const premiumBenefits = (t('learn_more.benefits_details') as any[]) || [];
+  
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'zap': return <Zap className="h-5 w-5" />;
+      case 'video': return <Video className="h-5 w-5" />;
+      case 'lock': return <Lock className="h-5 w-5" />;
+      case 'eye-off': return <EyeOff className="h-5 w-5" />;
+      case 'shield-check': return <ShieldCheck className="h-5 w-5" />;
+      default: return <Shield className="h-5 w-5" />;
+    }
+  };
+
+  const lastUpdated = t('learn_more.last_updated', { 
+    date: new Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { 
+      month: 'long', 
+      year: 'numeric' 
+    }) 
+  });
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#F2F2F7] text-[#1C1C1E] font-sans selection:bg-indigo-100 selection:text-indigo-900">
+      {/* iOS Style Navigation Bar */}
+      <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)] pt-[env(safe-area-inset-top)]">
+        <div className="max-w-3xl mx-auto flex h-16 items-center px-6">
+          <Link href="/" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors">
+            <ChevronLeft className="h-5 w-5" />
+            <span className="text-xs font-bold uppercase tracking-widest">{t('learn_more.back_button')}</span>
+          </Link>
+          <div className="flex-1 text-center">
+            <span className="text-lg font-bold tracking-tight text-[#1C1C1E]">{t('learn_more.title')}</span>
+          </div>
+          <div className="w-16"></div> {/* Spacer for centering */}
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">
+        <div className="space-y-12">
+          {/* Hero Section */}
+          <div className="text-center space-y-4">
+            <div className="inline-flex h-32 w-32 items-center justify-center mb-4">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-[#1C1C1E]">
+              "{t('learn_more.hero_title')}" <br /> {t('learn_more.title')}
+            </h1>
+            <p className="text-slate-500 font-medium max-w-md mx-auto">
+              {t('learn_more.hero_subtitle')}
+            </p>
+          </div>
+
+          {/* Key Points Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-4">
+              <div className="h-12 w-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500">
+                <EyeOff className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight">{t('learn_more.amnesia.title')}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {t('learn_more.amnesia.description')}
+              </p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-4">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight">{t('learn_more.on_device.title')}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {t('learn_more.on_device.description')}
+              </p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-4">
+              <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500">
+                <ServerOff className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight">{t('learn_more.zero_cloud.title')}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {t('learn_more.zero_cloud.description')}
+              </p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-4">
+              <div className="h-12 w-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500">
+                <Database className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight">{t('learn_more.zero_selling.title')}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {t('learn_more.zero_selling.description')}
+              </p>
+            </div>
+          </div>
+
+          {/* Premium Benefits Section */}
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-sm border border-white/60 space-y-6">
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <Zap className="h-5 w-5 text-indigo-600 fill-indigo-600" />
+              <h2 className="text-xl font-black tracking-tight uppercase text-slate-900">{t('learn_more.premium_title')}</h2>
+            </div>
+            
+            <div className="space-y-6">
+              {premiumBenefits.map((benefit, i) => (
+                <div key={i} className="flex gap-5 items-start">
+                  <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                    {getIcon(benefit.icon)}
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-base font-bold tracking-tight text-slate-900">{benefit.title}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Detailed Section */}
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] p-8 md:p-12 shadow-sm border border-white/60 space-y-8">
+            <section className="space-y-4">
+              <h2 className="text-2xl font-black tracking-tight">{t('learn_more.commitment_title')}</h2>
+              <p className="text-slate-600 leading-relaxed">
+                {t('learn_more.commitment_description')}
+              </p>
+              <div className="space-y-3">
+                {features.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                    <span className="text-sm font-bold text-slate-700">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-4 pt-8 border-t border-slate-100">
+              <h2 className="text-2xl font-black tracking-tight">{t('learn_more.technical_title')}</h2>
+              <p className="text-slate-600 leading-relaxed">
+                {t('learn_more.technical_description')}
+              </p>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <footer className="max-w-3xl mx-auto w-full px-6 py-12 flex justify-center border-t border-slate-200/60 mt-12">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          {lastUpdated}
+        </p>
+      </footer>
+    </div>
+  );
+}

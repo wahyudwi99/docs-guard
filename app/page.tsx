@@ -1043,7 +1043,7 @@ function HomeContent() {
                       {t('info_card.privacy_notice')}
                     </p>
                   </div>
-                  <Link href="/privacy" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
+                  <Link href="/learn-more" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all w-fit">
                     {t('info_card.learn_more')} <ChevronRight className="h-3 w-3" />
                   </Link>
                </div>
