@@ -140,8 +140,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [zoomScale, setZoomScale] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
+  const [panStart, setPanStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -162,73 +164,94 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!isSelectionMode) return;
+    if (isSelectionMode) {
+      // Use currentTarget to get the specific page div's relative coordinates
+      const rect = e.currentTarget.getBoundingClientRect();
+      setIsDragging(true);
 
-    // Use currentTarget to get the specific page div's relative coordinates
-    const rect = e.currentTarget.getBoundingClientRect();
-    setIsDragging(true);
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      // Direct coordinates as we're scaling width
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
 
-    // Direct coordinates as we're scaling width, not using transform
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    setStartPos({ x, y });
-    setCurrentPos({ x, y });
+      setStartPos({ x, y });
+      setCurrentPos({ x, y });
+    } else {
+      // Panning mode
+      setIsPanning(true);
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      if (containerRef.current) {
+        setPanStart({
+          x: clientX,
+          y: clientY,
+          scrollLeft: containerRef.current.scrollLeft,
+          scrollTop: containerRef.current.scrollTop
+        });
+      }
+    }
   }, [isSelectionMode]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
+    if (isDragging) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    setCurrentPos({ x, y });
-  }, [isDragging]);
+      setCurrentPos({ x, y });
+    } else if (isPanning && containerRef.current) {
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      const dx = clientX - panStart.x;
+      const dy = clientY - panStart.y;
+      
+      containerRef.current.scrollLeft = panStart.scrollLeft - dx;
+      containerRef.current.scrollTop = panStart.scrollTop - dy;
+    }
+  }, [isDragging, isPanning, panStart]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging || !onAreaSelected) {
-      setIsDragging(false);
-      return;
-    }
+    if (isDragging && onAreaSelected) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const canvas = e.currentTarget.querySelector('canvas');
+      
+      if (rect && canvas) {
+        // Scale from UI pixels to physical canvas pixels
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const canvas = e.currentTarget.querySelector('canvas');
-    
-    if (rect && canvas) {
-      // Scale from UI pixels to physical canvas pixels
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
+        const x = Math.min(startPos.x, currentPos.x);
+        const y = Math.min(startPos.y, currentPos.y);
+        const width = Math.abs(currentPos.x - startPos.x);
+        const height = Math.abs(currentPos.y - startPos.y);
 
-      const x = Math.min(startPos.x, currentPos.x);
-      const y = Math.min(startPos.y, currentPos.y);
-      const width = Math.abs(currentPos.x - startPos.x);
-      const height = Math.abs(currentPos.y - startPos.y);
+        const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
+        const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
+        const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
+        const finalHeight = Math.min(height, rect.height - Math.max(0, y)) * scaleY;
 
-      const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
-      const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
-      const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
-      const finalHeight = Math.min(height, rect.height - Math.max(0, y)) * scaleY;
-
-      if (finalWidth > 5 && finalHeight > 5) {
-        onAreaSelected({
-          x: finalX,
-          y: finalY,
-          width: finalWidth,
-          height: finalHeight,
-          pageIndex: currentPage
-        });
+        if (finalWidth > 5 && finalHeight > 5) {
+          onAreaSelected({
+            x: finalX,
+            y: finalY,
+            width: finalWidth,
+            height: finalHeight,
+            pageIndex: currentPage
+          });
+        }
       }
     }
 
     setIsDragging(false);
-  }, [isDragging, onAreaSelected, startPos, currentPos, currentPage, zoomScale]);
+    setIsPanning(false);
+  }, [isDragging, onAreaSelected, startPos, currentPos, currentPage]);
 
   // Effect to add non-passive touchmove listener to the container
   useEffect(() => {
@@ -236,7 +259,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     if (!container) return;
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging) {
+      if (isDragging || isPanning) {
         e.preventDefault();
       }
     };
@@ -245,7 +268,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     return () => {
       container.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isDragging]);
+  }, [isDragging, isPanning]);
 
   return (
     <div className="w-full space-y-4">
@@ -321,37 +344,38 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       <div 
         ref={containerRef}
         className={cn(
-          "relative w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-auto border border-black/5",
-          isSelectionMode && "cursor-crosshair",
-          documentType === 'video' ? "flex items-center justify-center" : "block"
+          "relative w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-auto border border-black/5 flex items-center justify-center",
+          isSelectionMode ? "cursor-crosshair" : isPanning ? "cursor-grabbing" : "cursor-grab"
         )}
       >
-        {Array.from({ length: numPages }).map((_, index) => {
-          // VIRTUAL WINDOWING: Only render the current page and 1 neighbor
-          // This keeps only 3 canvases in memory max, preventing OOM.
-          const isActive = index === currentPage;
-          const isNeighbor = Math.abs(index - currentPage) <= 1;
-          const shouldRender = isActive || isNeighbor;
+        <div className="flex items-center justify-center min-w-full min-h-full">
+          {Array.from({ length: numPages }).map((_, index) => {
+            // VIRTUAL WINDOWING: Only render the current page and 1 neighbor
+            // This keeps only 3 canvases in memory max, preventing OOM.
+            const isActive = index === currentPage;
+            const isNeighbor = Math.abs(index - currentPage) <= 1;
+            const shouldRender = isActive || isNeighbor;
 
-          return (
-            <CanvasPage
-              key={index}
-              index={index}
-              isActive={isActive}
-              shouldRender={shouldRender}
-              registerCanvas={registerCanvas}
-              isDragging={isDragging}
-              startPos={startPos}
-              currentPos={currentPos}
-              blurAreas={blurAreas}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              documentType={documentType}
-              zoomScale={zoomScale}
-            />
-          );
-        })}
+            return (
+              <CanvasPage
+                key={index}
+                index={index}
+                isActive={isActive}
+                shouldRender={shouldRender}
+                registerCanvas={registerCanvas}
+                isDragging={isDragging}
+                startPos={startPos}
+                currentPos={currentPos}
+                blurAreas={blurAreas}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                documentType={documentType}
+                zoomScale={zoomScale}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
