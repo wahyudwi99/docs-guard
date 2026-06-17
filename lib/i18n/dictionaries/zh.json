@@ -322,6 +322,34 @@
     "contact_title": "联系我们",
     "contact_description": "如果您对我们的“全面遗忘”政策有任何疑问，可以联系我们的安全团队。我们致力于保持最高标准的设备端隐私保护。",
     "back_button": "返回",
-    "last_updated": "最后更新：{date}"
+    "last_updated": "最后更新：{date}",
+    "premium_title": "专业版优势",
+    "benefits_details": [
+      {
+        "title": "无限文档保护",
+        "description": "在几秒钟内同时为数百页 PDF 添加水印。摆脱 3 页限制，立即处理繁重的工作任务。",
+        "icon": "zap"
+      },
+      {
+        "title": "无限视频水印（原始质量）",
+        "description": "让您的视频摆脱时长限制。为长视频添加水印，并保证 100% 原创导出质量。零分辨率损失，零压缩。",
+        "icon": "video"
+      },
+      {
+        "title": "高级 PDF 加密（PDF 保管库）",
+        "description": "使用安全本地加密锁定您的敏感文档。确保合同、财务报告和个人数据只能由您授权的人员访问。",
+        "icon": "lock"
+      },
+      {
+        "title": "智能模糊",
+        "description": "隐藏机密信息！在共享之前，永久模糊文档或图像上的特定区域（如银行账户或身份证号码）。",
+        "icon": "eye-off"
+      },
+      {
+        "title": "优先处理和无广告",
+        "description": "享受干净、专注的界面。体验更快的设备端处理，完全没有烦人的广告。",
+        "icon": "shield-check"
+      }
+    ]
   }
 }

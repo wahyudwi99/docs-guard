@@ -322,6 +322,34 @@
     "contact_title": "Contacto",
     "contact_description": "Si tiene preguntas sobre nuestra política 'Amnesia Total', puede comunicarse con nuestro equipo de seguridad. Estamos comprometidos a mantener los más altos estándares de privacidad en el dispositivo.",
     "back_button": "Atrás",
-    "last_updated": "Última actualización: {date}"
+    "last_updated": "Última actualización: {date}",
+    "premium_title": "Beneficios Premium",
+    "benefits_details": [
+      {
+        "title": "Protección de documentos ilimitada",
+        "description": "Agregue marcas de agua a cientos de páginas PDF simultáneamente en segundos. Libérese del límite de 3 páginas y complete sus tareas pesadas al instante.",
+        "icon": "zap"
+      },
+      {
+        "title": "Marcas de agua de video ilimitadas (calidad original)",
+        "description": "Libere sus videos de los límites de duración. Ponga marcas de agua en videos largos con una garantía de calidad de exportación 100% original. Cero pérdida de resolución, cero compresión.",
+        "icon": "video"
+      },
+      {
+        "title": "Cifrado PDF avanzado (Bóveda PDF)",
+        "description": "Bloquee sus documentos confidenciales con un cifrado local seguro. Asegúrese de que los contratos, informes financieros y datos personales solo puedan ser accedidos por quienes usted autorice.",
+        "icon": "lock"
+      },
+      {
+        "title": "Desenfoque inteligente",
+        "description": "¡Oculte información confidencial! Desenfoque permanentemente áreas específicas en documentos o imágenes (como cuentas bancarias o números de identificación) antes de compartirlos.",
+        "icon": "eye-off"
+      },
+      {
+        "title": "Procesamiento prioritario y sin anuncios",
+        "description": "Disfrute de una interfaz limpia y enfocada. Experimente un procesamiento en el dispositivo más rápido y completamente libre de anuncios molestos.",
+        "icon": "shield-check"
+      }
+    ]
   }
 }
