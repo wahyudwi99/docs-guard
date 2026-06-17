@@ -55,15 +55,15 @@ const CanvasPage: React.FC<{
     <div 
       ref={pageRef}
       className={cn(
-        "relative bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-300 ease-in-out touch-none select-none origin-top-left",
+        "relative bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-300 ease-in-out touch-none select-none",
         isActive 
           ? "opacity-100 z-10 block" 
           : "hidden",
         documentType === 'video' ? "max-h-[70vh] mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" : "mx-auto"
       )}
       style={documentType !== 'video' ? {
-        transform: `scale(${zoomScale})`,
-        width: 'fit-content'
+        width: `${100 * zoomScale}%`,
+        maxWidth: 'none'
       } : {}}
       onMouseDown={onMouseDown}
       onTouchStart={onMouseDown}
@@ -76,7 +76,7 @@ const CanvasPage: React.FC<{
         <canvas
           ref={canvasRef}
           className={cn(
-            "max-w-full h-auto block",
+            "w-full h-auto block",
             documentType === 'video' ? "bg-black" : "bg-white"
           )}
           style={documentType === 'video' ? { minWidth: '300px', minHeight: '200px' } : {}}
@@ -171,13 +171,13 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    // Account for CSS scale
-    const x = (clientX - rect.left) / zoomScale;
-    const y = (clientY - rect.top) / zoomScale;
+    // Direct coordinates as we're scaling width, not using transform
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     setStartPos({ x, y });
     setCurrentPos({ x, y });
-  }, [isSelectionMode, zoomScale]);
+  }, [isSelectionMode]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
@@ -186,11 +186,11 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const x = (clientX - rect.left) / zoomScale;
-    const y = (clientY - rect.top) / zoomScale;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     setCurrentPos({ x, y });
-  }, [isDragging, zoomScale]);
+  }, [isDragging]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !onAreaSelected) {
@@ -203,22 +203,18 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     
     if (rect && canvas) {
       // Scale from UI pixels to physical canvas pixels
-      // rect.width is scaled by zoomScale, so we need the unscaled width
-      const unscaledWidth = rect.width / zoomScale;
-      const unscaledHeight = rect.height / zoomScale;
-      
-      const scaleX = canvas.width / unscaledWidth;
-      const scaleY = canvas.height / unscaledHeight;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
 
       const x = Math.min(startPos.x, currentPos.x);
       const y = Math.min(startPos.y, currentPos.y);
       const width = Math.abs(currentPos.x - startPos.x);
       const height = Math.abs(currentPos.y - startPos.y);
 
-      const finalX = Math.max(0, Math.min(x, unscaledWidth)) * scaleX;
-      const finalY = Math.max(0, Math.min(y, unscaledHeight)) * scaleY;
-      const finalWidth = Math.min(width, unscaledWidth - Math.max(0, x)) * scaleX;
-      const finalHeight = Math.min(height, unscaledHeight - Math.max(0, y)) * scaleY;
+      const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
+      const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
+      const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
+      const finalHeight = Math.min(height, rect.height - Math.max(0, y)) * scaleY;
 
       if (finalWidth > 5 && finalHeight > 5) {
         onAreaSelected({
