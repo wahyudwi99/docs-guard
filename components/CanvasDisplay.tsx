@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Hash } from "lucide-react";
+import { ChevronLeft, ChevronRight, Hash, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 
 interface BlurArea {
   x: number;
@@ -35,11 +35,12 @@ const CanvasPage: React.FC<{
   onMouseMove: (e: React.MouseEvent | React.TouchEvent) => void;
   onMouseUp: (e: React.MouseEvent | React.TouchEvent) => void;
   documentType?: "image" | "pdf" | "video" | null;
+  zoomScale: number;
 }> = React.memo(({ 
   index, isActive, shouldRender, registerCanvas, 
   isDragging, startPos, currentPos, blurAreas,
   onMouseDown, onMouseMove, onMouseUp,
-  documentType
+  documentType, zoomScale
 }) => {
   const pageRef = useRef<HTMLDivElement>(null);
   
@@ -54,12 +55,16 @@ const CanvasPage: React.FC<{
     <div 
       ref={pageRef}
       className={cn(
-        "relative w-fit flex justify-center bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-500 ease-in-out absolute touch-none select-none",
+        "relative bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200 transition-all duration-300 ease-in-out touch-none select-none origin-top-left",
         isActive 
-          ? "opacity-100 scale-100 z-10 translate-x-0" 
-          : "opacity-0 scale-90 -z-10 pointer-events-none",
-        documentType === 'video' && "max-h-[70vh]"
+          ? "opacity-100 z-10 block" 
+          : "hidden",
+        documentType === 'video' ? "max-h-[70vh] mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" : "mx-auto"
       )}
+      style={documentType !== 'video' ? {
+        transform: `scale(${zoomScale})`,
+        width: 'fit-content'
+      } : {}}
       onMouseDown={onMouseDown}
       onTouchStart={onMouseDown}
       onMouseMove={onMouseMove}
@@ -133,6 +138,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   documentType
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [zoomScale, setZoomScale] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
@@ -146,6 +152,10 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const handlePrev = () => {
     if (currentPage > 0) setCurrentPage(prev => prev - 1);
   };
+
+  const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.2, 3));
+  const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.2, 0.5));
+  const handleResetZoom = () => setZoomScale(1);
 
   const handleJumpToPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentPage(parseInt(e.target.value));
@@ -161,12 +171,13 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    // Account for CSS scale
+    const x = (clientX - rect.left) / zoomScale;
+    const y = (clientY - rect.top) / zoomScale;
 
     setStartPos({ x, y });
     setCurrentPos({ x, y });
-  }, [isSelectionMode]);
+  }, [isSelectionMode, zoomScale]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
@@ -175,11 +186,11 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const x = (clientX - rect.left) / zoomScale;
+    const y = (clientY - rect.top) / zoomScale;
 
     setCurrentPos({ x, y });
-  }, [isDragging]);
+  }, [isDragging, zoomScale]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging || !onAreaSelected) {
@@ -192,18 +203,22 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     
     if (rect && canvas) {
       // Scale from UI pixels to physical canvas pixels
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
+      // rect.width is scaled by zoomScale, so we need the unscaled width
+      const unscaledWidth = rect.width / zoomScale;
+      const unscaledHeight = rect.height / zoomScale;
+      
+      const scaleX = canvas.width / unscaledWidth;
+      const scaleY = canvas.height / unscaledHeight;
 
       const x = Math.min(startPos.x, currentPos.x);
       const y = Math.min(startPos.y, currentPos.y);
       const width = Math.abs(currentPos.x - startPos.x);
       const height = Math.abs(currentPos.y - startPos.y);
 
-      const finalX = Math.max(0, Math.min(x, rect.width)) * scaleX;
-      const finalY = Math.max(0, Math.min(y, rect.height)) * scaleY;
-      const finalWidth = Math.min(width, rect.width - Math.max(0, x)) * scaleX;
-      const finalHeight = Math.min(height, rect.height - Math.max(0, y)) * scaleY;
+      const finalX = Math.max(0, Math.min(x, unscaledWidth)) * scaleX;
+      const finalY = Math.max(0, Math.min(y, unscaledHeight)) * scaleY;
+      const finalWidth = Math.min(width, unscaledWidth - Math.max(0, x)) * scaleX;
+      const finalHeight = Math.min(height, unscaledHeight - Math.max(0, y)) * scaleY;
 
       if (finalWidth > 5 && finalHeight > 5) {
         onAreaSelected({
@@ -217,7 +232,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     }
 
     setIsDragging(false);
-  }, [isDragging, onAreaSelected, startPos, currentPos, currentPage]);
+  }, [isDragging, onAreaSelected, startPos, currentPos, currentPage, zoomScale]);
 
   // Effect to add non-passive touchmove listener to the container
   useEffect(() => {
@@ -239,7 +254,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   return (
     <div className="w-full space-y-4">
       {/* Navigation Controls */}
-      <div className="flex items-center justify-between bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-black/5 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-black/5 shadow-sm gap-3">
         <div className="flex items-center gap-2">
           <button 
             onClick={handlePrev}
@@ -265,6 +280,32 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
           </button>
         </div>
 
+        {documentType !== 'video' && (
+          <div className="flex items-center gap-1.5 bg-slate-100/50 p-1 rounded-xl">
+            <button 
+              onClick={handleZoomOut}
+              className="h-7 w-7 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-indigo-600 transition-colors"
+              title="Zoom Out"
+            >
+              <ZoomOut className="h-3.5 w-3.5" />
+            </button>
+            <button 
+              onClick={handleResetZoom}
+              className="px-2 h-7 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+              title="Reset Zoom"
+            >
+              {Math.round(zoomScale * 100)}%
+            </button>
+            <button 
+              onClick={handleZoomIn}
+              className="h-7 w-7 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-indigo-600 transition-colors"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
            <div className="relative group">
               <select 
@@ -284,8 +325,9 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
       <div 
         ref={containerRef}
         className={cn(
-          "relative flex items-center justify-center w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-hidden border border-black/5",
-          isSelectionMode && "cursor-crosshair"
+          "relative w-full min-h-[400px] bg-slate-100/50 rounded-[32px] p-6 overflow-auto border border-black/5",
+          isSelectionMode && "cursor-crosshair",
+          documentType === 'video' ? "flex items-center justify-center" : "block"
         )}
       >
         {Array.from({ length: numPages }).map((_, index) => {
@@ -310,6 +352,7 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               documentType={documentType}
+              zoomScale={zoomScale}
             />
           );
         })}
@@ -317,3 +360,4 @@ export const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     </div>
   );
 };
+
