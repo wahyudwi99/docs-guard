@@ -7,8 +7,8 @@ import { useI18n } from "@/hooks/useI18n";
 export default function LearnMore() {
   const { t, locale } = useI18n();
 
-  const features = (t('learn_more.features') as string[]) || [];
-  const premiumBenefits = (t('learn_more.benefits_details') as any[]) || [];
+  const features = (Array.isArray(t('learn_more.features')) ? t('learn_more.features') : []) as string[];
+  const premiumBenefits = (Array.isArray(t('learn_more.benefits_details')) ? t('learn_more.benefits_details') : []) as any[];
   
   const getIcon = (iconName: string) => {
     switch (iconName) {

@@ -1023,8 +1023,6 @@ function HomeContent() {
             </div>
           </div>
 
-          <div className="h-24"></div>
-
           {/* Info Card */}
           <div className="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200 overflow-hidden relative group">
                <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-125 transition-transform duration-700">
