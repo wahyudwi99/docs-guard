@@ -466,12 +466,11 @@ function HomeContent() {
                         {trialActive ? "TRIAL" : "PRO"}
                       </span>
                     </div>
-                    {trialActive && session.createdAt && (
+                    {trialActive && currentPlan?.endDate && (
                       <div className="hidden xs:flex items-center px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border border-amber-100 shadow-sm">
                         <span className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-600 uppercase tracking-tighter">
                           Ends: {(() => {
-                            const created = new Date(session.createdAt);
-                            const end = new Date(created.getTime() + 3 * 24 * 60 * 60 * 1000);
+                            const end = new Date(currentPlan.endDate);
                             const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
                             return end.toLocaleDateString('en-GB', options);
                           })()}
@@ -846,11 +845,10 @@ function HomeContent() {
                                 )}
                               </div>
                               
-                              {trialActive && session?.createdAt && (
+                              {trialActive && currentPlan?.endDate && (
                                 <p className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest animate-pulse">
                                   {(() => {
-                                    const created = new Date(session.createdAt);
-                                    const end = new Date(created.getTime() + 3 * 24 * 60 * 60 * 1000);
+                                    const end = new Date(currentPlan.endDate);
                                     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
                                     const formattedDate = end.toLocaleDateString(locale === 'en' ? 'en-GB' : locale, options);
                                     return t('subscription_section.trial_ends', { date: formattedDate });

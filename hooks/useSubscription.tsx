@@ -56,27 +56,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const isInitialized = useRef(false);
 
-  // 3-day trial logic: Pro status for first 3 days after account creation
+  // Check if active subscription is in native trial period (RevenueCat)
   const trialActive = useMemo(() => {
-    if (activeEntitlements.length > 0) return false; // Pro subscription overrides trial
-    
-    if (!user?.createdAt) return false;
-    try {
-      const createdDate = new Date(user.createdAt);
-      const now = new Date();
-      const diffTime = now.getTime() - createdDate.getTime();
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      return diffDays >= 0 && diffDays <= 3;
-    } catch (e) {
-      return false;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.createdAt, activeEntitlements.length]);
+    return activeEntitlements.some((ent: any) => ent.periodType === 'TRIAL');
+  }, [activeEntitlements]);
 
-  // SOURCE OF TRUTH: PRO if user is logged in AND (active entitlement OR trial active)
+  // SOURCE OF TRUTH: PRO if user is logged in AND has active entitlements
   const isPro = useMemo(() => {
-    return !!user?.id && (activeEntitlements.length > 0 || trialActive);
-  }, [activeEntitlements, user?.id, trialActive]);
+    return !!user?.id && activeEntitlements.length > 0;
+  }, [activeEntitlements, user?.id]);
 
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
