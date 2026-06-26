@@ -73,9 +73,9 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
                 <Zap className="w-6 h-6 fill-current" />
               </div>
               
-              <h2 className="text-2xl font-black mb-1 text-zinc-900 tracking-tight uppercase">Get 3 Days Pro Free</h2>
+              <h2 className="text-2xl font-black mb-1 text-zinc-900 tracking-tight uppercase">Unlock Docs Guard Pro</h2>
               <p className="text-zinc-500 mb-6 text-xs font-medium uppercase tracking-widest">
-                Login now to unlock all premium features
+                Log in to continue and unlock your 3-day free trial
               </p>
 
               <div className="space-y-3 mb-8 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 text-left">
