@@ -139,6 +139,8 @@
     "upgrade_switch_plan": "플랜 업그레이드 또는 변경",
     "choose_plan": "플랜 선택",
     "free_trial_description": "3일 무료 체험으로 모든 Pro 기능을 잠금 해제하세요. 오늘 비용이 청구되지 않으며 언제든지 취소할 수 있습니다.",
+    "login_modal_title": "DocsGuard Pro 잠금 해제",
+    "login_modal_subtitle": "계속해서 로그인하여 3일 무료 체험을 시작해 보세요",
     "subscribe_button": "구독하기",
     "login_to_subscribe": "로그인하여 구독",
     "current_plan": "현재 플랜",

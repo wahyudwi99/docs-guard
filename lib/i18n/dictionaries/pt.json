@@ -139,6 +139,8 @@
     "upgrade_switch_plan": "Atualizar ou mudar de plano",
     "choose_plan": "Escolha o seu plano",
     "free_trial_description": "Desbloqueie todos os recursos Pro com um teste gratuito de 3 dias. Você não será cobrado hoje e pode cancelar a qualquer momento.",
+    "login_modal_title": "Desbloquear DocsGuard Pro",
+    "login_modal_subtitle": "Faça login para continuar e desbloquear seu teste gratuito de 3 dias",
     "subscribe_button": "Assinar",
     "login_to_subscribe": "Faça login para assinar",
     "current_plan": "Plano atual",

@@ -139,6 +139,8 @@
     "upgrade_switch_plan": "升级或更换计划",
     "choose_plan": "选择您的计划",
     "free_trial_description": "开启3天免费试用，解锁所有Pro功能。今日无需付费，您可以随时取消。",
+    "login_modal_title": "解锁 DocsGuard Pro",
+    "login_modal_subtitle": "登录以继续并开启您的3天免费试用",
     "subscribe_button": "订阅",
     "login_to_subscribe": "登录以订阅",
     "current_plan": "当前计划",
