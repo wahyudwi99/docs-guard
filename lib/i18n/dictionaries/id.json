@@ -153,7 +153,8 @@
     "paywall_feature_ad_free": "100% Bebas Iklan",
     "paywall_subtitle": "Buka semua fitur premium dan lindungi dokumen Anda seperti profesional.",
     "paywall_restore": "Pulihkan Pembelian",
-    "weekly_description": "Ditagih mingguan, batalkan kapan saja"
+    "weekly_description": "Ditagih mingguan, batalkan kapan saja",
+    "restore_failed": "Tidak ada langganan aktif yang ditemukan untuk dipulihkan."
   },
   "contact": {
     "title": "Kirimkan kami pesan",

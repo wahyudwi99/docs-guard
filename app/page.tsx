@@ -45,7 +45,7 @@ function HomeContent() {
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
   const { user: session, loading: isLoadingAuth, logout, deleteAccount } = useAuth();
-  const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess } = useSubscription();
+  const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess, restorePurchases, loading: subscriptionLoading } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
 
@@ -1014,6 +1014,28 @@ function HomeContent() {
                             </div>
                           );
                        })}
+
+                       {/* Restore Purchases Button */}
+                       <div className="text-center mt-6">
+                         <button
+                           onClick={async () => {
+                             try {
+                               const restored = await restorePurchases();
+                               if (restored) {
+                                 window.location.reload();
+                               } else {
+                                 alert(t('subscription_section.restore_failed') || 'No active subscription found to restore.');
+                               }
+                             } catch (err) {
+                               console.error("Restore failed:", err);
+                             }
+                           }}
+                           disabled={subscriptionLoading}
+                           className="text-xs text-zinc-500 underline underline-offset-4 hover:text-indigo-600 transition-colors disabled:opacity-50 font-bold"
+                         >
+                           {t('subscription_section.paywall_restore') || 'Restore Purchases'}
+                         </button>
+                       </div>
                        
                        {/* Subscription Logic Information Note */}
                        {isPro && (
