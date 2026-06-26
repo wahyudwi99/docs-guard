@@ -145,7 +145,7 @@
     "switch_lower_plan": "Pindah ke Paket Lebih Rendah",
     "switch_plan": "Ganti Paket",
     "status_note_title": "Catatan Status Langganan",
-    "status_note_description": "Status perpanjangan otomatis Anda telah diperbarui. Jika Anda telah mengganti paket, harap dicatat bahwa Anda akan tetap memiliki akses penuh ke manfaat paket sebelumnya hingga periode penagihan saat ini berakhir pada tanggal yang ditunjukkan di atas.",
+    "status_note_description": "Status perpanjangan otomatis Anda telah diperbarui. Jika Anda telah mengganti paket, harap dicatat bahwa Anda akan tetap memiliki akses penuh ke manfaat paket sebelumnya hingga periode penagihan saat ini berakhir pada tanggal yang ditunjukkan di atas. Jika Anda mengganti perangkat atau menginstal ulang aplikasi, Anda selalu dapat memulihkan langganan Anda dengan mengetuk 'Pulihkan Pembelian'.",
     "paywall_feature_unlimited_pdf": "Watermark PDF Tanpa Batas",
     "paywall_feature_unlimited_video": "Watermark Video Tanpa Batas",
     "paywall_feature_encryption": "Kunci & Enkripsi PDF",
@@ -154,7 +154,8 @@
     "paywall_subtitle": "Buka semua fitur premium dan lindungi dokumen Anda seperti profesional.",
     "paywall_restore": "Pulihkan Pembelian",
     "weekly_description": "Ditagih mingguan, batalkan kapan saja",
-    "restore_failed": "Tidak ada langganan aktif yang ditemukan untuk dipulihkan."
+    "restore_failed": "Tidak ada langganan aktif yang ditemukan untuk dipulihkan.",
+    "restore_helper_text": "Kehilangan status Pro? Jika Anda sebelumnya membeli langganan dengan Apple ID ini, klik di bawah untuk memulihkan akses Anda di akun ini."
   },
   "contact": {
     "title": "Kirimkan kami pesan",

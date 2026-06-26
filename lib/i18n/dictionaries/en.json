@@ -145,7 +145,7 @@
     "switch_lower_plan": "Switch to Lower Plan",
     "switch_plan": "Switch Plan",
     "status_note_title": "Subscription Status Note",
-    "status_note_description": "Your auto-renewal status has been updated. If you've switched plans, please note that you will continue to have full access to your previous plan's benefits until the current billing period expires on the date shown above.",
+    "status_note_description": "Your auto-renewal status has been updated. If you've switched plans, please note that you will continue to have full access to your previous plan's benefits until the current billing period expires on the date shown above. If you change devices or reinstall the app, you can always recover your subscription by tapping 'Restore Purchases'.",
     "paywall_feature_unlimited_pdf": "Unlimited PDF Watermarking",
     "paywall_feature_unlimited_video": "Unlimited Video Watermarking",
     "paywall_feature_encryption": "PDF Lock & Encryption",
@@ -154,7 +154,8 @@
     "paywall_subtitle": "Unlock all premium features and protect your documents like a pro.",
     "paywall_restore": "Restore Purchases",
     "weekly_description": "Billed weekly, cancel anytime",
-    "restore_failed": "No active subscription found to restore."
+    "restore_failed": "No active subscription found to restore.",
+    "restore_helper_text": "Lost your Pro status? If you previously purchased a subscription on this Apple ID, click below to restore your access on this account."
   },
   "contact": {
     "title": "Send us a message",
