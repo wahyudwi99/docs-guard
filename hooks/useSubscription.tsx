@@ -21,6 +21,7 @@ interface SubscriptionContextType {
   currentPlan: ActivePlan | null;
   subscriptionConflict: boolean;
   purchaseSuccess: boolean;
+  eligibleForTrial: boolean;
   setPurchaseSuccess: (success: boolean) => void;
   subscribe: (pkg: any) => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
@@ -44,6 +45,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     return false;
   });
+  const [hasPurchaseHistory, setHasPurchaseHistory] = useState(false);
 
   const setPurchaseSuccess = (val: boolean) => {
     setPurchaseSuccessState(val);
@@ -69,6 +71,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
   }, [latestPlanInfo]);
+
+  const eligibleForTrial = useMemo(() => {
+    return !isPro && !hasPurchaseHistory;
+  }, [isPro, hasPurchaseHistory]);
 
   const initRevenueCat = async () => {
     try {
@@ -138,6 +144,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setSubscriptionConflict(false);
       setActiveEntitlements([]);
       setLatestPlanInfo(null);
+      setHasPurchaseHistory(false);
     } catch (e) {
       console.error("RevenueCat Logout Error:", e);
     }
@@ -180,6 +187,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     // 1. Update active entitlements list
     const activeEnts = Object.values(customerInfo.entitlements.active);
     setActiveEntitlements(activeEnts);
+
+    // Check if user has any purchase history (indicating they've used a trial or subscribed before)
+    const hasHistory = !!(customerInfo?.allPurchaseDates && Object.keys(customerInfo.allPurchaseDates).length > 0);
+    setHasPurchaseHistory(hasHistory);
 
     // 2. Identify the primary active subscription (the "Current Plan")
     // Use the 'pro' entitlement as the source of truth if it exists
@@ -298,6 +309,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       currentPlan, 
       subscriptionConflict,
       purchaseSuccess,
+      eligibleForTrial,
       setPurchaseSuccess,
       subscribe, 
       restorePurchases, 
