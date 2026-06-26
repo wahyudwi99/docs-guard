@@ -814,7 +814,9 @@ function HomeContent() {
                         <div className={cn(
                           "px-10 py-3 rounded-[24px] flex items-center justify-center mb-6 backdrop-blur-xl border-2 border-white/40 shadow-2xl bg-white/20"
                         )}>
-                          <span className="text-4xl font-black text-white tracking-tighter drop-shadow-md">PRO</span>
+                          <span className="text-4xl font-black text-white tracking-tighter drop-shadow-md">
+                            {isPro ? "PRO" : "FREE"}
+                          </span>
                         </div>
                         
                         <div className="space-y-4">
