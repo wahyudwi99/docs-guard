@@ -45,7 +45,7 @@ function HomeContent() {
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
   const { user: session, loading: isLoadingAuth, logout, deleteAccount } = useAuth();
-  const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess, restorePurchases, eligibleForTrial, loading: subscriptionLoading } = useSubscription();
+  const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess, restorePurchases, loading: subscriptionLoading } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
 
@@ -908,9 +908,9 @@ function HomeContent() {
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
                           {isPro ? t('subscription_section.upgrade_switch_plan') : t('subscription_section.choose_plan')}
                         </p>
-                        {eligibleForTrial && (
+                        {!isPro && (
                           <p className="text-xs text-slate-500 font-medium mb-3 mt-1 leading-relaxed">
-                            Unlock all Pro features with a 3-day free trial. You will not be charged today, and you can cancel anytime.
+                            {t('subscription_section.free_trial_description')}
                           </p>
                         )}
                        
