@@ -102,7 +102,7 @@ function HomeContent() {
     return new Promise(async (resolve) => {
       try {
         // Rewarded Ad Unit ID from environment (Must be provided in .env)
-        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_APP_ID as string;
+        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_UNIT_ID as string;
         
         if (!adId) {
           console.error('AdMob: Ad Unit ID is missing in environment variables');
