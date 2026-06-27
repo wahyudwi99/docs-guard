@@ -765,7 +765,7 @@ function HomeContent() {
                             )}
                           >
                             <Share2 className={cn("h-4 w-4", isSaving && "animate-pulse")} />
-                            {isSaving ? t('preview_modal.sharing') : t('preview_modal.share')}
+                            {isSaving ? t('preview_modal.sharing') : `${t('preview_modal.share')}${!isPro ? ' (watch ads)' : ''}`}
                           </button>
                           <button 
                             onClick={() => handleFinalDownload()}
@@ -777,9 +777,9 @@ function HomeContent() {
                           >
                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
                             {isSaving ? t('preview_modal.saving') : 
-                              documentType === 'pdf' ? t('preview_modal.download_pdf') : 
+                              `${documentType === 'pdf' ? t('preview_modal.download_pdf') : 
                               documentType === 'video' ? t('preview_modal.download_video') : 
-                              t('preview_modal.download_png')
+                              t('preview_modal.download_png')}${!isPro ? ' (watch ads)' : ''}`
                             }
                           </button>
                         </div>
