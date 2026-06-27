@@ -38,6 +38,8 @@ function HomeContent() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showAdWarningModal, setShowAdWarningModal] = useState(false);
+  const [adWarningAction, setAdWarningAction] = useState<'download' | 'share' | null>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -757,7 +759,14 @@ function HomeContent() {
                      <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <button 
-                            onClick={() => handleShare()}
+                            onClick={() => {
+                              if (!isPro) {
+                                setAdWarningAction('share');
+                                setShowAdWarningModal(true);
+                              } else {
+                                handleShare();
+                              }
+                            }}
                             disabled={isSaving}
                             className={cn(
                               "px-4 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
@@ -765,10 +774,17 @@ function HomeContent() {
                             )}
                           >
                             <Share2 className={cn("h-4 w-4", isSaving && "animate-pulse")} />
-                            {isSaving ? t('preview_modal.sharing') : `${t('preview_modal.share')}${!isPro ? ' (watch ads)' : ''}`}
+                            {isSaving ? t('preview_modal.sharing') : t('preview_modal.share')}
                           </button>
                           <button 
-                            onClick={() => handleFinalDownload()}
+                            onClick={() => {
+                              if (!isPro) {
+                                setAdWarningAction('download');
+                                setShowAdWarningModal(true);
+                              } else {
+                                handleFinalDownload();
+                              }
+                            }}
                             disabled={isSaving}
                             className={cn(
                               "px-4 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2",
@@ -777,9 +793,9 @@ function HomeContent() {
                           >
                             <Download className={cn("h-4 w-4", isSaving && "animate-bounce")} />
                             {isSaving ? t('preview_modal.saving') : 
-                              `${documentType === 'pdf' ? t('preview_modal.download_pdf') : 
+                              documentType === 'pdf' ? t('preview_modal.download_pdf') : 
                               documentType === 'video' ? t('preview_modal.download_video') : 
-                              t('preview_modal.download_png')}${!isPro ? ' (watch ads)' : ''}`
+                              t('preview_modal.download_png')
                             }
                           </button>
                         </div>
@@ -1155,6 +1171,62 @@ function HomeContent() {
             >
               {t('preview_modal.close')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Ad Warning Modal */}
+      {showAdWarningModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            onClick={() => {
+              setShowAdWarningModal(false);
+              setAdWarningAction(null);
+            }}
+          ></div>
+          <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl animate-in zoom-in duration-300 text-center space-y-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 mx-auto">
+              <Sparkles className="h-10 w-10" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight text-center">
+                {t('preview_modal.ad_title')}
+              </h3>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed text-center">
+                {t('preview_modal.ad_description')}
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={async () => {
+                  setShowAdWarningModal(false);
+                  const action = adWarningAction;
+                  setAdWarningAction(null);
+                  if (action === 'download') {
+                    await handleFinalDownload();
+                  } else if (action === 'share') {
+                    await handleShare();
+                  }
+                }}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                {t('preview_modal.watch_ad')}
+              </button>
+              
+              <button 
+                onClick={() => {
+                  setShowAdWarningModal(false);
+                  setAdWarningAction(null);
+                  setActiveTab('subscription');
+                }}
+                className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold text-sm transition-all"
+              >
+                {t('preview_modal.go_pro_cta')}
+              </button>
+            </div>
           </div>
         </div>
       )}
