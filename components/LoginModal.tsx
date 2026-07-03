@@ -14,7 +14,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalProps) {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, loginWithApple } = useAuth();
   const router = useRouter();
   const { t } = useI18n();
 
@@ -24,6 +24,15 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
       onClose();
     } catch (error) {
       console.error("Google Sign-In error:", error);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      await loginWithApple();
+      onClose();
+    } catch (error) {
+      console.error("Apple Sign-In error:", error);
     }
   };
 
@@ -91,10 +100,20 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full py-4 px-6 rounded-2xl bg-white border border-zinc-200 text-zinc-900 font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-3 shadow-md hover:bg-zinc-50 mb-4"
+                className="w-full py-4 px-6 rounded-2xl bg-white border border-zinc-200 text-zinc-900 font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-3 shadow-md hover:bg-zinc-50 mb-3"
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                 SIGN IN WITH GOOGLE
+              </button>
+
+              <button
+                onClick={handleAppleSignIn}
+                className="w-full py-4 px-6 rounded-2xl bg-black text-white font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-3 shadow-md hover:bg-zinc-900 mb-4"
+              >
+                <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
+                  <path d="M17.05 20.28c-.98.95-2.05 1.88-3.08 1.88-1.06 0-1.4-.65-2.61-.65-1.22 0-1.6.63-2.61.65-1.03.02-2.23-1-3.22-1.95C3.51 18.23 2 13.92 2 10.3c0-3.56 2.32-5.46 4.59-5.5 1.72-.03 3.34 1.16 4.4 1.16 1.06 0 3-.14 4.74 1.63a5.55 5.55 0 0 1 2.24 4.31c-.03 2.63 2.14 3.89 2.18 3.93a10.87 10.87 0 0 1-1.56 3.44c-.75 1.08-1.52 2.15-2.54 2.01M15.22 3.12a4.42 4.42 0 0 0 1.05-3.12c-1 .04-2 .66-2.73 1.5a4.46 4.46 0 0 0-1.06 3.06c1.12.08 2.1-.56 2.74-1.44z" />
+                </svg>
+                SIGN IN WITH APPLE
               </button>
               
               <p className="text-[10px] text-zinc-400 font-medium">

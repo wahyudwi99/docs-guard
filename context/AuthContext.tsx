@@ -19,6 +19,7 @@ type AuthContextType = {
   user: AuthUser | null;
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
   restoreSession: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -32,10 +33,6 @@ const AUTH_STORAGE_KEY = 'docs_guard_auth_user';
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    restoreSession();
-  }, []);
 
   const fetchUserProfile = async (userId: string): Promise<Partial<AuthUser>> => {
     try {
@@ -98,6 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    restoreSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const loginWithGoogle = async () => {
     try {
       setLoading(true);
@@ -147,10 +150,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginWithApple = async () => {
+    try {
+      setLoading(true);
+
+      if (Capacitor.isNativePlatform()) {
+        try { await SocialLogin.logout({ provider: 'apple' }); } catch (e) {}
+      }
+
+      const result = await SocialLogin.login({
+        provider: 'apple',
+        options: { scopes: ['email', 'name'] },
+      });
+
+      if (result.provider === 'apple' && result.result) {
+        const idToken = result.result.idToken;
+        if (idToken) {
+          const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
+            provider: 'apple',
+            token: idToken,
+          });
+
+          if (authError) throw authError;
+
+          if (authData.user) {
+            // Give DB triggers a tiny moment to finish (optional but recommended)
+            await new Promise(resolve => setTimeout(resolve, 800));
+            const profile = await fetchUserProfile(authData.user.id);
+            
+            const newUser: AuthUser = {
+              id: authData.user.id,
+              email: authData.user.email,
+              name: profile.name || authData.user.user_metadata.full_name || authData.user.user_metadata.name || "User",
+              image: authData.user.user_metadata.avatar_url,
+              createdAt: profile.createdAt || authData.user.created_at,
+              loggedIn: true,
+            };
+            
+            await Preferences.set({ key: AUTH_STORAGE_KEY, value: JSON.stringify(newUser) });
+            setUser(newUser);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[AUTH] Apple Login failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       setLoading(true);
-      if (Capacitor.isNativePlatform()) await SocialLogin.logout({ provider: 'google' });
+      if (Capacitor.isNativePlatform()) {
+        try { await SocialLogin.logout({ provider: 'google' }); } catch (e) {}
+        try { await SocialLogin.logout({ provider: 'apple' }); } catch (e) {}
+      }
       await supabase.auth.signOut();
       await Preferences.remove({ key: AUTH_STORAGE_KEY });
       setUser(null);
@@ -183,7 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout, restoreSession, refreshProfile, deleteAccount }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, loginWithApple, logout, restoreSession, refreshProfile, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

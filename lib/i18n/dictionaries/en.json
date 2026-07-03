@@ -95,6 +95,7 @@
     "login_required_title": "Login Required",
     "login_required_desc": "Please login to subscribe and protect your documents with Pro features.",
     "login_with_google": "Login with Google",
+    "login_with_apple": "Login with Apple",
     "features": [
       "Unlimited PDF Watermarking (No 3-page limit)",
       "Unlimited Video Watermarking (High quality export)",

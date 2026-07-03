@@ -95,6 +95,7 @@
     "login_required_title": "ログインが必要",
     "login_required_desc": "Pro機能でドキュメントを保護するには、ログインして購読してください。",
     "login_with_google": "Googleでログイン",
+    "login_with_apple": "Appleでログイン",
     "features": [
       "無制限のPDF透かし（3ページ制限なし）",
       "無制限のビデオ透かし（高品質エクスポート）",

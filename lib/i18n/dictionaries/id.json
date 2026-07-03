@@ -95,6 +95,7 @@
     "login_required_title": "Perlu Masuk",
     "login_required_desc": "Silakan masuk untuk berlangganan dan melindungi dokumen Anda dengan fitur Pro.",
     "login_with_google": "Masuk dengan Google",
+    "login_with_apple": "Masuk dengan Apple",
     "features": [
       "Watermark PDF Tanpa Batas (Bebas limit 3 halaman)",
       "Watermark Video Tanpa Batas (Kualitas ekspor asli)",

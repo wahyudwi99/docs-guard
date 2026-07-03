@@ -95,6 +95,7 @@
     "login_required_title": "Login necessário",
     "login_required_desc": "Faça login para assinar e proteger seus documentos com recursos Pro.",
     "login_with_google": "Fazer login com Google",
+    "login_with_apple": "Fazer login com Apple",
     "features": [
       "Marca d'água em PDF ilimitada (sem limite de 3 páginas)",
       "Marca d'água em vídeo ilimitada (exportação de alta qualidade)",

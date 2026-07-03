@@ -95,6 +95,7 @@
     "login_required_title": "Inicio de sesión requerido",
     "login_required_desc": "Inicie sesión para suscribirse y proteger sus documentos con funciones Pro.",
     "login_with_google": "Iniciar sesión con Google",
+    "login_with_apple": "Iniciar sesión con Apple",
     "features": [
       "Marcas de agua PDF ilimitadas (sin límite de 3 páginas)",
       "Marcas de agua de video ilimitadas (exportación de alta calidad)",

@@ -95,6 +95,7 @@
     "login_required_title": "로그인 필요",
     "login_required_desc": "Pro 기능을 사용하려면 로그인 후 구독해 주세요.",
     "login_with_google": "Google로 로그인",
+    "login_with_apple": "Apple로 로그인",
     "features": [
       "무제한 PDF 워터마크 (3페이지 제한 없음)",
       "무제한 비디오 워터마크 (고화질 내보내기)",

@@ -95,6 +95,7 @@
     "login_required_title": "需要登录",
     "login_required_desc": "请登录以订阅并使用 Pro 功能保护您的文档。",
     "login_with_google": "使用 Google 登录",
+    "login_with_apple": "使用 Apple 登录",
     "features": [
       "无限 PDF 水印（无 3 页限制）",
       "无限视频水印（高清导出）",
