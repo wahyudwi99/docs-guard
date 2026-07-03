@@ -21,7 +21,7 @@
     "google_button": "Lanjutkan dengan Google",
     "apple_button": "Lanjutkan dengan Apple",
     "secure_badge": "Akses Aman",
-    "privacy_note": "Kredensial Anda tidak pernah disimpan. Kami hanya menggunakan Google untuk identifikasi.",
+    "privacy_note": "Kredensial Anda tidak pernah disimpan. Kami hanya menggunakan Google atau Apple untuk identifikasi.",
     "footer_privacy": "Dengan masuk, Anda menyetujui Kebijakan Privasi kami",
     "footer_version": "Protokol Privasi DocsGuard v1.0",
     "footer_processing": "Pemrosesan Lokal-Aman"
@@ -238,7 +238,7 @@
         "title": "3. Informasi yang Kami Kumpulkan untuk Manajemen Akun dan Dukungan",
         "content": "Meskipun dokumen dan file Anda tetap diproses secara murni di perangkat lokal, kami mengumpulkan informasi minimal yang diperlukan untuk mengelola langganan Pro Anda dan memberikan dukungan pelanggan:",
         "list": [
-          "Data Autentikasi (Google Sign-In): Jika Anda memilih untuk masuk menggunakan Akun Google Anda untuk mengakses fitur Pro, kami menerima informasi profil dasar yang disediakan oleh Google, khususnya Alamat Email dan Nama Anda.",
+          "Data Autentikasi (Google & Apple Sign-In): Jika Anda memilih untuk masuk menggunakan Akun Google atau Apple Anda untuk mengakses fitur Pro, kami menerima informasi profil dasar yang disediakan oleh penyedia layanan, khususnya Alamat Email dan Nama Anda.",
           "Data Dukungan Pelanggan dan Umpan Balik: Jika Anda mengirimkan keluhan, pertanyaan, atau umpan balik melalui Halaman Dukungan Dalam Aplikasi (“Contact us” page) kami, kami mengumpulkan dan menyimpan Nama, Alamat Email, dan isi pesan Anda secara aman di dalam database kami.",
           "Tujuan Pengumpulan: Data autentikasi digunakan untuk menyinkronkan langganan Pro Anda di berbagai perangkat. Data dukungan disimpan secara eksklusif untuk menganalisis, memproses, dan menanggapi keluhan atau pertanyaan Anda melalui email dukungan resmi kami. Kami tidak menggunakan informasi ini untuk pemasaran pihak ketiga, dan kami tidak pernah menjualnya kepada pialang data (data brokers)."
         ]
@@ -261,7 +261,7 @@
       },
       {
         "title": "6. Langganan dan Pemrosesan Pembayaran",
-        "content": "Semua transaksi keuangan ditangani secara aman dan langsung oleh Apple App Store. DocsGuard tidak memproses, menyimpan, atau memiliki akses ke informasi pembayaran, nomor kartu kredit, atau alamat penagihan Anda. Dengan masuk menggunakan Akun Google Anda, kami menautkan ID pengguna anonim yang aman ke tanda terima pembelian Anda, memungkinkan Anda memulihkan langganan Anda di perangkat baru dengan lancar."
+        "content": "Semua transaksi keuangan ditangani secara aman dan langsung oleh Apple App Store. DocsGuard tidak memproses, menyimpan, atau memiliki akses ke informasi pembayaran, nomor kartu kredit, atau alamat penagihan Anda. Dengan masuk menggunakan Akun Google atau Apple Anda, kami menautkan ID pengguna anonim yang aman ke tanda terima pembelian Anda, memungkinkan Anda memulihkan langganan Anda di perangkat baru dengan lancar."
       },
       {
         "title": "7. Retensi Data dan Penghapusan Akun",

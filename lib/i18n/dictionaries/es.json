@@ -21,7 +21,7 @@
     "google_button": "Continuar con Google",
     "apple_button": "Continuar con Apple",
     "secure_badge": "Acceso seguro",
-    "privacy_note": "Tus credenciales nunca se almacenan. Solo usamos Google para la identificación.",
+    "privacy_note": "Tus credenciales nunca se almacenan. Solo usamos Google o Apple para la identificación.",
     "footer_privacy": "Al iniciar sesión, aceptas nuestra Política de privacidad",
     "footer_version": "Protocolo de privacidad DocsGuard v1.0",
     "footer_processing": "Procesamiento local seguro primero"
@@ -236,7 +236,7 @@
         "title": "3. Información que Recopilamos para la Gestión de Cuentas y Soporte",
         "content": "Si bien sus documentos y archivos permanecen estrictamente locales, recopilamos la información mínima necesaria para administrar su suscripción Pro y brindar atención al cliente:",
         "list": [
-          "Datos de autenticación (Google Sign-In): Si elige iniciar sesión con su cuenta de Google para acceder a las funciones Pro, recibimos información de perfil básica proporcionada por Google, específicamente su dirección de correo electrónico y nombre.",
+          "Datos de autenticación (Google y Apple Sign-In): Si elige iniciar sesión con su cuenta de Google o Apple para acceder a las funciones Pro, recibimos información de perfil básica proporcionada por el proveedor, específicamente su dirección de correo electrónico y nombre.",
           "Datos de atención al cliente y comentarios: Si envía una queja, consulta o comentario a través de nuestra página \"Contáctenos\", recopilamos y almacenamos de forma segura su nombre, dirección de correo electrónico y el contenido de su mensaje en nuestra base de datos segura.",
           "Propósito de la recopilación: Los datos de autenticación se utilizan para sincronizar su suscripción Pro en múltiples dispositivos. Los datos de soporte se almacenan exclusivamente para analizar, procesar y responder a sus quejas o consultas a través de nuestro correo electrónico de soporte oficial. No utilizamos esta información para marketing de terceros, ni la vendemos nunca a corredores de datos."
         ]
@@ -259,7 +259,7 @@
       },
       {
         "title": "6. Suscripciones y Procesamiento de Pagos",
-        "content": "Todas las transacciones financieras son gestionadas de forma segura y directa por Apple App Store. DocsGuard no procesa, almacena ni tiene acceso a su información de pago, números de tarjeta de crédito o dirección de facturación. Al iniciar sesión con su cuenta de Google, vinculamos una identificación de usuario segura y anónima con su recibo de compra, lo que le permite restaurar sin problemas su suscripción en un nuevo dispositivo."
+        "content": "Todas las transacciones financieras son gestionadas de forma segura y directa por Apple App Store. DocsGuard no procesa, almacena ni tiene acceso a su información de pago, números de tarjeta de crédito o dirección de facturación. Al iniciar sesión con su cuenta de Google o Apple, vinculamos una identificación de usuario segura y anónima con su recibo de compra, lo que le permite restaurar sin problemas su suscripción en un nuevo dispositivo."
       },
       {
         "title": "7. Retención de Datos y Eliminación de Cuentas",

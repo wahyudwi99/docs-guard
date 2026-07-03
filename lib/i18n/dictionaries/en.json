@@ -21,7 +21,7 @@
     "google_button": "Continue with Google",
     "apple_button": "Continue with Apple",
     "secure_badge": "Secure Access",
-    "privacy_note": "Your credentials are never stored. we only use Google for identification.",
+    "privacy_note": "Your credentials are never stored. We only use Google or Apple for identification.",
     "footer_privacy": "By signing in, you agree to our Privacy Policy",
     "footer_version": "DocsGuard Privacy Protocol v1.0",
     "footer_processing": "Secure Local-First Processing"
@@ -238,7 +238,7 @@
         "title": "3. Information We Collect for Account and Support Management",
         "content": "While your documents and files remain strictly local, we collect minimal information necessary to manage your Pro subscription and provide customer support:",
         "list": [
-          "Authentication Data (Google Sign-In): If you choose to log in using your Google Account to access Pro features, we receive basic profile information provided by Google, specifically your Email Address and Name.",
+          "Authentication Data (Google & Apple Sign-In): If you choose to log in using your Google or Apple Account to access Pro features, we receive basic profile information provided by the provider, specifically your Email Address and Name.",
           "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our “Contact us” Page , we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
           "Purpose of Collection: Authentication data is used to sync your Pro subscription across multiple devices. Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for third-party marketing, nor do we ever sell it to data brokers."
         ]
@@ -261,7 +261,7 @@
       },
       {
         "title": "6. Subscriptions and Payment Processing",
-        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing address. By logging in with your Google Account, we link a secure, anonymous user ID to your purchase receipt, allowing you to seamlessly restore your subscription on a new device."
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing address. By logging in with your Google or Apple Account, we link a secure, anonymous user ID to your purchase receipt, allowing you to seamlessly restore your subscription on a new device."
       },
       {
         "title": "7. Data Retention and Account Deletion",
