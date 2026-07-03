@@ -925,9 +925,14 @@ function HomeContent() {
                           {isPro ? t('subscription_section.upgrade_switch_plan') : t('subscription_section.choose_plan')}
                         </p>
                         {!isPro && (
-                          <p className="text-xs text-slate-500 font-medium mb-3 mt-1 leading-relaxed">
-                            {t('subscription_section.free_trial_description')}
-                          </p>
+                          <div className="mb-3 mt-1">
+                            <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                              {t('subscription_section.free_trial_description')}
+                            </p>
+                            <p className="text-[10px] text-slate-400 font-semibold mt-1.5 leading-relaxed italic">
+                              * {t('subscription_section.price_disclaimer') || "Listed prices follow the United States pricing standard. The actual value may vary depending on your country's App Store settings."}
+                            </p>
+                          </div>
                         )}
                        
                        {/* Always show Plan Cards - Sorted by duration */}
