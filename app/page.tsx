@@ -1049,16 +1049,16 @@ function HomeContent() {
                        })}
 
                         {/* Privacy & Terms Links */}
-                        <div className="flex items-center justify-center gap-4 mt-4 mb-2 text-[10px] font-bold text-slate-400">
-                          <Link href="/privacy" className="hover:text-indigo-600 transition-colors uppercase tracking-wider underline underline-offset-4">
+                        <div className="flex items-center justify-center gap-3 mt-6 mb-2 text-[11px] font-medium text-slate-400">
+                          <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
                             Privacy Policy
                           </Link>
-                          <span className="text-slate-300">•</span>
+                          <span className="text-slate-200 pointer-events-none">|</span>
                           <a 
                             href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="hover:text-indigo-600 transition-colors uppercase tracking-wider underline underline-offset-4"
+                            className="hover:text-indigo-600 transition-colors"
                           >
                             Terms of Use
                           </a>
