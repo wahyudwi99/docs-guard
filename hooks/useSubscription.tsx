@@ -235,23 +235,31 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       // Override productId if there are multiple active subscriptions (common in sandbox upgrades)
       if (customerInfo.activeSubscriptions && customerInfo.activeSubscriptions.length > 0) {
         const activeSubs = customerInfo.activeSubscriptions;
-        const purchaseDates = customerInfo.allPurchaseDates || {};
         
-        let latestProductId = productId;
-        let latestPurchaseTime = 0;
+        // Check if we have a locally stored last purchased product that is still active
+        const lastPurchased = typeof window !== 'undefined' ? localStorage.getItem('docsguard_last_purchased_product') : null;
         
-        activeSubs.forEach((id: string) => {
-          const dateStr = purchaseDates[id];
-          if (dateStr) {
-            const time = new Date(dateStr).getTime();
-            if (time > latestPurchaseTime) {
-              latestPurchaseTime = time;
-              latestProductId = id;
+        if (lastPurchased && activeSubs.includes(lastPurchased)) {
+          productId = lastPurchased;
+        } else {
+          // Fallback to latest purchase date comparison
+          const purchaseDates = customerInfo.allPurchaseDates || {};
+          let latestProductId = productId;
+          let latestPurchaseTime = 0;
+          
+          activeSubs.forEach((id: string) => {
+            const dateStr = purchaseDates[id];
+            if (dateStr) {
+              const time = new Date(dateStr).getTime();
+              if (time > latestPurchaseTime) {
+                latestPurchaseTime = time;
+                latestProductId = id;
+              }
             }
-          }
-        });
-        
-        productId = latestProductId;
+          });
+          
+          productId = latestProductId;
+        }
       }
       
       let type = 'premium';
@@ -312,6 +320,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setLoading(true);
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
+        if (productIdentifier) {
+          localStorage.setItem('docsguard_last_purchased_product', productIdentifier);
+        }
         processCustomerInfo(customerInfo);
         if (customerInfo.entitlements.active['pro']) {
           await logTransactionToSupabase(productIdentifier, pkg.identifier);
@@ -320,6 +331,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
       } else {
         // Mock
+        localStorage.setItem('docsguard_last_purchased_product', pkg.identifier);
         const fakeExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         const mockInfo = {
           entitlements: { active: { pro: { productIdentifier: pkg.identifier, expirationDate: fakeExpiry, willRenew: true } } },
@@ -344,6 +356,10 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       setLoading(true);
       if (!Capacitor.isNativePlatform()) return false;
+      
+      // Clear last purchased on restore to let date/entitlement logic decide
+      localStorage.removeItem('docsguard_last_purchased_product');
+      
       const { customerInfo } = await Purchases.restorePurchases();
       processCustomerInfo(customerInfo);
       return Object.keys(customerInfo.entitlements.active).length > 0;
