@@ -57,6 +57,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const isInitialized = useRef(false);
+  const initialLoadDone = useRef(false);
+  const initialActiveSubs = useRef<string[]>([]);
+  const initialPro = useRef(false);
 
   // Check if active subscription is in native trial period (RevenueCat)
   const trialActive = useMemo(() => {
@@ -156,9 +159,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       isInitialized.current = true;
     } else if (user?.id) {
       // If already initialized but user just logged in, sync them
+      initialLoadDone.current = false;
       loginToRevenueCat(user.id);
     } else if (!user && isInitialized.current) {
       // User logged out, clear RevenueCat session
+      initialLoadDone.current = false;
       logoutFromRevenueCat();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,10 +197,38 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     const hasHistory = !!(customerInfo?.allPurchaseDates && Object.keys(customerInfo.allPurchaseDates).length > 0);
     setHasPurchaseHistory(hasHistory);
 
+    // Identify the pro entitlement status
+    const proEntitlement = customerInfo.entitlements.active['pro'];
+    const isProNow = !!proEntitlement;
+
+    // Detect if this is a new purchase or upgrade
+    if (initialLoadDone.current) {
+      const currentSubs = customerInfo.activeSubscriptions || [];
+      const hasNewSub = currentSubs.some((sub: string) => !initialActiveSubs.current.includes(sub));
+      const statusUpgraded = isProNow && !initialPro.current;
+      
+      if (statusUpgraded || hasNewSub) {
+        console.log("[SUBSCRIPTION] New purchase or upgrade detected! Reloading page...");
+        // Update refs to prevent reload loop
+        initialActiveSubs.current = currentSubs;
+        initialPro.current = isProNow;
+        
+        // Save success state to trigger splash transition on reload
+        localStorage.setItem('docsguard_purchase_success', 'true');
+        
+        // Perform the reload
+        window.location.reload();
+        return;
+      }
+    } else {
+      // First load: capture initial state
+      initialLoadDone.current = true;
+      initialActiveSubs.current = customerInfo.activeSubscriptions || [];
+      initialPro.current = isProNow;
+    }
+
     // 2. Identify the primary active subscription (the "Current Plan")
     // Use the 'pro' entitlement as the source of truth if it exists
-    const proEntitlement = customerInfo.entitlements.active['pro'];
-    
     if (proEntitlement) {
       let productId = proEntitlement.productIdentifier;
       
