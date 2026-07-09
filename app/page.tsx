@@ -145,6 +145,10 @@ function HomeContent() {
     });
   }, [isPro]);
 
+  const purchaseTimerRef = useRef<any>(null);
+  const purchaseExitTimerRef = useRef<any>(null);
+  const isReviewRequested = useRef(false);
+
   const handlePurchaseSuccess = useCallback(() => {
     // 1. Close modal and reset tab
     setShowPaywall(false);
@@ -154,16 +158,27 @@ function HomeContent() {
     setIsExiting(false);
     setShowSplash(true);
     
+    // Clear any previous timers to prevent duplicate/stacked executions
+    if (purchaseTimerRef.current) clearTimeout(purchaseTimerRef.current);
+    if (purchaseExitTimerRef.current) clearTimeout(purchaseExitTimerRef.current);
+    
+    // Reset the review request flag for this transition
+    isReviewRequested.current = false;
+    
     // 3. Timers to fade out splash screen and trigger review
-    const timer = setTimeout(() => {
+    purchaseTimerRef.current = setTimeout(() => {
       setIsExiting(true);
-      const exitTimer = setTimeout(() => {
+      purchaseExitTimerRef.current = setTimeout(() => {
         setShowSplash(false);
         
         // Trigger In-App Review after splash fades out
         const triggerReview = async () => {
+          if (isReviewRequested.current) return; // Prevent double trigger
+          isReviewRequested.current = true;
+          
           try {
             if (Capacitor.isNativePlatform()) {
+              console.log("[REVIEW] Requesting App Store review natively...");
               await InAppReview.requestReview();
             }
           } catch (error) {
@@ -182,6 +197,10 @@ function HomeContent() {
     if (purchaseSuccess) {
       handlePurchaseSuccess();
     }
+    return () => {
+      if (purchaseTimerRef.current) clearTimeout(purchaseTimerRef.current);
+      if (purchaseExitTimerRef.current) clearTimeout(purchaseExitTimerRef.current);
+    };
   }, [purchaseSuccess, handlePurchaseSuccess]);
 
   useEffect(() => {
