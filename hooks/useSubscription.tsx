@@ -235,20 +235,23 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       // Override productId if there are multiple active subscriptions (common in sandbox upgrades)
       if (customerInfo.activeSubscriptions && customerInfo.activeSubscriptions.length > 0) {
         const activeSubs = customerInfo.activeSubscriptions;
-        const hasYearly = activeSubs.some((id: string) => id.toLowerCase().includes('yearly'));
-        const hasMonthly = activeSubs.some((id: string) => id.toLowerCase().includes('monthly'));
-        const hasWeekly = activeSubs.some((id: string) => id.toLowerCase().includes('weekly'));
+        const purchaseDates = customerInfo.allPurchaseDates || {};
         
-        if (hasYearly) {
-          const yearlyId = activeSubs.find((id: string) => id.toLowerCase().includes('yearly'));
-          if (yearlyId) productId = yearlyId;
-        } else if (hasMonthly) {
-          const monthlyId = activeSubs.find((id: string) => id.toLowerCase().includes('monthly'));
-          if (monthlyId) productId = monthlyId;
-        } else if (hasWeekly) {
-          const weeklyId = activeSubs.find((id: string) => id.toLowerCase().includes('weekly'));
-          if (weeklyId) productId = weeklyId;
-        }
+        let latestProductId = productId;
+        let latestPurchaseTime = 0;
+        
+        activeSubs.forEach((id: string) => {
+          const dateStr = purchaseDates[id];
+          if (dateStr) {
+            const time = new Date(dateStr).getTime();
+            if (time > latestPurchaseTime) {
+              latestPurchaseTime = time;
+              latestProductId = id;
+            }
+          }
+        });
+        
+        productId = latestProductId;
       }
       
       let type = 'premium';
