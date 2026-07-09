@@ -460,7 +460,7 @@ function HomeContent() {
             {/* Tier Status Badge - Always Visible */}
             {!isLoadingAuth && (
               <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
-                {isPro && session ? (
+                {isPro ? (
                   <div className="flex items-center gap-1.5">
                     <div className="flex items-center">
                       <Zap className="w-3.5 h-3.5 fill-amber-600 text-amber-600 mr-1" />
@@ -501,7 +501,7 @@ function HomeContent() {
               </div>
             )}
 
-            {!isPro && session && (
+            {!isPro && (
                <button 
                 onClick={() => setShowPaywall(true)}
                 className="hidden sm:flex h-9 px-4 rounded-full bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest hover:bg-amber-200 transition-all active:scale-95 items-center gap-2 border border-amber-200"
