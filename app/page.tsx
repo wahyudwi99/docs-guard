@@ -964,9 +964,7 @@ function HomeContent() {
                           const isActive = isPro && currentPlan?.productIdentifier === pkg.product.identifier;
                           
                           let buttonLabel = t('subscription_section.subscribe_button');
-                          if (!session) {
-                             buttonLabel = t('subscription_section.login_to_subscribe');
-                          } else if (isActive) {
+                          if (isActive) {
                              buttonLabel = t('subscription_section.current_plan');
                           } else if (isPro) {
                              const planOrder = ['weekly', 'monthly', 'yearly'];
@@ -1046,6 +1044,22 @@ function HomeContent() {
                             </div>
                           );
                        })}
+
+                        {/* Privacy & Terms Links */}
+                        <div className="flex items-center justify-center gap-4 mt-4 mb-2 text-[10px] font-bold text-slate-400">
+                          <Link href="/privacy" className="hover:text-indigo-600 transition-colors uppercase tracking-wider underline underline-offset-4">
+                            Privacy Policy
+                          </Link>
+                          <span className="text-slate-300">•</span>
+                          <a 
+                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="hover:text-indigo-600 transition-colors uppercase tracking-wider underline underline-offset-4"
+                          >
+                            Terms of Use
+                          </a>
+                        </div>
 
                        {/* Restore Purchases Section */}
                        {session && (
