@@ -982,13 +982,9 @@ function HomeContent() {
                               <button
                                 disabled={isActive}
                                 onClick={async () => {
-                                  if (!session) {
-                                    setShowLoginModal(true);
-                                  } else {
-                                    const success = await subscribe(pkg);
-                                    if (success) {
-                                      window.location.reload();
-                                    }
+                                  const success = await subscribe(pkg);
+                                  if (success) {
+                                    window.location.reload();
                                   }
                                 }}
                                 className={cn(
