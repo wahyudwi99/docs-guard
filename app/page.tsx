@@ -145,44 +145,44 @@ function HomeContent() {
     });
   }, [isPro]);
 
+  const handlePurchaseSuccess = useCallback(() => {
+    // 1. Close modal and reset tab
+    setShowPaywall(false);
+    setActiveTab('upload');
+    
+    // 2. Show splash screen again
+    setIsExiting(false);
+    setShowSplash(true);
+    
+    // 3. Timers to fade out splash screen and trigger review
+    const timer = setTimeout(() => {
+      setIsExiting(true);
+      const exitTimer = setTimeout(() => {
+        setShowSplash(false);
+        
+        // Trigger In-App Review after splash fades out
+        const triggerReview = async () => {
+          try {
+            if (Capacitor.isNativePlatform()) {
+              await InAppReview.requestReview();
+            }
+          } catch (error) {
+            console.error("Failed to trigger review:", error);
+          } finally {
+            setPurchaseSuccess(false);
+          }
+        };
+        triggerReview();
+      }, 800); // 800ms for exit animation
+    }, 2200); // Splash screen display duration
+  }, [setPurchaseSuccess]);
+
   // Handle successful purchase transition: show splash, redirect to main page, then hide splash
   useEffect(() => {
     if (purchaseSuccess) {
-      // 1. Close modal and reset tab
-      setShowPaywall(false);
-      setActiveTab('upload');
-      
-      // 2. Show splash screen again
-      setIsExiting(false);
-      setShowSplash(true);
-      
-      // 3. Timers to fade out splash screen and trigger review
-      const timer = setTimeout(() => {
-        setIsExiting(true);
-        const exitTimer = setTimeout(() => {
-          setShowSplash(false);
-          
-          // Trigger In-App Review after splash fades out
-          const triggerReview = async () => {
-            try {
-              if (Capacitor.isNativePlatform()) {
-                await InAppReview.requestReview();
-              }
-            } catch (error) {
-              console.error("Failed to trigger review:", error);
-            } finally {
-              setPurchaseSuccess(false);
-            }
-          };
-          triggerReview();
-        }, 800); // 800ms for exit animation
-        
-        return () => clearTimeout(exitTimer);
-      }, 2200); // Splash screen display duration
-      
-      return () => clearTimeout(timer);
+      handlePurchaseSuccess();
     }
-  }, [purchaseSuccess, setPurchaseSuccess]);
+  }, [purchaseSuccess, handlePurchaseSuccess]);
 
   useEffect(() => {
     if (subscriptionConflict) {
@@ -998,7 +998,10 @@ function HomeContent() {
                               <button
                                 disabled={isActive}
                                   onClick={async () => {
-                                   await subscribe(pkg);
+                                   const success = await subscribe(pkg);
+                                   if (success) {
+                                     handlePurchaseSuccess();
+                                   }
                                  }}
                                 className={cn(
                                   "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",
@@ -1272,7 +1275,10 @@ function HomeContent() {
       </footer>
 
       {showPaywall && (
-        <Paywall onClose={() => setShowPaywall(false)} />
+        <Paywall 
+          onClose={() => setShowPaywall(false)} 
+          onPurchaseSuccess={handlePurchaseSuccess}
+        />
       )}
 
       {/* Export Progress Modal */}

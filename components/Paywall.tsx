@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 
 interface PaywallProps {
   onClose?: () => void;
+  onPurchaseSuccess?: () => void;
 }
 
-export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
+export const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) => {
   const { packages, subscribe, loading, restorePurchases } = useSubscription();
   const { t } = useI18n();
   const { loading: isLoadingAuth } = useAuth();
@@ -80,7 +81,10 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                     key={pkg.identifier}
                     disabled={loading}
                     onClick={async () => {
-                      await subscribe(pkg);
+                      const success = await subscribe(pkg);
+                      if (success && onPurchaseSuccess) {
+                        onPurchaseSuccess();
+                      }
                     }}
                     className={cn(
                       "relative w-full p-5 rounded-3xl text-left transition-all active:scale-[0.98] border-2",

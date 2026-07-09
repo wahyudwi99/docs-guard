@@ -197,7 +197,26 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     const proEntitlement = customerInfo.entitlements.active['pro'];
     
     if (proEntitlement) {
-      const productId = proEntitlement.productIdentifier;
+      let productId = proEntitlement.productIdentifier;
+      
+      // Override productId if there are multiple active subscriptions (common in sandbox upgrades)
+      if (customerInfo.activeSubscriptions && customerInfo.activeSubscriptions.length > 0) {
+        const activeSubs = customerInfo.activeSubscriptions;
+        const hasYearly = activeSubs.some((id: string) => id.toLowerCase().includes('yearly'));
+        const hasMonthly = activeSubs.some((id: string) => id.toLowerCase().includes('monthly'));
+        const hasWeekly = activeSubs.some((id: string) => id.toLowerCase().includes('weekly'));
+        
+        if (hasYearly) {
+          const yearlyId = activeSubs.find((id: string) => id.toLowerCase().includes('yearly'));
+          if (yearlyId) productId = yearlyId;
+        } else if (hasMonthly) {
+          const monthlyId = activeSubs.find((id: string) => id.toLowerCase().includes('monthly'));
+          if (monthlyId) productId = monthlyId;
+        } else if (hasWeekly) {
+          const weeklyId = activeSubs.find((id: string) => id.toLowerCase().includes('weekly'));
+          if (weeklyId) productId = weeklyId;
+        }
+      }
       
       let type = 'premium';
       const idLower = productId.toLowerCase();
