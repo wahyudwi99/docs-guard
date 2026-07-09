@@ -1065,35 +1065,33 @@ function HomeContent() {
                         </div>
 
                        {/* Restore Purchases Section */}
-                       {session && (
-                         <div className="mt-6 p-4 rounded-3xl bg-slate-50 border border-slate-100 text-center space-y-3">
-                           <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                             {t('subscription_section.restore_helper_text') || 
-                               (t('nav.title') === 'DocsGuard' 
-                                 ? "Lost your Pro status? If you previously purchased a subscription with this Apple ID, click below to restore your access on this account." 
-                                 : "Kehilangan status Pro? Jika Anda sebelumnya membeli langganan dengan Apple ID ini, klik di bawah untuk memulihkan akses Anda di akun ini.")}
-                           </p>
-                           <button
-                             onClick={async () => {
-                               try {
-                                 const restored = await restorePurchases();
-                                 if (restored) {
-                                   window.location.reload();
-                                 } else {
-                                   alert(t('subscription_section.restore_failed') || 'No active subscription found to restore.');
-                                 }
-                               } catch (err) {
-                                 console.error("Restore failed:", err);
+                       <div className="mt-6 p-4 rounded-3xl bg-slate-50 border border-slate-100 text-center space-y-3">
+                         <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                           {t('subscription_section.restore_helper_text') || 
+                             (t('nav.title') === 'DocsGuard' 
+                               ? "Lost your Pro status? If you previously purchased a subscription with this Apple ID, click below to restore your access on this account." 
+                               : "Kehilangan status Pro? Jika Anda sebelumnya membeli langganan dengan Apple ID ini, klik di bawah untuk memulihkan akses Anda di akun ini.")}
+                         </p>
+                         <button
+                           onClick={async () => {
+                             try {
+                               const restored = await restorePurchases();
+                               if (restored) {
+                                 window.location.reload();
+                               } else {
+                                 alert(t('subscription_section.restore_failed') || 'No active subscription found to restore.');
                                }
-                             }}
-                             disabled={subscriptionLoading}
-                             className="w-full py-3 px-4 rounded-2xl bg-white border border-slate-200 hover:border-indigo-200 text-xs font-bold text-slate-700 hover:text-indigo-600 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-                           >
-                             <RefreshCw className={cn("h-3.5 w-3.5 text-slate-400", subscriptionLoading && "animate-spin")} />
-                             {t('subscription_section.paywall_restore') || 'Restore Purchases'}
-                           </button>
-                         </div>
-                       )}
+                             } catch (err) {
+                               console.error("Restore failed:", err);
+                             }
+                           }}
+                           disabled={subscriptionLoading}
+                           className="w-full py-3 px-4 rounded-2xl bg-white border border-slate-200 hover:border-indigo-200 text-xs font-bold text-slate-700 hover:text-indigo-600 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                         >
+                           <RefreshCw className={cn("h-3.5 w-3.5 text-slate-400", subscriptionLoading && "animate-spin")} />
+                           {t('subscription_section.paywall_restore') || 'Restore Purchases'}
+                         </button>
+                       </div>
                        
                        {/* Subscription Logic Information Note */}
                        {isPro && (
