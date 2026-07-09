@@ -235,31 +235,55 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       // Override productId if there are multiple active subscriptions (common in sandbox upgrades)
       if (customerInfo.activeSubscriptions && customerInfo.activeSubscriptions.length > 0) {
         const activeSubs = customerInfo.activeSubscriptions;
+        const purchaseDates = customerInfo.allPurchaseDates || {};
+        const expirationDates = customerInfo.allExpirationDates || {};
         
-        // Check if we have a locally stored last purchased product that is still active
-        const lastPurchased = typeof window !== 'undefined' ? localStorage.getItem('docsguard_last_purchased_product') : null;
+        // Helper to find a value in a case-insensitive object
+        const getValueCaseInsensitive = (obj: Record<string, any>, targetKey: string) => {
+          const lowerTarget = targetKey.toLowerCase();
+          const matchKey = Object.keys(obj).find(k => k.toLowerCase() === lowerTarget);
+          return matchKey ? obj[matchKey] : null;
+        };
         
-        if (lastPurchased && activeSubs.includes(lastPurchased)) {
-          productId = lastPurchased;
-        } else {
-          // Fallback to latest purchase date comparison
-          const purchaseDates = customerInfo.allPurchaseDates || {};
-          let latestProductId = productId;
-          let latestPurchaseTime = 0;
+        let latestProductId = productId;
+        let latestPurchaseTime = 0;
+        
+        // 1. Compare case-insensitive purchase dates to find the most recently purchased subscription
+        activeSubs.forEach((id: string) => {
+          const dateStr = getValueCaseInsensitive(purchaseDates, id);
+          if (dateStr) {
+            const time = new Date(dateStr).getTime();
+            if (time > latestPurchaseTime) {
+              latestPurchaseTime = time;
+              latestProductId = id;
+            }
+          }
+        });
+        
+        // 2. If multiple active subscriptions are present, also compare their expiration dates.
+        // During sandbox upgrades/overlaps, the newly purchased plan will have an expiration date
+        // that is further in the future than the old plan.
+        if (activeSubs.length > 1) {
+          let furthestExpiryProductId = latestProductId;
+          let furthestExpiryTime = 0;
           
           activeSubs.forEach((id: string) => {
-            const dateStr = purchaseDates[id];
-            if (dateStr) {
-              const time = new Date(dateStr).getTime();
-              if (time > latestPurchaseTime) {
-                latestPurchaseTime = time;
-                latestProductId = id;
+            const expiryStr = getValueCaseInsensitive(expirationDates, id);
+            if (expiryStr) {
+              const time = new Date(expiryStr).getTime();
+              if (time > furthestExpiryTime) {
+                furthestExpiryTime = time;
+                furthestExpiryProductId = id;
               }
             }
           });
           
-          productId = latestProductId;
+          if (furthestExpiryTime > 0) {
+            latestProductId = furthestExpiryProductId;
+          }
         }
+        
+        productId = latestProductId;
       }
       
       let type = 'premium';
@@ -318,13 +342,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const subscribe = async (pkg: any) => {
     try {
       setLoading(true);
-      
-      // Store the intended product identifier BEFORE calling native purchase
-      // to prevent the native listener reload from race-canceling this state write
-      const prodId = pkg.product?.identifier || pkg.identifier;
-      if (prodId) {
-        localStorage.setItem('docsguard_last_purchased_product', prodId);
-      }
 
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
@@ -349,8 +366,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       }
       return false;
     } catch (error: any) {
-      // Clear the local state override if the purchase was cancelled or failed
-      localStorage.removeItem('docsguard_last_purchased_product');
       if (!error.userCancelled) console.error("Purchase Error:", error);
       return false;
     } finally {
@@ -362,10 +377,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       setLoading(true);
       if (!Capacitor.isNativePlatform()) return false;
-      
-      // Clear last purchased on restore to let date/entitlement logic decide
-      localStorage.removeItem('docsguard_last_purchased_product');
-      
       const { customerInfo } = await Purchases.restorePurchases();
       processCustomerInfo(customerInfo);
       return Object.keys(customerInfo.entitlements.active).length > 0;
