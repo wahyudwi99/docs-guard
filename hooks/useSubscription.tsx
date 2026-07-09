@@ -318,11 +318,16 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const subscribe = async (pkg: any) => {
     try {
       setLoading(true);
+      
+      // Store the intended product identifier BEFORE calling native purchase
+      // to prevent the native listener reload from race-canceling this state write
+      const prodId = pkg.product?.identifier || pkg.identifier;
+      if (prodId) {
+        localStorage.setItem('docsguard_last_purchased_product', prodId);
+      }
+
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
         const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
-        if (productIdentifier) {
-          localStorage.setItem('docsguard_last_purchased_product', productIdentifier);
-        }
         processCustomerInfo(customerInfo);
         if (customerInfo.entitlements.active['pro']) {
           await logTransactionToSupabase(productIdentifier, pkg.identifier);
@@ -331,7 +336,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
       } else {
         // Mock
-        localStorage.setItem('docsguard_last_purchased_product', pkg.identifier);
         const fakeExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         const mockInfo = {
           entitlements: { active: { pro: { productIdentifier: pkg.identifier, expirationDate: fakeExpiry, willRenew: true } } },
@@ -345,6 +349,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       }
       return false;
     } catch (error: any) {
+      // Clear the local state override if the purchase was cancelled or failed
+      localStorage.removeItem('docsguard_last_purchased_product');
       if (!error.userCancelled) console.error("Purchase Error:", error);
       return false;
     } finally {
