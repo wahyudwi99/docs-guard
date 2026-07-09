@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Shield, Lock, X, CheckCircle2, Zap } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/hooks/useI18n';
@@ -42,14 +42,6 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
     router.push('/privacy');
   };
 
-  const benefits = [
-    t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
-    t('subscription_section.paywall_feature_unlimited_video') || 'Unlimited Video Watermarking',
-    t('subscription_section.paywall_feature_encryption') || 'PDF Lock & Encryption',
-    t('subscription_section.paywall_feature_smart_blur') || 'Smart Blur',
-    t('subscription_section.paywall_feature_ad_free') || '100% Ad-Free Experience',
-  ];
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -77,26 +69,10 @@ export function LoginModal({ isOpen, onClose, callbackUrl = '/' }: LoginModalPro
               <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center">
-              <div className="mb-4 inline-flex p-3 rounded-2xl bg-indigo-50 text-indigo-600">
-                <Zap className="w-6 h-6 fill-current" />
-              </div>
-              
-              <h2 className="text-2xl font-black mb-1 text-zinc-900 tracking-tight uppercase">
-                {t('subscription_section.login_modal_title') || 'Unlock DocsGuard Pro'}
+            <div className="text-center pt-6">
+              <h2 className="text-2xl font-black mb-8 text-zinc-900 tracking-tight uppercase">
+                SIGN IN
               </h2>
-              <p className="text-zinc-500 mb-6 text-xs font-medium uppercase tracking-widest">
-                {t('subscription_section.login_modal_subtitle') || 'Log in to continue and unlock your 3-day free trial'}
-              </p>
-
-              <div className="space-y-3 mb-8 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 text-left">
-                {benefits.map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span className="text-sm font-bold text-zinc-700">{benefit}</span>
-                  </div>
-                ))}
-              </div>
               
               <button
                 onClick={handleGoogleSignIn}

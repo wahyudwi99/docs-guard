@@ -65,8 +65,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // SOURCE OF TRUTH: PRO if user is logged in AND has active entitlements
   const isPro = useMemo(() => {
-    return !!user?.id && activeEntitlements.length > 0;
-  }, [activeEntitlements, user?.id]);
+    return activeEntitlements.length > 0;
+  }, [activeEntitlements]);
 
   const currentPlan = useMemo(() => {
     return latestPlanInfo;
