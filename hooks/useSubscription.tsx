@@ -3,8 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
-import { useAuth } from './useAuth';
-import { supabase } from '@/lib/supabase';
 
 interface ActivePlan {
   type: string;
@@ -33,7 +31,6 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<any[]>([]);
   const [activeEntitlements, setActiveEntitlements] = useState<any[]>([]);
@@ -94,12 +91,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         await fetchPackages();
 
-        // If user is already logged in from previous session
-        if (user?.id) {
-          await loginToRevenueCat(user.id);
-        } else {
-          await checkSubscriptionStatus();
-        }
+        // Always check anonymous status, do not log in to RevenueCat with user UUID
+        await checkSubscriptionStatus();
       } else {
         // Professional default prices for web/unidentified users
         setPackages([
@@ -116,58 +109,22 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const loginToRevenueCat = async (userId: string) => {
-    if (!Capacitor.isNativePlatform()) return;
-    try {
-      console.log("[SUBSCRIPTION] Logging in to RevenueCat:", userId);
-      const { customerInfo } = await Purchases.logIn({ appUserID: userId });
-      
-      // CONFLICT DETECTION:
-      // If the device has a purchase date but NO active entitlements for this user ID
-      const hasPurchasesOnDevice = Object.keys(customerInfo.allPurchaseDates).length > 0;
-      const hasActiveEntitlements = Object.keys(customerInfo.entitlements.active).length > 0;
-      
-      if (hasPurchasesOnDevice && !hasActiveEntitlements) {
-        console.warn("[SUBSCRIPTION] Conflict detected: Purchases exist on device but not for this user.");
-        setSubscriptionConflict(true);
-      } else {
-        setSubscriptionConflict(false);
-      }
-
-      processCustomerInfo(customerInfo);
-    } catch (e) {
-      console.error("RevenueCat Login Error:", e);
-    }
+    // No-op: Do not log in to RevenueCat with database UUID
+    console.log("[SUBSCRIPTION] loginToRevenueCat called (no-op):", userId);
   };
 
   const logoutFromRevenueCat = async () => {
-    if (!Capacitor.isNativePlatform()) return;
-    try {
-      console.log("[SUBSCRIPTION] Logging out from RevenueCat");
-      await Purchases.logOut();
-      setSubscriptionConflict(false);
-      setActiveEntitlements([]);
-      setLatestPlanInfo(null);
-      setHasPurchaseHistory(false);
-    } catch (e) {
-      console.error("RevenueCat Logout Error:", e);
-    }
+    // No-op: Do not log out or clear session since we are always anonymous
+    console.log("[SUBSCRIPTION] logoutFromRevenueCat called (no-op)");
   };
 
   useEffect(() => {
     if (!isInitialized.current) {
       initRevenueCat();
       isInitialized.current = true;
-    } else if (user?.id) {
-      // If already initialized but user just logged in, sync them
-      initialLoadDone.current = false;
-      loginToRevenueCat(user.id);
-    } else if (!user && isInitialized.current) {
-      // User logged out, clear RevenueCat session
-      initialLoadDone.current = false;
-      logoutFromRevenueCat();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, user === null]);
+  }, []);
 
   const fetchPackages = async () => {
     // Professional fallback packages
@@ -322,32 +279,14 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
 
-  const logTransactionToSupabase = async (transactionId: string, productId: string) => {
-    if (!user?.id) return;
-    try {
-      await supabase
-        .from('payments')
-        .insert({
-          user_id: user.id,
-          transaction_id: transactionId,
-          product_id: productId,
-          status: 'completed',
-          created_at: new Date().toISOString()
-        });
-    } catch (error) {
-      console.error("[SUPABASE] Logging failed:", error);
-    }
-  };
-
   const subscribe = async (pkg: any) => {
     try {
       setLoading(true);
 
       if (!pkg.isMock && Capacitor.isNativePlatform()) {
-        const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ aPackage: pkg });
+        const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
         processCustomerInfo(customerInfo);
         if (customerInfo.entitlements.active['pro']) {
-          await logTransactionToSupabase(productIdentifier, pkg.identifier);
           setPurchaseSuccess(true);
           return true;
         }
@@ -360,7 +299,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
           allPurchaseDates: { [pkg.identifier]: new Date().toISOString() }
         };
         processCustomerInfo(mockInfo);
-        await logTransactionToSupabase(`sim_${Date.now()}`, pkg.identifier);
         setPurchaseSuccess(true);
         return true;
       }
@@ -381,6 +319,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       processCustomerInfo(customerInfo);
       return Object.keys(customerInfo.entitlements.active).length > 0;
     } catch (error) {
+      console.error("Restore Purchases Error:", error);
       return false;
     } finally {
       setLoading(false);
