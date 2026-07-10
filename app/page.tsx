@@ -16,14 +16,11 @@ import { Paywall } from "@/components/Paywall";
 import { useCallback, useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Capacitor } from "@capacitor/core";
-import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, LogOut, User, Video, EyeOff, Lock, Mail, Trash2, RefreshCw } from "lucide-react";
+import { Shield, FileText, Settings, Settings2, Plus, Layout, Info, ExternalLink, ChevronRight, Sparkles, Image as ImageIcon, X, Download, CheckCircle2, CreditCard, Zap, Camera, Share2, Video, EyeOff, Lock, Mail, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useAuth } from "@/hooks/useAuth";
-import { LoginModal } from "@/components/LoginModal";
-import { DeleteAccountModal } from "@/components/DeleteAccountModal";
 import { motion, AnimatePresence } from 'framer-motion';
 import { InAppReview } from '@capacitor-community/in-app-review';
 import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
@@ -41,32 +38,12 @@ function HomeContent() {
   const [showAdWarningModal, setShowAdWarningModal] = useState(false);
   const [adWarningAction, setAdWarningAction] = useState<'download' | 'share' | null>(null);
   const [showCamera, setShowCamera] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [exportProgress, setExportProgress] = useState<string | null>(null);
 
-  const { user: session, loading: isLoadingAuth, logout, deleteAccount } = useAuth();
   const { isPro, trialActive, packages, subscribe, currentPlan, activeEntitlements, subscriptionConflict, purchaseSuccess, setPurchaseSuccess, restorePurchases, loading: subscriptionLoading } = useSubscription();
 
   const [showConflictModal, setShowConflictModal] = useState(false);
-
-  // Auto-Login Invitation for non-logged-in users
-  useEffect(() => {
-    // Check if invitation was already shown in this session
-    const hasSeenInSession = sessionStorage.getItem('docsguard_session_invitation');
-    
-    // Only trigger if auth is finished loading, no session exists, and not shown in current session
-    if (!isLoadingAuth && !session && !hasSeenInSession) {
-      // Increase delay to 3000ms to ensure splash screen is gone and home page is visible
-      const timer = setTimeout(() => {
-        setShowLoginModal(true);
-        // Mark as shown for THIS session only (cleared when app is closed/killed)
-        sessionStorage.setItem('docsguard_session_invitation', 'true');
-      }, 3000); 
-      return () => clearTimeout(timer);
-    }
-  }, [isLoadingAuth, session]);
 
   // AdMob Initialization
   useEffect(() => {
@@ -210,30 +187,9 @@ function HomeContent() {
   }, [subscriptionConflict]);
 
   useEffect(() => {
-    console.log("Auth Status:", isLoadingAuth ? 'loading' : (session ? 'authenticated' : 'unauthenticated'));
-    console.log("Session Data:", session);
     console.log("Subscription Status:", isPro ? 'PRO' : 'FREE');
     console.log("Current Plan:", currentPlan);
-  }, [isLoadingAuth, session, isPro, currentPlan]);
-
-  const handleLogout = useCallback(async () => {
-    await logout();
-    // Hard refresh to clear all states and re-trigger splash screen
-    window.location.reload();
-  }, [logout]);
-
-  const handleDeleteAccount = useCallback(async () => {
-    await deleteAccount();
-    // Hard refresh to clear all states and re-trigger splash screen
-    window.location.reload();
-  }, [deleteAccount]);
-
-  // Close login modal when session is established
-  useEffect(() => {
-    if (session && showLoginModal) {
-      setShowLoginModal(false);
-    }
-  }, [session, showLoginModal]);
+  }, [isPro, currentPlan]);
   const [password, setPassword] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -495,7 +451,7 @@ function HomeContent() {
           </div>
           <div className="flex items-center gap-4">
             {/* Tier Status Badge - Always Visible */}
-            {!isLoadingAuth && (
+            {!subscriptionLoading && (
               <div className="flex items-center gap-1.5 animate-in fade-in zoom-in duration-700">
                 {isPro ? (
                   <div className="flex items-center gap-1.5">
@@ -547,44 +503,9 @@ function HomeContent() {
                 Go Pro
               </button>
             )}
-            {isLoadingAuth ? (
-              <div className="h-9 w-20 bg-slate-100 animate-pulse rounded-full" />
-            ) : session ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex flex-col items-end leading-none">
-                  <span className="text-[10px] font-bold text-slate-900">{session.name}</span>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="h-9 px-4 rounded-full bg-rose-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-rose-700 transition-all active:scale-95 flex items-center gap-2 shadow-sm shadow-rose-100"
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setShowLoginModal(true)}
-                className="h-9 px-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2"
-              >
-                <User className="h-3.5 w-3.5" />
-                Login
-              </button>
-            )}
           </div>
         </div>
       </header>
-
-      <LoginModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)} 
-      />
-
-      <DeleteAccountModal 
-        isOpen={showDeleteModal} 
-        onClose={() => setShowDeleteModal(false)} 
-        onConfirm={handleDeleteAccount} 
-      />
 
       <main className="flex-1 relative z-10 max-w-2xl mx-auto w-full px-4 py-8 md:py-12 flex flex-col items-center">
         <div className="w-full space-y-6">
@@ -600,22 +521,12 @@ function HomeContent() {
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
-                    {session ? (
-                      <span className="flex items-center gap-1.5 whitespace-nowrap capitalize">
-                        Hi, {session.name?.toLowerCase()} <span className="ml-1">👋</span>
-                      </span>
-                    ) : t('nav.privacy_banner_title')}
+                    {t('nav.privacy_banner_title')}
                   </span>
                 </div>
-                {!session ? (
-                   <p className="text-xs font-normal text-slate-600 leading-relaxed text-left">
-                     {t('nav.privacy_banner')}
-                   </p>
-                ) : (
-                  <p className="text-[10px] font-normal text-slate-500 italic">
-                    {t('nav.privacy_banner')}
-                  </p>
-                )}
+                <p className="text-xs font-normal text-slate-600 leading-relaxed text-left">
+                  {t('nav.privacy_banner')}
+                </p>
               </div>
             </div>
           </div>
@@ -1175,17 +1086,6 @@ function HomeContent() {
                 </div>
              </div>
           </Link>
-          {session && (
-            <div className="w-full pt-2">
-               <button 
-                  onClick={() => setShowDeleteModal(true)}
-                  className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-rose-600 bg-rose-50/50 hover:bg-rose-100 py-5 rounded-[2rem] transition-all border border-rose-200 shadow-sm active:scale-[0.98] group/del"
-               >
-                  <Trash2 className="h-4 w-4 group-hover/del:animate-bounce" />
-                  {t('info_card.delete_account')}
-               </button>
-            </div>
-          )}
         </div>
       </main>
 

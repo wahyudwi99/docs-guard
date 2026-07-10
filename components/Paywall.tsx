@@ -4,7 +4,6 @@ import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useI18n } from '@/hooks/useI18n';
 import { Check, X, Star } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
 import { cn } from "@/lib/utils";
 
 interface PaywallProps {
@@ -15,7 +14,6 @@ interface PaywallProps {
 export const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) => {
   const { packages, subscribe, loading, restorePurchases } = useSubscription();
   const { t } = useI18n();
-  const { loading: isLoadingAuth } = useAuth();
 
   const features = [
     t('subscription_section.paywall_feature_unlimited_pdf') || 'Unlimited PDF Watermarking',
@@ -59,12 +57,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) 
               </div>
             ))}
           </div>
-          {isLoadingAuth ? (
-            <div className="w-full py-12 flex items-center justify-center">
-              <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 mb-8">
+          <div className="grid grid-cols-1 gap-4 mb-8">
               {packages.map((pkg) => {
                 const isYearly = pkg.identifier.toLowerCase().includes('yearly') || pkg.packageType === 'ANNUAL' || pkg.packageType === 'YEARLY';
                 const isMonthly = pkg.identifier.toLowerCase().includes('monthly') || pkg.packageType === 'MONTHLY';
@@ -123,7 +116,6 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) 
                 );
               })}
             </div>
-          )}
           
           <button
             onClick={restorePurchases}
