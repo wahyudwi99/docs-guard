@@ -214,76 +214,76 @@
   "privacy": {
     "title": "Política de Privacidade",
     "back_button": "Voltar",
-    "last_updated": "Última atualização: 12 de junho de 2026",
-    "hero_title": "Política de Privacidade do DocsGuard",
-    "hero_subtitle": "Estamos comprometidos em proteger sua privacidade absoluta e garantir a segurança inabalável de seus documentos.",
-    "effective_date": "Data de vigência: 12 de junho de 2026",
+    "last_updated": "Last Updated: July 12, 2026",
+    "hero_title": "Privacy Policy for DocsGuard",
+    "hero_subtitle": "We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents.",
+    "effective_date": "Effective Date: July 12, 2026",
     "sections": [
       {
-        "title": "1. Introdução",
-        "content": "Bem-vindo ao DocsGuard. Estamos comprometidos em proteger sua privacidade absoluta e garantir a segurança inabalável de seus documentos. Esta Política de Privacidade explica como suas informações são tratadas quando você usa nosso aplicativo móvel (\"DocsGuard\" ou o \"App\")."
+        "title": "1. Introduction",
+        "content": "Welcome to DocsGuard. We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents. This Privacy Policy explains how your information is handled when you use our mobile application (\"DocsGuard\" or the \"App\")."
       },
       {
-        "title": "2. O Princípio Fundamental: Conhecimento Zero e Processamento Local",
-        "content": "Nossa filosofia fundamental é que seus dados pertencem exclusivamente a você. O DocsGuard é projetado com uma arquitetura de processamento estritamente local.",
+        "title": "2. The Core Principle: Zero-Knowledge & Local Processing",
+        "content": "Our fundamental philosophy is that your data belongs exclusively to you. DocsGuard is engineered with a strictly local-processing architecture.",
         "list": [
-          "Sem servidores em nuvem para arquivos: Não fazemos upload, transmitimos, armazenamos ou processamos nenhum de seus documentos, fotos ou vídeos em nenhum servidor remoto.",
-          "Operação no dispositivo: Todas as funções de edição de documentos, marca d'água e segurança são executadas inteiramente localmente no hardware do seu dispositivo.",
-          "Acesso Zero: Nossos desenvolvedores, funcionários e empresa têm absolutamente zero acesso aos arquivos que você importa ou modifica usando o DocsGuard."
+          "No Cloud Servers for Files: We do not upload, transmit, store, or process any of your documents, photos, or videos on any remote servers.",
+          "On-Device Operation: All document editing, watermarking, and security features are executed entirely locally on your device's hardware.",
+          "Zero Access: Our developers, employees, and company have absolutely zero access to the files you import or modify using DocsGuard."
         ]
       },
       {
-        "title": "3. Informações que coletamos para gerenciamento de conta e suporte",
-        "content": "Embora seus documentos e arquivos permaneçam estritamente locais, coletamos informações mínimas necessárias para gerenciar sua assinatura Pro e fornecer suporte ao cliente:",
+        "title": "3. Information We Collect for Support Management",
+        "content": "DocsGuard operates entirely without user accounts; you do not need to register, provide an email, or log in to use the App or purchase Premium features. While your documents and files remain strictly local, we collect minimal information only if you voluntarily contact us for customer support:",
         "list": [
-          "Dados de autenticação (Google & Apple Sign-In): Se você optar por fazer login usando sua Conta do Google ou Apple para acessar recursos Pro, receberemos informações básicas de perfil fornecidas pelo provedor, especificamente seu endereço de e-mail e nome.",
-          "Dados de suporte ao cliente e feedback: Se você enviar uma reclamação, dúvida ou feedback por meio da nossa página “Fale conosco”, coletaremos e armazenaremos com segurança seu Nome, Endereço de e-mail e o conteúdo da sua mensagem em nosso banco de dados seguro.",
-          "Finalidade da coleta: Os dados de autenticação são usados para sincronizar sua assinatura Pro em vários dispositivos. Os dados de suporte são armazenados exclusivamente para analisar, processar e responder às suas reclamações ou dúvidas por meio do nosso e-mail de suporte oficial. Não usamos essas informações para marketing de terceiros, nem as vendemos a corretores de dados."
+          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our \"Contact us\" Page, we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
+          "Purpose of Collection: Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for marketing, nor do we ever sell it to data brokers."
         ]
       },
       {
-        "title": "4. Informações que não coletamos",
-        "content": "Para garantir clareza absoluta, o DocsGuard não coleta, armazena ou compartilha:",
+        "title": "4. Information We Do Not Collect",
+        "content": "To ensure absolute clarity, DocsGuard does not collect, store, or share:",
         "list": [
-          "O conteúdo de seus documentos, imagens, PDFs ou vídeos.",
-          "Quaisquer informações de identificação pessoal (PII) além dos dados explícitos de conta e suporte mencionados na Seção 3."
+          "The contents of your documents, images, PDFs, or videos.",
+          "Any Personally Identifiable Information (PII) beyond the explicit support data mentioned in Section 3."
         ]
       },
       {
-        "title": "5. Dados coletados automaticamente (serviços de terceiros)",
-        "content": "Usamos serviços de terceiros altamente confiáveis para operar as funções essenciais de back-end do aplicativo. Esses serviços podem coletar dados anonimizados:",
+        "title": "5. Data Collected by Third-Party Services (Advertising & Diagnostics)",
+        "content": "We integrate highly trusted industry-standard third-party SDKs to monetize the free tier of the App and manage payments. These services handle data as follows:",
         "list": [
-          "Gerenciamento de assinatura (por exemplo, Apple App Store, RevenueCat): usado para verificar seu histórico de compras e o nível de assinatura atual.",
-          "Análise e relatórios de falhas (por exemplo, Firebase / Apple App Analytics): Se você optar por participar por meio das configurações do seu dispositivo, receberemos logs de falhas anônimos (modelo do dispositivo, versão do sistema operacional, hora da falha) para nos ajudar a corrigir bugs e melhorar o desempenho do aplicativo."
+          "Subscription Management (Apple App Store / RevenueCat): Used securely to verify your purchase history and validate your current subscription tier. This data is not linked to your real-world identity.",
+          "Advertising (Google AdMob): To support our free features, the App displays advertisements served by Google AdMob. AdMob may collect and use device identifiers (such as the iOS Advertising Identifier or IDFA) and usage data (such as ad interactions) to deliver personalized ads, measure ad performance, and prevent fraud. This tracking only occurs if you explicitly grant permission via the iOS App Tracking Transparency prompt.",
+          "Native Diagnostics (Apple App Analytics): We do not use third-party analytics or crash reporting SDKs (such as Firebase). We only receive anonymous, aggregate crash logs and performance metrics provided natively by Apple if you have opted-in via your iOS device settings to share diagnostic data with developers."
         ]
       },
       {
-        "title": "6. Assinaturas e Processamento de Pagamento",
-        "content": "Todas as transações financeiras são tratadas de forma segura e direta pela Apple App Store. O DocsGuard não processa, armazena ou tem acesso às suas informações de pagamento, números de cartão de crédito ou endereço de cobrança. Ao fazer login com sua Conta do Google ou Apple, vinculamos um ID de usuário seguro e anônimo ao seu recibo de compra, permitindo que você restaure perfeitamente sua assinatura em um novo dispositivo."
+        "title": "6. Subscriptions and Payment Processing",
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing addresses. Because DocsGuard does not require user accounts, all subscription purchases, premium access, and purchase restorations are tied strictly and directly to your personal Apple ID. You can seamlessly restore your purchases on a new device by using the Apple ID associated with the original transaction."
       },
       {
-        "title": "7. Retenção de dados e exclusão de conta",
-        "content": "Retemos suas informações básicas de conta e histórico de suporte apenas pelo tempo necessário para cumprir os propósitos descritos nesta política.",
+        "title": "7. Data Retention",
+        "content": "Because we do not have user accounts, there is no profile data to retain. We retain your support history only for as long as necessary to fulfill the purposes outlined in this policy.",
         "list": [
-          "Seu direito de excluir: você tem o direito de excluir completamente sua conta do DocsGuard e todos os dados associados (incluindo seu histórico de suporte em nosso banco de dados) a qualquer momento. Você pode fazer isso diretamente no aplicativo navegando em Configurações > Conta > Excluir conta.",
-          "Consequência da exclusão: após a exclusão da conta, seu endereço de e-mail, registros de autenticação e mensagens de suporte enviadas serão permanentemente apagados de nossos bancos de dados. Observe que a exclusão da sua conta não cancela automaticamente as assinaturas ativas da App Store; você deve gerenciar e cancelar essas assinaturas diretamente nas configurações da loja do seu dispositivo."
+          "Your Right to Delete: You have the right to request the complete deletion of your submitted support messages and contact email from our database at any time.",
+          "Subscription Management: Please note that deleting your support history with us does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your Apple ID store settings."
         ]
       },
       {
-        "title": "8. Direitos do usuário (conformidade com GDPR e CCPA)",
-        "content": "De acordo com o Regulamento Geral de Proteção de Dados (GDPR) e a Lei de Privacidade do Consumidor da Califórnia (CCPA), os usuários têm o direito de solicitar acesso, modificação ou exclusão de seus datos. Como o DocsGuard opera localmente e não armazena seus arquivos em nossos servidores, seu direito à exclusão de seus arquivos está totalmente sob seu controle. Para excluir todos os seus documentos associados ao DocsGuard, basta excluir os arquivos do seu dispositivo ou desinstalar o aplicativo. Para a exclusão dos dados da sua conta e suporte, consulte a Seção 7."
+        "title": "8. User Rights (GDPR & CCPA Compliance)",
+        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your support data deletion, please refer to Section 7."
       },
       {
-        "title": "9. Privacidade de crianças",
-        "content": "Nosso aplicativo é uma ferramenta profissional de segurança de documentos e não é direcionado a indivíduos com menos de 13 anos (ou a idade legal aplicável em sua região). Não coletamos intencionalmente nenhuma informação pessoal de crianças. Se tomarmos conhecimento de que coletamos inadvertidamente dados pessoais de uma criança, tomaremos medidas imediatas para excluir tais informações de nossos bancos de dados."
+        "title": "9. Children's Privacy",
+        "content": "Our App is a professional document security tool and is not directed at individuals under the age of 13 (or the applicable legal age in your region). We do not knowingly collect any personal information from children. If we become aware that we have inadvertently collected personal data from a child, we will take immediate steps to delete such information from our databases."
       },
       {
-        "title": "10. Alterações nesta Política de Privacidade",
-        "content": "Podemos atualizar esta Política de Privacidade de tempos em tempos para refletir mudanças em nossas práticas, tecnologia ou requisitos legais. A política atualizada estará acessível nas configurações do aplicativo."
+        "title": "10. Changes to This Privacy Policy",
+        "content": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. The updated policy will be accessible within the App settings."
       },
       {
-        "title": "11. Fale conosco",
-        "content": "Se você tiver dúvidas, preocupações ou solicitações em relação a esta Política de Privacidade ou como o DocsGuard lida com sua privacidade, entre em contato conosco diretamente por meio da nossa página “Fale conosco” (localizada na página do aplicativo). Assim que você enviar sua dúvida, nossa equipe de suporte oficial revisará seu caso e responderá diretamente ao endereço de e-mail fornecido no formulário."
+        "title": "11. Contact Us",
+        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our \"Contact us\" page located within the App. Once you submit your inquiry, our support team will review your case and respond directly to the email address you provided."
       }
     ]
   },

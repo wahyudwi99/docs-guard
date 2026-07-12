@@ -216,10 +216,10 @@
   "privacy": {
     "title": "Privacy Policy",
     "back_button": "Back",
-    "last_updated": "Last Updated: June 12, 2026",
+    "last_updated": "Last Updated: July 12, 2026",
     "hero_title": "Privacy Policy for DocsGuard",
     "hero_subtitle": "We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents.",
-    "effective_date": "Effective Date: June 12, 2026",
+    "effective_date": "Effective Date: July 12, 2026",
     "sections": [
       {
         "title": "1. Introduction",
@@ -235,12 +235,11 @@
         ]
       },
       {
-        "title": "3. Information We Collect for Account and Support Management",
-        "content": "While your documents and files remain strictly local, we collect minimal information necessary to manage your Pro subscription and provide customer support:",
+        "title": "3. Information We Collect for Support Management",
+        "content": "DocsGuard operates entirely without user accounts; you do not need to register, provide an email, or log in to use the App or purchase Premium features. While your documents and files remain strictly local, we collect minimal information only if you voluntarily contact us for customer support:",
         "list": [
-          "Authentication Data (Google & Apple Sign-In): If you choose to log in using your Google or Apple Account to access Pro features, we receive basic profile information provided by the provider, specifically your Email Address and Name.",
-          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our “Contact us” Page , we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
-          "Purpose of Collection: Authentication data is used to sync your Pro subscription across multiple devices. Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for third-party marketing, nor do we ever sell it to data brokers."
+          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our \"Contact us\" Page, we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
+          "Purpose of Collection: Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for marketing, nor do we ever sell it to data brokers."
         ]
       },
       {
@@ -248,32 +247,33 @@
         "content": "To ensure absolute clarity, DocsGuard does not collect, store, or share:",
         "list": [
           "The contents of your documents, images, PDFs, or videos.",
-          "Any Personally Identifiable Information (PII) beyond the explicit account and support data mentioned in Section 3."
+          "Any Personally Identifiable Information (PII) beyond the explicit support data mentioned in Section 3."
         ]
       },
       {
-        "title": "5. Data Collected Automatically (Third-Party Services)",
-        "content": "We use highly trusted third-party services to operate the App's essential backend functions. These services may collect anonymized data:",
+        "title": "5. Data Collected by Third-Party Services (Advertising & Diagnostics)",
+        "content": "We integrate highly trusted industry-standard third-party SDKs to monetize the free tier of the App and manage payments. These services handle data as follows:",
         "list": [
-          "Subscription Management (e.g., Apple App Store, RevenueCat): Used to verify your purchase history and current subscription tier.",
-          "Analytics & Crash Reports (e.g., Firebase / Apple App Analytics): If you opt-in via your device settings, we receive anonymous crash logs (device model, OS version, time of crash) to help us fix bugs and improve App performance."
+          "Subscription Management (Apple App Store / RevenueCat): Used securely to verify your purchase history and validate your current subscription tier. This data is not linked to your real-world identity.",
+          "Advertising (Google AdMob): To support our free features, the App displays advertisements served by Google AdMob. AdMob may collect and use device identifiers (such as the iOS Advertising Identifier or IDFA) and usage data (such as ad interactions) to deliver personalized ads, measure ad performance, and prevent fraud. This tracking only occurs if you explicitly grant permission via the iOS App Tracking Transparency prompt.",
+          "Native Diagnostics (Apple App Analytics): We do not use third-party analytics or crash reporting SDKs (such as Firebase). We only receive anonymous, aggregate crash logs and performance metrics provided natively by Apple if you have opted-in via your iOS device settings to share diagnostic data with developers."
         ]
       },
       {
         "title": "6. Subscriptions and Payment Processing",
-        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing address. By logging in with your Google or Apple Account, we link a secure, anonymous user ID to your purchase receipt, allowing you to seamlessly restore your subscription on a new device."
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing addresses. Because DocsGuard does not require user accounts, all subscription purchases, premium access, and purchase restorations are tied strictly and directly to your personal Apple ID. You can seamlessly restore your purchases on a new device by using the Apple ID associated with the original transaction."
       },
       {
-        "title": "7. Data Retention and Account Deletion",
-        "content": "We retain your basic account information and support history only for as long as necessary to fulfill the purposes outlined in this policy.",
+        "title": "7. Data Retention",
+        "content": "Because we do not have user accounts, there is no profile data to retain. We retain your support history only for as long as necessary to fulfill the purposes outlined in this policy.",
         "list": [
-          "Your Right to Delete: You have the right to completely delete your DocsGuard account and all associated data (including your support history in our database) at any time. You can do this directly within the App by navigating to Settings > Account > Delete Account.",
-          "Consequence of Deletion: Upon account deletion, your email address, authentication records, and submitted support messages will be permanently erased from our databases. Please note that deleting your account does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your device's store settings."
+          "Your Right to Delete: You have the right to request the complete deletion of your submitted support messages and contact email from our database at any time.",
+          "Subscription Management: Please note that deleting your support history with us does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your Apple ID store settings."
         ]
       },
       {
         "title": "8. User Rights (GDPR & CCPA Compliance)",
-        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your account and support data deletion, please refer to Section 7."
+        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your support data deletion, please refer to Section 7."
       },
       {
         "title": "9. Children's Privacy",
@@ -285,7 +285,7 @@
       },
       {
         "title": "11. Contact Us",
-        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our “Contact us” page (located within the App's page). Once you submit your inquiry, our official support team will review your case and respond directly to the email address you provided in the form."
+        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our \"Contact us\" page located within the App. Once you submit your inquiry, our support team will review your case and respond directly to the email address you provided."
       }
     ]
   },

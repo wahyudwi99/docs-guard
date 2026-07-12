@@ -214,76 +214,76 @@
   "privacy": {
     "title": "隐私政策",
     "back_button": "返回",
-    "last_updated": "最后更新：2026年6月12日",
-    "hero_title": "DocsGuard 隐私政策",
-    "hero_subtitle": "我们致力于保护您的绝对隐私并确保您文档的牢不可破的安全。",
-    "effective_date": "生效日期：2026年6月12日",
+    "last_updated": "Last Updated: July 12, 2026",
+    "hero_title": "Privacy Policy for DocsGuard",
+    "hero_subtitle": "We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents.",
+    "effective_date": "Effective Date: July 12, 2026",
     "sections": [
       {
-        "title": "1. 简介",
-        "content": "欢迎使用 DocsGuard。我们致力于保护您的绝对隐私并确保您文档的牢不可破的安全。本隐私政策解释了当您使用我们的移动应用程序（“DocsGuard”或“本应用”）时，您的信息是如何处理的。"
+        "title": "1. Introduction",
+        "content": "Welcome to DocsGuard. We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents. This Privacy Policy explains how your information is handled when you use our mobile application (\"DocsGuard\" or the \"App\")."
       },
       {
-        "title": "2. 核心原则：零知识与本地处理",
-        "content": "我们的基本哲学是，您的数据完全属于您。DocsGuard 采用严格的本地处理架构设计。",
+        "title": "2. The Core Principle: Zero-Knowledge & Local Processing",
+        "content": "Our fundamental philosophy is that your data belongs exclusively to you. DocsGuard is engineered with a strictly local-processing architecture.",
         "list": [
-          "文件不使用云服务器：我们不会在任何远程服务器上上传、传输、存储或处理您的任何文档、照片或视频。",
-          "设备端运行：所有文档编辑、水印和安全功能完全在您设备的硬件上本地执行。",
-          "零访问：我们的开发人员、员工和公司完全无法访问您使用 DocsGuard 导入或修改的文件。"
+          "No Cloud Servers for Files: We do not upload, transmit, store, or process any of your documents, photos, or videos on any remote servers.",
+          "On-Device Operation: All document editing, watermarking, and security features are executed entirely locally on your device's hardware.",
+          "Zero Access: Our developers, employees, and company have absolutely zero access to the files you import or modify using DocsGuard."
         ]
       },
       {
-        "title": "3. 我们为账户和支持管理收集的信息",
-        "content": "虽然您的文档和文件严格保持在本地，但我们会收集管理您的 Pro 订阅和提供客户支持所需的最少信息：",
+        "title": "3. Information We Collect for Support Management",
+        "content": "DocsGuard operates entirely without user accounts; you do not need to register, provide an email, or log in to use the App or purchase Premium features. While your documents and files remain strictly local, we collect minimal information only if you voluntarily contact us for customer support:",
         "list": [
-          "身份验证数据（Google 和 Apple 登录）：如果您选择使用 Google 或 Apple 账号登录以访问 Pro 功能，我们会收到服务商提供的基本个人资料信息，具体包括您的电子邮件地址和姓名。",
-          "客户支持和反馈数据：如果您通过我们的“联系我们”页面提交投诉、咨询或反馈，我们会安全地收集并存储您的姓名、电子邮件地址以及您在安全数据库中发送的消息内容。",
-          "收集目的：身份验证数据用于跨多台设备同步您的 Pro 订阅。支持数据仅用于分析、处理和通过我们的官方支持电子邮件回复您的投诉或咨询。我们不会将此信息用于第三方营销，也绝不会将其出售给数据经纪人。"
+          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our \"Contact us\" Page, we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
+          "Purpose of Collection: Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for marketing, nor do we ever sell it to data brokers."
         ]
       },
       {
-        "title": "4. 我们不收集的信息",
-        "content": "为了确保绝对清晰，DocsGuard 不会收集、存储或共享：",
+        "title": "4. Information We Do Not Collect",
+        "content": "To ensure absolute clarity, DocsGuard does not collect, store, or share:",
         "list": [
-          "您的文档、图像、PDF 或视频的内容。",
-          "除第 3 节中提到的明确账户和支持数据之外的任何个人身份信息 (PII)。"
+          "The contents of your documents, images, PDFs, or videos.",
+          "Any Personally Identifiable Information (PII) beyond the explicit support data mentioned in Section 3."
         ]
       },
       {
-        "title": "5. 自动收集的数据（第三方服务）",
-        "content": "我们使用备受信任的第三方服务来运行应用的基本后端功能。这些服务可能会收集匿名数据：",
+        "title": "5. Data Collected by Third-Party Services (Advertising & Diagnostics)",
+        "content": "We integrate highly trusted industry-standard third-party SDKs to monetize the free tier of the App and manage payments. These services handle data as follows:",
         "list": [
-          "订阅管理（例如 Apple App Store、RevenueCat）：用于验证您的购买历史记录和当前订阅层级。",
-          "分析和崩溃报告（例如 Firebase / Apple App Analytics）：如果您通过设备设置选择加入，我们会收到匿名崩溃日志（设备型号、操作系统版本、崩溃时间），以帮助我们修复错误并改进应用性能。"
+          "Subscription Management (Apple App Store / RevenueCat): Used securely to verify your purchase history and validate your current subscription tier. This data is not linked to your real-world identity.",
+          "Advertising (Google AdMob): To support our free features, the App displays advertisements served by Google AdMob. AdMob may collect and use device identifiers (such as the iOS Advertising Identifier or IDFA) and usage data (such as ad interactions) to deliver personalized ads, measure ad performance, and prevent fraud. This tracking only occurs if you explicitly grant permission via the iOS App Tracking Transparency prompt.",
+          "Native Diagnostics (Apple App Analytics): We do not use third-party analytics or crash reporting SDKs (such as Firebase). We only receive anonymous, aggregate crash logs and performance metrics provided natively by Apple if you have opted-in via your iOS device settings to share diagnostic data with developers."
         ]
       },
       {
-        "title": "6. 订阅和支付处理",
-        "content": "所有财务交易均由 Apple App Store 安全且直接地处理。DocsGuard 不处理、存储或访问您的支付信息、信用卡号或账单地址。通过使用您的 Google 或 Apple 账号登录，我们将安全的匿名用户 ID 与您的购买收据相关联，使您能够在设备上无缝恢复订阅。"
+        "title": "6. Subscriptions and Payment Processing",
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing addresses. Because DocsGuard does not require user accounts, all subscription purchases, premium access, and purchase restorations are tied strictly and directly to your personal Apple ID. You can seamlessly restore your purchases on a new device by using the Apple ID associated with the original transaction."
       },
       {
-        "title": "7. 数据保留和账户删除",
-        "content": "我们仅在履行本政策所述目的所需的时间内保留您的基本账户信息和支持历史记录。",
+        "title": "7. Data Retention",
+        "content": "Because we do not have user accounts, there is no profile data to retain. We retain your support history only for as long as necessary to fulfill the purposes outlined in this policy.",
         "list": [
-          "您的删除权：您有权随时完全删除您的 DocsGuard 账户及所有相关数据（包括我们在数据库中的支持历史记录）。您可以直接在应用内导航至 设置 > 账户 > 删除账户 来执行此操作。",
-          "删除后果：删除账户后，您的电子邮件地址、身份验证记录和提交的支持消息将从我们的数据库中永久擦除。请注意，删除您的账户不会自动取消有效的 App Store 订阅；您必须直接在设备的商店设置中管理并取消这些订阅。"
+          "Your Right to Delete: You have the right to request the complete deletion of your submitted support messages and contact email from our database at any time.",
+          "Subscription Management: Please note that deleting your support history with us does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your Apple ID store settings."
         ]
       },
       {
-        "title": "8. 用户权利（符合 GDPR 和 CCPA）",
-        "content": "根据通用数据保护条例 (GDPR) 和加州消费者隐私法 (CCPA)，用户有权请求访问、修改或删除其数据。由于 DocsGuard 本地运行且不在我们的服务器上存储您的文件，因此删除文件的权利完全由您控制。要删除与 DocsGuard 相关的所有文档，只需从您的设备中删除文件或卸载应用即可。对于您的账户和支持数据删除，请参阅第 7 节。"
+        "title": "8. User Rights (GDPR & CCPA Compliance)",
+        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your support data deletion, please refer to Section 7."
       },
       {
-        "title": "9. 儿童隐私",
-        "content": "我们的应用是一个专业的文档安全工具，不面向 13 岁（或您所在地区的法定年龄）以下的人群。我们不会有意收集儿童的任何个人信息。如果我们意识到我们无意中收集了儿童的个人数据，我们将立即采取措施从我们的数据库中删除此类信息。"
+        "title": "9. Children's Privacy",
+        "content": "Our App is a professional document security tool and is not directed at individuals under the age of 13 (or the applicable legal age in your region). We do not knowingly collect any personal information from children. If we become aware that we have inadvertently collected personal data from a child, we will take immediate steps to delete such information from our databases."
       },
       {
-        "title": "10. 本隐私政策的变更",
-        "content": "我们可能会不时更新本隐私政策，以反映我们的实践、技术或法律要求的变化。更新后的政策可在应用设置中查看。"
+        "title": "10. Changes to This Privacy Policy",
+        "content": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. The updated policy will be accessible within the App settings."
       },
       {
-        "title": "11. 联系我们",
-        "content": "如果您对本隐私政策或 DocsGuard 如何处理您的隐私有任何疑问、疑虑或要求，请通过我们的“联系我们”页面（位于应用页面内）直接与我们联系。一旦您提交咨询，我们的官方支持团队将审核您的案例并直接回复您在表单中提供的电子邮件地址。"
+        "title": "11. Contact Us",
+        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our \"Contact us\" page located within the App. Once you submit your inquiry, our support team will review your case and respond directly to the email address you provided."
       }
     ]
   },

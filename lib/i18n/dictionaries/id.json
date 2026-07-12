@@ -216,10 +216,10 @@
   "privacy": {
     "title": "Kebijakan Privasi",
     "back_button": "Kembali",
-    "last_updated": "Terakhir Diperbarui: 12 Juni 2026",
-    "hero_title": "Kebijakan Privasi (Privacy Policy) untuk DocsGuard",
+    "last_updated": "Terakhir Diperbarui: 12 Juli 2026",
+    "hero_title": "Kebijakan Privasi untuk DocsGuard",
     "hero_subtitle": "Kami berkomitmen untuk melindungi privasi mutlak Anda dan memastikan keamanan dokumen Anda yang tidak dapat ditembus.",
-    "effective_date": "Tanggal Efektif: 12 Juni 2026",
+    "effective_date": "Tanggal Efektif: 12 Juli 2026",
     "sections": [
       {
         "title": "1. Pendahuluan",
@@ -230,17 +230,16 @@
         "content": "Filosofi mendasar kami adalah bahwa data Anda adalah milik Anda sepenuhnya. DocsGuard dirancang secara ketat dengan arsitektur pemrosesan lokal.",
         "list": [
           "Tidak Ada Server Cloud untuk File: Kami tidak mengunggah, mengirimkan, menyimpan, atau memproses dokumen, foto, atau video Anda di server jarak jauh mana pun.",
-          "Operasi di Perangkat (On-Device): Semua pengeditan dokumen, pemberian watermark, dan fitur keamanan dieksekusi sepenuhnya secara lokal pada perangkat keras Anda.",
+          "Operasi di Perangkat (On-Device): Semua pengeditan dokumen, pemberian watermark, dan fitur keamanan dieksekusi sepenuhnya secara lokal pada perangkat keras perangkat Anda.",
           "Akses Nol (Zero Access): Pengembang, karyawan, dan perusahaan kami sama sekali tidak memiliki akses ke file yang Anda impor atau modifikasi menggunakan DocsGuard."
         ]
       },
       {
-        "title": "3. Informasi yang Kami Kumpulkan untuk Manajemen Akun dan Dukungan",
-        "content": "Meskipun dokumen dan file Anda tetap diproses secara murni di perangkat lokal, kami mengumpulkan informasi minimal yang diperlukan untuk mengelola langganan Pro Anda dan memberikan dukungan pelanggan:",
+        "title": "3. Informasi yang Kami Kumpulkan untuk Manajemen Dukungan",
+        "content": "DocsGuard beroperasi sepenuhnya tanpa akun pengguna; Anda tidak perlu mendaftar, memberikan email, atau masuk untuk menggunakan Aplikasi atau membeli fitur Premium. Meskipun dokumen dan file Anda tetap bersifat lokal, kami mengumpulkan informasi minimal hanya jika Anda secara sukarela menghubungi kami untuk dukungan pelanggan:",
         "list": [
-          "Data Autentikasi (Google & Apple Sign-In): Jika Anda memilih untuk masuk menggunakan Akun Google atau Apple Anda untuk mengakses fitur Pro, kami menerima informasi profil dasar yang disediakan oleh penyedia layanan, khususnya Alamat Email dan Nama Anda.",
-          "Data Dukungan Pelanggan dan Umpan Balik: Jika Anda mengirimkan keluhan, pertanyaan, atau umpan balik melalui Halaman Dukungan Dalam Aplikasi (“Contact us” page) kami, kami mengumpulkan dan menyimpan Nama, Alamat Email, dan isi pesan Anda secara aman di dalam database kami.",
-          "Tujuan Pengumpulan: Data autentikasi digunakan untuk menyinkronkan langganan Pro Anda di berbagai perangkat. Data dukungan disimpan secara eksklusif untuk menganalisis, memproses, dan menanggapi keluhan atau pertanyaan Anda melalui email dukungan resmi kami. Kami tidak menggunakan informasi ini untuk pemasaran pihak ketiga, dan kami tidak pernah menjualnya kepada pialang data (data brokers)."
+          "Data Dukungan Pelanggan dan Umpan Balik: Jika Anda mengirimkan keluhan, pertanyaan, atau umpan balik melalui halaman \"Contact us\" kami, kami mengumpulkan dan menyimpan Nama, Alamat Email, dan isi pesan Anda secara aman di dalam database kami yang aman.",
+          "Tujuan Pengumpulan: Data dukungan disimpan secara eksklusif untuk menganalisis, memproses, dan menanggapi keluhan atau pertanyaan Anda melalui email dukungan resmi kami. Kami tidak menggunakan informasi ini untuk pemasaran, dan kami tidak pernah menjualnya kepada pialang data."
         ]
       },
       {
@@ -248,32 +247,33 @@
         "content": "Untuk memastikan kejelasan mutlak, DocsGuard tidak mengumpulkan, menyimpan, atau membagikan:",
         "list": [
           "Isi dari dokumen, gambar, PDF, atau video Anda.",
-          "Informasi Identifikasi Pribadi (PII) apa pun di luar data akun dan dukungan eksplisit yang disebutkan pada Bagian 3."
+          "Informasi Identifikasi Pribadi (PII) apa pun di luar data dukungan eksplisit yang disebutkan pada Bagian 3."
         ]
       },
       {
-        "title": "5. Data yang Dikumpulkan Secara Otomatis (Layanan Pihak Ketiga)",
-        "content": "Kami menggunakan layanan pihak ketiga yang sangat terpercaya untuk mengoperasikan fungsi backend esensial Aplikasi. Layanan ini mungkin mengumpulkan data yang dianonimkan:",
+        "title": "5. Data yang Dikumpulkan oleh Layanan Pihak Ketiga (Periklanan & Diagnostik)",
+        "content": "Kami mengintegrasikan SDK pihak ketiga standar industri yang tepercaya untuk memonetisasi tingkat gratis Aplikasi dan mengelola pembayaran. Layanan ini menangani data sebagai berikut:",
         "list": [
-          "Manajemen Langganan (misalnya, Apple App Store, RevenueCat): Digunakan untuk memverifikasi riwayat pembelian dan tingkat langganan Anda saat ini.",
-          "Analitik & Laporan Kerusakan (misalnya, Firebase / Apple App Analytics): Jika Anda memberikan izin (opt-in) melalui pengaturan perangkat Anda, kami menerima log kerusakan anonim (model perangkat, versi OS, waktu kerusakan) untuk membantu kami memperbaiki bug dan meningkatkan kinerja Aplikasi."
+          "Manajemen Langganan (Apple App Store / RevenueCat): Digunakan dengan aman untuk memverifikasi riwayat pembelian Anda dan memvalidasi tingkat langganan Anda saat ini. Data ini tidak ditautkan dengan identitas dunia nyata Anda.",
+          "Periklanan (Google AdMob): Untuk mendukung fitur gratis kami, Aplikasi menampilkan iklan yang disajikan oleh Google AdMob. AdMob dapat mengumpulkan dan menggunakan pengenal perangkat (seperti iOS Advertising Identifier atau IDFA) dan data penggunaan (seperti interaksi iklan) untuk menayangkan iklan yang dipersonalisasi, mengukur kinerja iklan, dan mencegah penipuan. Pelacakan ini hanya terjadi jika Anda secara eksplisit memberikan izin melalui konfirmasi App Tracking Transparency iOS.",
+          "Diagnostik Native (Apple App Analytics): Kami tidak menggunakan SDK analitik pihak ketiga atau pelaporan kerusakan pihak ketiga (seperti Firebase). Kami hanya menerima log kerusakan anonim dan metrik kinerja agregat yang disediakan secara native oleh Apple jika Anda telah memilih untuk membagikan data diagnostik dengan pengembang melalui pengaturan perangkat iOS Anda."
         ]
       },
       {
         "title": "6. Langganan dan Pemrosesan Pembayaran",
-        "content": "Semua transaksi keuangan ditangani secara aman dan langsung oleh Apple App Store. DocsGuard tidak memproses, menyimpan, atau memiliki akses ke informasi pembayaran, nomor kartu kredit, atau alamat penagihan Anda. Dengan masuk menggunakan Akun Google atau Apple Anda, kami menautkan ID pengguna anonim yang aman ke tanda terima pembelian Anda, memungkinkan Anda memulihkan langganan Anda di perangkat baru dengan lancar."
+        "content": "Semua transaksi keuangan ditangani secara aman dan langsung oleh Apple App Store. DocsGuard tidak memproses, menyimpan, atau memiliki akses ke informasi pembayaran, nomor kartu kredit, atau alamat penagihan Anda. Karena DocsGuard tidak memerlukan akun pengguna, semua pembelian langganan, akses premium, dan pemulihan pembelian diikat secara ketat dan langsung ke Apple ID pribadi Anda. Anda dapat memulihkan pembelian Anda dengan lancar di perangkat baru menggunakan Apple ID yang terkait dengan transaksi asli."
       },
       {
-        "title": "7. Retensi Data dan Penghapusan Akun",
-        "content": "Kami menyimpan informasi akun dasar dan riwayat dukungan Anda hanya selama diperlukan untuk memenuhi tujuan yang diuraikan dalam kebijakan ini.",
+        "title": "7. Retensi Data",
+        "content": "Karena kami tidak memiliki akun pengguna, tidak ada data profil untuk disimpan. Kami hanya menyimpan riwayat dukungan Anda selama diperlukan untuk memenuhi tujuan yang diuraikan dalam kebijakan ini.",
         "list": [
-          "Hak Anda untuk Menghapus: Anda memiliki hak untuk sepenuhnya menghapus akun DocsGuard Anda dan semua data terkait (termasuk riwayat dukungan Anda di database kami) kapan saja. Anda dapat melakukannya langsung di dalam Aplikasi dengan menavigasi ke Settings > Account > Delete Account (Pengaturan > Akun > Hapus Akun).",
-          "Konsekuensi Penghapusan: Setelah penghapusan akun, alamat email, catatan autentikasi, dan pesan dukungan yang Anda kirimkan akan dihapus secara permanen dari database kami. Harap dicatat bahwa menghapus akun Anda tidak secara otomatis membatalkan langganan App Store yang aktif; Anda harus mengelola dan membatalkannya secara langsung melalui pengaturan toko (store) di perangkat Anda."
+          "Hak Anda untuk Menghapus: Anda memiliki hak untuk meminta penghapusan lengkap dari pesan dukungan yang dikirimkan dan email kontak Anda dari database kami kapan saja.",
+          "Manajemen Langganan: Harap dicatat bahwa menghapus riwayat dukungan Anda dengan kami tidak secara otomatis membatalkan langganan App Store yang aktif; Anda harus mengelola dan membatalkannya secara langsung melalui pengaturan toko Apple ID Anda."
         ]
       },
       {
         "title": "8. Hak Pengguna (Kepatuhan GDPR & CCPA)",
-        "content": "Berdasarkan General Data Protection Regulation (GDPR) dan California Consumer Privacy Act (CCPA), pengguna memiliki hak untuk meminta akses, modifikasi, atau penghapusan data mereka. Karena DocsGuard beroperasi secara lokal dan tidak menyimpan file Anda di server kami, hak Anda untuk menghapus file sepenuhnya berada di bawah kendali Anda. Untuk menghapus semua dokumen Anda yang terkait dengan DocsGuard, cukup hapus file tersebut dari perangkat Anda atau uninstall (copot pemasangan) Aplikasi. Untuk penghapusan data akun dan dukungan Anda, silakan merujuk ke Bagian 7."
+        "content": "Berdasarkan General Data Protection Regulation (GDPR) dan California Consumer Privacy Act (CCPA), pengguna memiliki hak untuk meminta akses, modifikasi, atau penghapusan data mereka. Karena DocsGuard beroperasi secara lokal dan tidak menyimpan file Anda di server kami, hak Anda untuk menghapus file sepenuhnya berada di bawah kendali Anda. Untuk menghapus semua dokumen Anda yang terkait dengan DocsGuard, cukup hapus file tersebut dari perangkat Anda atau copot pemasangan (uninstall) Aplikasi. Untuk penghapusan data dukungan Anda, silakan merujuk ke Bagian 7."
       },
       {
         "title": "9. Privasi Anak-Anak",
@@ -281,11 +281,11 @@
       },
       {
         "title": "10. Perubahan pada Kebijakan Privasi Ini",
-        "content": "Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk mencerminkan perubahan pada praktik, teknologi, atau persyaratan hukum kami. Kebijakan yang diperbarui akan dapat diakses melalui menu pengaturan Aplikasi."
+        "content": "Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk mencerminkan perubahan pada praktik, teknologi, atau persyaratan hukum kami. Kebijakan yang diperbarui akan dapat diakses melalui pengaturan Aplikasi."
       },
       {
         "title": "11. Hubungi Kami",
-        "content": "Jika Anda memiliki pertanyaan, kekhawatiran, atau permintaan mengenai Kebijakan Privasi ini atau bagaimana DocsGuard handles your privacy, silakan hubungi kami secara langsung melalui Halaman Dukungan Dalam Aplikasi (“Contact us” page) yang terletak di dalam menu pengaturan Aplikasi. Setelah Anda mengirimkan pertanyaan Anda, tim dukungan resmi kami akan meninjau kasus Anda dan membalasnya langsung ke alamat email yang Anda berikan di dalam formulir tersebut."
+        "content": "Jika Anda memiliki pertanyaan, kekhawatiran, atau permintaan mengenai Kebijakan Privasi ini atau bagaimana DocsGuard menangani privasi Anda, silakan hubungi kami secara langsung melalui halaman \"Contact us\" yang terletak di dalam Aplikasi. Setelah Anda mengirimkan pertanyaan Anda, tim dukungan kami akan meninjau kasus Anda dan merespons langsung ke alamat email yang Anda berikan."
       }
     ]
   },

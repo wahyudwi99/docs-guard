@@ -214,76 +214,76 @@
   "privacy": {
     "title": "プライバシーポリシー",
     "back_button": "戻る",
-    "last_updated": "最終更新日: 2026年6月12日",
-    "hero_title": "DocsGuard プライバシーポリシー",
-    "hero_subtitle": "私たちは、お客様の絶対的なプライバシーを保護し、ドキュメントの盤石なセキュリティを確保することをお約束します。",
-    "effective_date": "発効日: 2026年6月12日",
+    "last_updated": "Last Updated: July 12, 2026",
+    "hero_title": "Privacy Policy for DocsGuard",
+    "hero_subtitle": "We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents.",
+    "effective_date": "Effective Date: July 12, 2026",
     "sections": [
       {
-        "title": "1. はじめに",
-        "content": "DocsGuardへようこそ。私たちは、お客様の絶対的なプライバシーを保護し、ドキュメントの盤石なセキュリティを確保することをお約束します。このプライバシーポリシーは、お客様が当社のモバイルアプリケーション（以下「DocsGuard」または「本アプリ」）を使用する際の情報の取り扱いについて説明するものです。"
+        "title": "1. Introduction",
+        "content": "Welcome to DocsGuard. We are committed to protecting your absolute privacy and ensuring the unbreakable security of your documents. This Privacy Policy explains how your information is handled when you use our mobile application (\"DocsGuard\" or the \"App\")."
       },
       {
-        "title": "2. 基本原則：ゼロ知識とローカル処理",
-        "content": "当社の根本的な理念は、お客様のデータはお客様自身にのみ帰属するというものです。DocsGuardは、厳格なローカル処理アーキテクチャで構築されています。",
+        "title": "2. The Core Principle: Zero-Knowledge & Local Processing",
+        "content": "Our fundamental philosophy is that your data belongs exclusively to you. DocsGuard is engineered with a strictly local-processing architecture.",
         "list": [
-          "ファイル用のクラウドサーバーなし：お客様のドキュメント、写真、ビデオをリモートサーバーにアップロード、送信、保存、または処理することはありません。",
-          "デバイス上での操作：すべてのドキュメント編集、透かし、セキュリティ機能は、お客様のデバイスのハードウェア上で完全にローカルに実行されます。",
-          "アクセスゼロ：当社の開発者、従業員、および会社は、お客様がDocsGuardを使用してインポートまたは変更したファイルに一切アクセスできません。"
+          "No Cloud Servers for Files: We do not upload, transmit, store, or process any of your documents, photos, or videos on any remote servers.",
+          "On-Device Operation: All document editing, watermarking, and security features are executed entirely locally on your device's hardware.",
+          "Zero Access: Our developers, employees, and company have absolutely zero access to the files you import or modify using DocsGuard."
         ]
       },
       {
-        "title": "3. アカウントおよびサポート管理のために収集する情報",
-        "content": "ドキュメントとファイルは厳密にローカルに保持されますが、プロサブスクリプションの管理とカスタマーサポートの提供に必要な最小限の情報を収集します。",
+        "title": "3. Information We Collect for Support Management",
+        "content": "DocsGuard operates entirely without user accounts; you do not need to register, provide an email, or log in to use the App or purchase Premium features. While your documents and files remain strictly local, we collect minimal information only if you voluntarily contact us for customer support:",
         "list": [
-          "認証データ（Google & Appleサインイン）：プロ機能にアクセスするためにGoogleまたはAppleアカウントを使用してログインすることを選択した場合、提供元から提供される基本的なプロフィール情報（具体的にはメールアドレスと名前）を受け取ります。",
-          "カスタマーサポートおよびフィードバックデータ：当社の「お問い合わせ」ページを通じて苦情、問い合わせ、またはフィードバックを送信した場合、当社はお客様の名前、メールアドレス、およびメッセージの内容を安全なデータベースに安全に収集および保存します。",
-          "収集の目的：認証データは、複数のデバイス間でプロサブスクリプションを同期するために使用されます。サポートデータは、当社の公式サポートメールを通じてお客様の苦情や問い合わせを分析、処理、および回答するためにのみ保存されます。当社は、この情報を第三者のマーケティングに使用したり、データブローカーに販売したりすることはありません。"
+          "Customer Support and Feedback Data: If you submit a complaint, inquiry, or feedback through our \"Contact us\" Page, we securely collect and store your Name, Email Address, and the contents of your message in our secure database.",
+          "Purpose of Collection: Support data is stored exclusively to analyze, process, and respond to your complaints or inquiries via our official support email. We do not use this information for marketing, nor do we ever sell it to data brokers."
         ]
       },
       {
-        "title": "4. 収集しない情報",
-        "content": "絶対的な明確さを確保するため、DocsGuardは以下の情報を収集、保存、または共有しません。",
+        "title": "4. Information We Do Not Collect",
+        "content": "To ensure absolute clarity, DocsGuard does not collect, store, or share:",
         "list": [
-          "お客様のドキュメント、画像、PDF、またはビデオの内容。",
-          "セクション3で述べた明示的なアカウントおよびサポートデータ以外の個人を特定できる情報（PII）。"
+          "The contents of your documents, images, PDFs, or videos.",
+          "Any Personally Identifiable Information (PII) beyond the explicit support data mentioned in Section 3."
         ]
       },
       {
-        "title": "5. 自動的に収集されるデータ（第三者サービス）",
-        "content": "本アプリの重要なバックエンド機能を運営するために、信頼性の高い第三者サービスを使用しています。これらのサービスは匿名化されたデータを収集する場合があります。",
+        "title": "5. Data Collected by Third-Party Services (Advertising & Diagnostics)",
+        "content": "We integrate highly trusted industry-standard third-party SDKs to monetize the free tier of the App and manage payments. These services handle data as follows:",
         "list": [
-          "サブスクリプション管理（例：Apple App Store、RevenueCat）：購入履歴と現在のサブスクリプション層を検証するために使用されます。",
-          "分析とクラッシュレポート（例：Firebase / Apple App Analytics）：デバイス設定でオプトインした場合、バグの修正とアプリのパフォーマンス向上のために匿名化されたクラッシュログ（デバイスモデル、OSバージョン、クラッシュ時間）を受け取ります。"
+          "Subscription Management (Apple App Store / RevenueCat): Used securely to verify your purchase history and validate your current subscription tier. This data is not linked to your real-world identity.",
+          "Advertising (Google AdMob): To support our free features, the App displays advertisements served by Google AdMob. AdMob may collect and use device identifiers (such as the iOS Advertising Identifier or IDFA) and usage data (such as ad interactions) to deliver personalized ads, measure ad performance, and prevent fraud. This tracking only occurs if you explicitly grant permission via the iOS App Tracking Transparency prompt.",
+          "Native Diagnostics (Apple App Analytics): We do not use third-party analytics or crash reporting SDKs (such as Firebase). We only receive anonymous, aggregate crash logs and performance metrics provided natively by Apple if you have opted-in via your iOS device settings to share diagnostic data with developers."
         ]
       },
       {
-        "title": "6. サブスクリプションと支払い処理",
-        "content": "すべての金融取引は、Apple App Storeによって安全かつ直接的に処理されます。DocsGuardは、お客様の支払い情報、クレジットカード番号、または請求先住所を処理、保存、またはアクセスすることはありません。GoogleまたはAppleアカウントでログインすることにより、安全で匿名のユーザーIDを購入レシートにリンクし、新しいデバイスでサブスクリプションをシームレスに復元できるようにします。"
+        "title": "6. Subscriptions and Payment Processing",
+        "content": "All financial transactions are handled securely and directly by the Apple App Store. DocsGuard does not process, store, or have access to your payment information, credit card numbers, or billing addresses. Because DocsGuard does not require user accounts, all subscription purchases, premium access, and purchase restorations are tied strictly and directly to your personal Apple ID. You can seamlessly restore your purchases on a new device by using the Apple ID associated with the original transaction."
       },
       {
-        "title": "7. データの保持とアカウントの削除",
-        "content": "当社は、このポリシーに概説されている目的を果たすために必要な期間のみ、お客様の基本アカウント情報とサポート履歴を保持します。",
+        "title": "7. Data Retention",
+        "content": "Because we do not have user accounts, there is no profile data to retain. We retain your support history only for as long as necessary to fulfill the purposes outlined in this policy.",
         "list": [
-          "削除する権利：お客様は、DocsGuardアカウントおよびすべての関連データ（データベース内のサポート履歴を含む）をいつでも完全に削除する権利を有します。これは、アプリ内の [設定] > [アカウント] > [アカウントを削除] から直接行うことができます。",
-          "削除の結果：アカウントを削除すると、お客様のメールアドレス、認証記録、および送信されたサポートメッセージは当社のデータベースから永久に消去されます。アカウントを削除しても、有効なApp Storeサブスクリプションは自動的にキャンセルされませんのでご注意ください。デバイスのストア設定内で直接管理およびキャンセルする必要があります。"
+          "Your Right to Delete: You have the right to request the complete deletion of your submitted support messages and contact email from our database at any time.",
+          "Subscription Management: Please note that deleting your support history with us does not automatically cancel active App Store subscriptions; you must manage and cancel those directly within your Apple ID store settings."
         ]
       },
       {
-        "title": "8. ユーザーの権利（GDPRおよびCCPA準拠）",
-        "content": "EU一般データ保護規則（GDPR）およびカリフォルニア州消費者プライバシー法（CCPA）に基づき、ユーザーは自身のデータへのアクセス、修正、または削除を要求する権利を有します。DocsGuardはローカルで動作し、サーバーにお客様のファイルを保存しないため、ファイルの消去に関する権利はお客様が完全に制御できます。DocsGuardに関連するすべてのドキュメントを削除するには、デバイスからファイルを削除するか、アプリをアンインストールするだけです。アカウントとサポートデータの削除については、セクション7を参照してください。"
+        "title": "8. User Rights (GDPR & CCPA Compliance)",
+        "content": "Under the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), users have the right to request access, modification, or deletion of their data. Because DocsGuard operates locally and does not store your files on our servers, your right to erasure of your files is completely in your control. To delete all your documents associated with DocsGuard, simply delete the files from your device or uninstall the App. For your support data deletion, please refer to Section 7."
       },
       {
-        "title": "9. お子様のプライバシー",
-        "content": "本アプリはプロフェッショナルなドキュメントセキュリティツールであり、13歳未満（またはお住まいの地域の該当する法定年齢）の方を対象としていません。当社は、お子様から個人情報を故意に収集することはありません。お子様から誤って個人データを収集したことが判明した場合は、直ちにデータベースから当該情報を削除する措置を講じます。"
+        "title": "9. Children's Privacy",
+        "content": "Our App is a professional document security tool and is not directed at individuals under the age of 13 (or the applicable legal age in your region). We do not knowingly collect any personal information from children. If we become aware that we have inadvertently collected personal data from a child, we will take immediate steps to delete such information from our databases."
       },
       {
-        "title": "10. 本プライバシーポリシーの変更",
-        "content": "当社は、当社の慣行、技術、または法的要件の変化を反映するために、このプライバシーポリシーを随時更新することがあります。更新されたポリシーは、アプリの設定内からアクセスできます。"
+        "title": "10. Changes to This Privacy Policy",
+        "content": "We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or legal requirements. The updated policy will be accessible within the App settings."
       },
       {
-        "title": "11. お問い合わせ",
-        "content": "このプライバシーポリシーやDocsGuardのプライバシーの取り扱いについてご質問、ご懸念、またはご要望がある場合は、アプリ内のページにある「お問い合わせ」ページから直接ご連絡ください。お問い合わせを送信いただくと、当社の公式サポートチームが内容を確認し、フォームに入力いただいたメールアドレスに直接回答いたします。"
+        "title": "11. Contact Us",
+        "content": "If you have any questions, concerns, or requests regarding this Privacy Policy or how DocsGuard handles your privacy, please reach out to us directly through our \"Contact us\" page located within the App. Once you submit your inquiry, our support team will review your case and respond directly to the email address you provided."
       }
     ]
   },
