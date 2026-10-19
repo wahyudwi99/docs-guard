@@ -39,7 +39,6 @@ node_modules/
 .idea/
 
 # Capacitor specific
-android/
 ios/
 
 # DocsGuard project specific (relative to the root .gitignore)

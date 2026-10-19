@@ -1,6 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
-import fs from 'fs';
-import path from 'path';
+import { loadEnvConfig } from '@next/env';
+
+loadEnvConfig(process.cwd());
 
 const config: CapacitorConfig = {
   appId: 'com.docsguard',

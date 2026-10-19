@@ -10,6 +10,18 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 import { renderPdfPageToCanvas } from "@/lib/pdf";
 import { processVideoWithCanvas } from "@/lib/videoProcessor";
 
+async function getExportAlbumIdentifier(): Promise<string | undefined> {
+  if (Capacitor.getPlatform() !== "android") return undefined;
+  const { albums } = await Media.getAlbums();
+  const existing = albums.find((album) => album.name === "DocsGuard");
+  if (existing) return existing.identifier;
+  await Media.createAlbum({ name: "DocsGuard" });
+  const { albums: updated } = await Media.getAlbums();
+  const created = updated.find((album) => album.name === "DocsGuard");
+  if (!created) throw new Error("Could not find the DocsGuard export album");
+  return created.identifier;
+}
+
 interface UseFileExportProps {
   canvases: HTMLCanvasElement[];
   watermarkText: string;
@@ -196,20 +208,24 @@ export function useFileExport({
         if (documentType === "image") {
           try {
             await Media.savePhoto({
-              path: savedFile.uri
+              path: savedFile.uri,
+              albumIdentifier: await getExportAlbumIdentifier(),
             });
             console.log("Saved to Gallery");
           } catch (err) {
             console.error("Failed to save to Gallery:", err);
+            throw err;
           }
         } else if (documentType === "video") {
           try {
             await Media.saveVideo({
-              path: savedFile.uri
+              path: savedFile.uri,
+              albumIdentifier: await getExportAlbumIdentifier(),
             });
             console.log("Saved Video to Gallery");
           } catch (err) {
             console.error("Failed to save Video to Gallery:", err);
+            throw err;
           }
         } else if (documentType === "pdf") {
           // On iOS, sometimes saving to Documents isn't enough to "see" it immediately

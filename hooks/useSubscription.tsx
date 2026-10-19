@@ -81,9 +81,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
       setLoading(true);
       if (Capacitor.isNativePlatform()) {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
-        if (Capacitor.getPlatform() === 'ios') {
-          await Purchases.configure({ apiKey: process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY || 'YOUR_REVENUECAT_IOS_KEY' });
-        }
+        const apiKey = Capacitor.getPlatform() === 'android'
+          ? process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY
+          : process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY;
+        if (!apiKey) throw new Error('RevenueCat API key is missing for this platform');
+        await Purchases.configure({ apiKey });
         
         await Purchases.addCustomerInfoUpdateListener((info) => {
           processCustomerInfo(info);

@@ -53,7 +53,9 @@ function HomeContent() {
           console.log('AdMob: Initializing...');
           
           // Step 1: Request tracking authorization for iOS
-          await AdMob.requestTrackingAuthorization();
+          if (Capacitor.getPlatform() === 'ios') {
+            await AdMob.requestTrackingAuthorization();
+          }
           
           // Step 2: Initialize AdMob
           await AdMob.initialize({
@@ -79,7 +81,9 @@ function HomeContent() {
     return new Promise(async (resolve) => {
       try {
         // Rewarded Ad Unit ID from environment (Must be provided in .env)
-        const adId = process.env.NEXT_PUBLIC_GOOGLE_ADMOB_UNIT_ID as string;
+        const adId = Capacitor.getPlatform() === 'android'
+          ? process.env.NEXT_PUBLIC_GOOGLE_ADMOB_ANDROID_UNIT_ID || 'ca-app-pub-3940256099942544/5224354917'
+          : process.env.NEXT_PUBLIC_GOOGLE_ADMOB_UNIT_ID;
         
         if (!adId) {
           console.error('AdMob: Ad Unit ID is missing in environment variables');
@@ -824,7 +828,7 @@ function HomeContent() {
                               
                               {!trialActive && (
                                 <button 
-                                  onClick={() => window.open('https://apps.apple.com/account/subscriptions', '_blank')}
+                                  onClick={() => window.open(Capacitor.getPlatform() === 'android' ? 'https://play.google.com/store/account/subscriptions' : 'https://apps.apple.com/account/subscriptions', '_blank')}
                                   className="mt-4 px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto"
                                 >
                                   <Settings2 className="h-3.5 w-3.5" />

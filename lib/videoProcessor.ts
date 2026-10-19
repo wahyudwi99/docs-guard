@@ -20,7 +20,7 @@ export async function processVideoWithCanvas(
 ): Promise<{ blob: Blob; ext: string; mimeType: string }> {
   
   // NATIVE ACCELERATED PATH (iOS/Android)
-  if (Capacitor.isNativePlatform()) {
+  if (Capacitor.isPluginAvailable('VideoWatermark')) {
     try {
       onProgress?.("Utilizing native hardware acceleration...");
       

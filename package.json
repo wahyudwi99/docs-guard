@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "cap open android",
+    "android:run": "npm run android:sync && cap run android",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:bundle": "npm run android:sync && cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.0.0",
